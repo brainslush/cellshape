@@ -1,0 +1,117 @@
+#include "ofApp.h"
+
+//--------------------------------------------------------------
+void ofApp::setup(){
+	ofBackground(200,200,200);
+
+	// create mayors
+	Grid = new grid_base(1024,1024);
+	// Create Components
+	Cell = new cell(Grid,250,250,1000);
+	Surface = new simple_surface(Grid,510);
+	Surface->create_facs(0,100,10);
+}
+
+//--------------------------------------------------------------
+void ofApp::update(){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::draw(){
+
+
+
+	std::vector<visual_base*>visualObjs;
+	Surface->obtain_visualObjs(visualObjs);
+	Cell->obtain_visualObjs(visualObjs);
+
+	for (auto& it : visualObjs) {
+
+		ofSetColor(it->get_fillColor());
+		switch (it->get_type()) {
+			case 1:
+				ofDrawLine(
+						it->get_positions().at(0),
+						it->get_positions().at(1));
+				break;
+			case 2:
+				ofDrawEllipse(
+						it->get_positions().at(0),
+						it->get_parameters().at(0),
+						it->get_parameters().at(1));
+				break;
+			case 3:
+				ofDrawRectangle(
+						it->get_positions().at(0),
+						it->get_positions().at(3).x - it->get_positions().at(0).x,
+						it->get_positions().at(3).y - it->get_positions().at(0).y);
+				break;
+			case 4:
+				ofDrawTriangle(
+						it->get_positions().at(0),
+						it->get_positions().at(1),
+						it->get_positions().at(2));
+				break;
+			case 5:
+
+				break;
+		}
+	}
+
+}
+
+//--------------------------------------------------------------
+void ofApp::keyPressed(int key){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::keyReleased(int key){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseMoved(int x, int y ){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseDragged(int x, int y, int button){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mousePressed(int x, int y, int button){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseReleased(int x, int y, int button){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseEntered(int x, int y){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseExited(int x, int y){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::windowResized(int w, int h){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::gotMessage(ofMessage msg){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo){ 
+
+}
