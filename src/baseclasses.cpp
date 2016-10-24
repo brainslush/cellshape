@@ -213,6 +213,8 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(com
 		ofVec2d vecA = posRef[i+1] - posRef[i];
 		ofVec2d vecB = posCom[0] - posRef[i];
 		double angle = vecA.angleRad(vecB);
+		if (angle < )
+		if (vecB.length() * sin(angle))
 	}
 }
 
