@@ -32,26 +32,37 @@ void ofApp::draw(){
 		switch (it->get_type()) {
 			case 1:
 				ofDrawLine(
-						it->get_positions().at(0),
-						it->get_positions().at(1));
+						it->get_positions()[0].x,
+						it->get_positions()[0].y,
+						it->get_positions()[1].x,
+						it->get_positions()[1].y
+				);
 				break;
 			case 2:
 				ofDrawEllipse(
-						it->get_positions().at(0),
-						it->get_parameters().at(0),
-						it->get_parameters().at(1));
+						it->get_positions()[0].x,
+						it->get_positions()[0].y,
+						it->get_parameters()[0],
+						it->get_parameters()[1]
+				);
 				break;
 			case 3:
 				ofDrawRectangle(
-						it->get_positions().at(0),
-						it->get_positions().at(3).x - it->get_positions().at(0).x,
-						it->get_positions().at(3).y - it->get_positions().at(0).y);
+						it->get_positions()[0].x,
+						it->get_positions()[0].y,
+						it->get_positions()[3].x - it->get_positions()[0].x,
+						it->get_positions()[3].y - it->get_positions()[0].y
+				);
 				break;
 			case 4:
 				ofDrawTriangle(
-						it->get_positions().at(0),
-						it->get_positions().at(1),
-						it->get_positions().at(2));
+						it->get_positions()[0].x,
+						it->get_positions()[0].y,
+						it->get_positions()[1].x,
+						it->get_positions()[1].y,
+						it->get_positions()[2].x,
+						it->get_positions()[2].y
+				);
 				break;
 			case 5:
 

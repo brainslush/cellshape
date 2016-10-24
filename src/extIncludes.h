@@ -18,13 +18,18 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/exponential_distribution.hpp>
+#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <limits>
 #include <cmath>
 #include <set>
+#include <utility>
+
 #include "ofColor.h"
-#include "ofPoint.h"
+//#include "ofPoint.h"
+#include "ofxGeo.h"
 #include "ofMain.h"
 
 #endif /* SRC_EXTINCLUDES_H_ */

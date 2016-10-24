@@ -2,6 +2,11 @@
 #ifndef __H_CLASSES_BASE
 #define __H_CLASSES_BASE
 
+
+#define __GRID_CIRCLE_SEGMENTS 100
+
+//typedef boost::geometry::model::d2::point_xy<double> ofVec2d;
+
 class random_base {
 	public:
 		/*
@@ -80,11 +85,12 @@ class grid_cell {
 		grid_cell();
 		virtual ~grid_cell();
 		std::set<components_base*>& get_components();
-		std::vector<components_base*> obtain_intersecting(components_base* iComponent);
+		std::vector<std::pair<components_base*,ofVec2d>> obtain_intersecting(components_base* iComponent);
 		void remove_component(components_base* iComponent);
 		void add_component(components_base* iComponent);
 	protected:
-		template<class T> T* determine_shape(unsigned iID,components_base* iComponent);
+		std::pair<components_base*,ofVec2d> obtain_intersectingCircleLine(components_base* iRef, components_base* iCom);
+		std::pair<components_base*,ofVec2d> obtain_intersectingLineLine(components_base* iRef, components_base* iCom);
 		std::set<components_base*> components;
 		typedef boost::geometry::model::point<
 				double,
@@ -130,7 +136,7 @@ class visual_base {
 		virtual ofFloatColor& get_color();
 		virtual ofFloatColor& get_fillColor();
 		virtual unsigned& get_type();
-		virtual std::vector<ofPoint>& get_positions();
+		virtual std::vector<ofVec2d>& get_positions();
 		virtual std::vector<double>& get_parameters();
 
 		virtual void set_associatedComponent(components_base* iComponent);
@@ -184,7 +190,7 @@ class components_base {
 		virtual bool& get_canMove();
 		virtual bool& get_canColide();
 
-		virtual std::vector<ofPoint>& get_positions();
+		virtual std::vector<ofVec2d>& get_positions();
 		virtual std::vector<double>& get_parameters();
 		virtual unsigned long long& get_timeStamp();
 		virtual std::vector<grid_cell*>& get_gridCells();
@@ -201,7 +207,7 @@ class components_base {
 		virtual void update_timeStamp();
 		bool canMove;
 		bool canColide;
-		std::vector<ofPoint> positions;
+		std::vector<ofVec2d> positions;
 		std::vector<double> parameters;
 		unsigned long long timeStamp;
 		visual_base* associatedVisualObj;
@@ -235,13 +241,13 @@ class crosslinker_base : public cell_base {
 		virtual ~crosslinker_base();
 
 		virtual std::set<fillament_base*>& get_connectedFillaments();
-		virtual ofPoint& get_force(unsigned long long iTimeStamp);
+		virtual ofVec2d& get_force(unsigned long long iTimeStamp);
 
 		virtual void add_connectedFillament(fillament_base* iFillament);
 		virtual void remove_connectedFillament(fillament_base* iFillament);
 	protected:
 		std::set<fillament_base*> connectedFillaments;
-		ofPoint force;
+		ofVec2d force;
 };
 class crosslinker_static : public crosslinker_base {
 	public:
@@ -269,17 +275,17 @@ class actin : public fillament_base {
 	public:
 		actin(
 				grid_base* iGrid,
-				ofPoint& iStart,
-				ofPoint& iTmVelocity,
+				ofVec2d& iStart,
+				ofVec2d& iTmVelocity,
 				double iMaxLength,
 				double iLifeTime,
 				double iStallingForce);
 		virtual ~actin();
-		virtual ofPoint& get_force(unsigned long long iTimeStamp);
+		virtual ofVec2d& get_force(unsigned long long iTimeStamp);
 		virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
 	protected:
-		ofPoint tmVelocity; // treadmilling velocity
-		ofPoint force; // current force vector in actin element
+		ofVec2d tmVelocity; // treadmilling velocity
+		ofVec2d force; // current force vector in actin element
 		double maxLength; // maximum length
 		double lifeTime; // dies after lifetime
 		double stallingForce;

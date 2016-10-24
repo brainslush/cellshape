@@ -31,9 +31,19 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>addons/ofxGeo</name>
+			<type>2</type>
+			<locationURI>/home/siegbahn/of_v0.9.4_linux64_release/addons/ofxGeo</locationURI>
+		</link>
+		<link>
 			<name>addons/ofxGui</name>
 			<type>2</type>
 			<locationURI>/home/siegbahn/of_v0.9.4_linux64_release/addons/ofxGui</locationURI>
+		</link>
+		<link>
+			<name>addons/ofxXmlSettings</name>
+			<type>2</type>
+			<locationURI>/home/siegbahn/of_v0.9.4_linux64_release/addons/ofxXmlSettings</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -141,40 +141,123 @@ grid_cell::~grid_cell() {
 std::set<components_base*>& grid_cell::get_components() {
 	return components;
 }
-template<class T> T* grid_cell::determine_shape(unsigned iID, components_base* iComponent) {
-	typedef boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> point_t;
+
+/*
+template<class T> T grid_cell::determine_shape(unsigned iID, components_base* iComponent) {
+
+	// get data
+	std::vector<ofVec2d>& positions = iComponent->get_positions();
+	std::vector<double>& parameters = iComponent->get_parameters();
+
+	// get shapes
 	switch (iComponent->get_visualObj()->get_type()) {
 		case 1: {
 			if (iID == 0) {
-				lineA.
+				boost::geometry::clear(lineA);
+				boost::geometry::append(lineA,point_t(positions[0].x,positions[0].y));
+				boost::geometry::append(lineA,point_t(positions[1].x,positions[1].y));
+				return lineA;
 			} else if (iID == 1) {
-
+				boost::geometry::clear(lineB);
+				boost::geometry::append(lineB,point_t(positions[0].x,positions[0].y));
+				boost::geometry::append(lineB,point_t(positions[1].x,positions[1].y));
+				return lineB;
 			}
 		}
 		break;
 		case 2: {
 			if (iID == 0) {
-
+				boost::geometry::clear(ringA);
+				double angle = 360/__GRID_CIRCLE_SEGMENTS;
+				for(unsigned long long i = 0; i < __GRID_CIRCLE_SEGMENTS; i++) {
+					double x = positions[0].x + parameters[0] * cos(angle * i);
+					double y = positions[0].y + parameters[0] * sin(angle * i);
+					boost::geometry::append(ringA,point_t(x,y));
+				}
+				return ringA;
 			} else if (iID == 1) {
-
+				boost::geometry::clear(ringB);
+				double angle = 360/__GRID_CIRCLE_SEGMENTS;
+				for(unsigned long long i = 0; i < __GRID_CIRCLE_SEGMENTS; i++) {
+					double x = positions[0].x + parameters[0] * cos(angle * i);
+					double y = positions[0].y + parameters[0] * sin(angle * i);
+					boost::geometry::append(ringB,point_t(x,y));
+				}
+				return ringB;
 			}
 		}
 		break;
 		case 3: {
 			if (iID == 0) {
-
+				boost::geometry::clear(boxA);
+				boost::geometry::append(boxA,point_t(positions[0].x,positions[0].y));
+				boost::geometry::append(boxA,point_t(positions[3].x,positions[3].y));
+				return(boxA);
 			} else if (iID == 1) {
-
+				boost::geometry::clear(boxB);
+				boost::geometry::append(boxB,point_t(positions[0].x,positions[0].y));
+				boost::geometry::append(boxB,point_t(positions[3].x,positions[3].y));
+				return(boxB);
 			}
 		}
 		break;
 	}
 }
-std::vector<components_base*> grid_cell::obtain_intersecting(components_base* iComponent) {
-	std::vector<components_base*> intersecting;
+*/
+
+std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(components_base* iRef, components_base* iCom) {
+	std::vector<ofVec2d>& posRef = iRef->get_positions();
+	std::vector<ofVec2d>& posCom = iCom->get_positions();
+	std::vector<double>& parCom = iRef->get_parameters();
+	for (unsigned long long i = 0; i < posRef.size() - 1; i++) {
+		ofVec2d vecA = posRef[i+1] - posRef[i];
+		ofVec2d vecB = posCom[0] - posRef[i];
+		double angle = vecA.angleRad(vecB);
+	}
+}
+
+std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingLineLine(components_base* iRef, components_base* iCom) {
+
+}
+
+std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(components_base* iComponent) {
+	std::vector<std::pair<components_base*,ofVec2d>> intersecting;
+
+	// get data of reference object
+	unsigned& typeRef = iComponent->get_visualObj()->get_type();
+	std::vector<ofVec2d>& posRef = iComponent->get_positions();
+	std::vector<double>& parRef = iComponent->get_parameters();
+
 	for (auto& it : components) {
 		if (it != iComponent) {
+			// get data of neighbor object
+			unsigned& typeCom = it->get_visualObj()->get_type();
+			std::vector<ofVec2d>& posCom = it->get_positions();
+			std::vector<double>& parCom = it->get_parameters();
 
+			// handle two circles
+			if (typeRef == typeCom && typeRef == 2) {
+				// check whether the two circles overlap
+				if (posRef[0].distance(posCom[0]) < parRef[0] + parCom[0]) {
+					ofVec2d v = posCom[0] - posRef[0];
+					v.normalize();
+					intersecting.push_back(std::make_pair(it,v));
+				}
+			} else
+			// handle circle and line like
+			if ((typeRef == 1 || typeRef == 3 || typeRef == 4) && typeCom == 2) {
+				intersecting.push_back(obtain_intersectingCircleLine(iComponent,it));
+			} else
+			if ((typeCom == 1 || typeCom == 3 || typeCom == 4) && typeRef == 2) {
+				intersecting.push_back(obtain_intersectingCircleLine(it,iComponent));
+			} else
+			// handle multiline objects
+			if (
+					(typeRef == 1 || typeRef == 3 || typeRef == 4)
+					&& (typeCom == 1 || typeCom == 3 || typeCom == 4)
+			) {
+				intersecting.push_back(obtain_intersectingLineLine(iComponent,it));
+			}
 		}
 	}
 	return intersecting;
@@ -190,19 +273,6 @@ void grid_cell::add_component(components_base* iComponent) {
  * grid_base
  ***************************/
 
-/*
-grid_base::grid_base() {
-	sideLength = 1;
-	resolution = 1000;
-	for(unsigned long long i = 0; i < resolution; i++) {
-		std::vector<grid_cell> temp;
-		for(unsigned long long j = 0; j < resolution; j++) {
-			temp.push_back(grid_cell());
-		}
-		cells.push_back(temp);
-	}
-}
-*/
 grid_base::grid_base(unsigned long long iResolution, double iSideLength) {
 	sideLength = iSideLength;
 	resolution = iResolution;
@@ -237,8 +307,8 @@ void grid_base::update_component(components_base* iComponent) {
 	std::vector<grid_cell*> assignedCells;
 	switch (iComponent->get_visualObj()->get_type()) {
 		case 1: {
-			const ofPoint& posA = iComponent->get_positions().at(0);
-			const ofPoint& posB = iComponent->get_positions().at(1);
+			const ofVec2d& posA = iComponent->get_positions()[0];
+			const ofVec2d& posB = iComponent->get_positions()[1];
 
 			// get slope
 			double m = std::numeric_limits<double>::infinity();
@@ -249,8 +319,8 @@ void grid_base::update_component(components_base* iComponent) {
 			if (m < std::numeric_limits<double>::max()) {
 				// get f(0)
 				double f0 = posA.y - m * posA.x;
-				double xMin = min(posA.x,posB.x);
-				double xMax = max(posA.x,posB.x);
+				double xMin = std::min(posA.x,posB.x);
+				double xMax = std::max(posA.x,posB.x);
 				while (xMin < xMax) {
 					assignedCells.push_back(&(cells
 							[floor(xMin / cellLength)]
@@ -258,8 +328,8 @@ void grid_base::update_component(components_base* iComponent) {
 					xMin += cellLength;
 				}
 			} else {
-				double yMin = min(posA.y,posB.y);
-				double yMax = max(posA.y,posB.y);
+				double yMin = std::min(posA.y,posB.y);
+				double yMax = std::max(posA.y,posB.y);
 				unsigned long long x = floor(posA.x / cellLength);
 				while (yMin < yMax) {
 					assignedCells.push_back(&cells[x][floor(yMin / cellLength)]);
@@ -270,9 +340,9 @@ void grid_base::update_component(components_base* iComponent) {
 		break;
 		case 2: {
 			// get position and parameters
-			const ofPoint& pos = iComponent->get_positions().at(0);
-			const double& a = iComponent->get_parameters().at(0);
-			const double& b = iComponent->get_parameters().at(1);
+			const ofVec2d& pos = iComponent->get_positions()[0];
+			const double& a = iComponent->get_parameters()[0];
+			const double& b = iComponent->get_parameters()[1];
 			// get lowest x
 			double xMin = pos.x - a;
 			double xMax = pos.x + a;
@@ -294,13 +364,13 @@ void grid_base::update_component(components_base* iComponent) {
 		break;
 		case 3: {
 			// get position and parameters
-			ofPoint& posA = iComponent->get_positions().at(0);
-			ofPoint& posB = iComponent->get_positions().at(1);
+			ofVec2d& posA = iComponent->get_positions()[0];
+			ofVec2d& posB = iComponent->get_positions()[1];
 			// get lowest and largest x and y
-			double xMin = min(posA.x,posB.x);
-			double xMax = max(posA.x,posB.x);
-			double yMin = min(posA.y,posB.y);
-			double yMax = max(posA.y,posB.y);
+			double xMin = std::min(posA.x,posB.x);
+			double xMax = std::max(posA.x,posB.x);
+			double yMin = std::min(posA.y,posB.y);
+			double yMax = std::max(posA.y,posB.y);
 			// get grid cells
 			unsigned long long xA = floor(xMin / cellLength);
 			unsigned long long xB = floor(xMax / cellLength);
@@ -364,7 +434,7 @@ ofFloatColor& visual_base::get_fillColor() {
 unsigned& visual_base::get_type() {
 	return type;
 }
-std::vector<ofPoint>& visual_base::get_positions() {
+std::vector<ofVec2d>& visual_base::get_positions() {
 	return associatedComponent->get_positions();
 }
 std::vector<double>& visual_base::get_parameters() {
@@ -462,7 +532,7 @@ bool& components_base::get_canMove() {
 bool& components_base::get_canColide() {
 	return canColide;
 }
-std::vector<ofPoint>& components_base::get_positions() {
+std::vector<ofVec2d>& components_base::get_positions() {
 	return positions;
 }
 std::vector<double>& components_base::get_parameters() {
@@ -532,7 +602,7 @@ matrix_base::~matrix_base(){
 crosslinker_base::crosslinker_base(grid_base* iGrid): cell_base(iGrid) {
 	canColide = false;
 	canMove = true;
-	force = ofPoint(0,0);
+	force = ofVec2d(0,0);
 };
 crosslinker_base::~crosslinker_base() {
 
@@ -540,7 +610,7 @@ crosslinker_base::~crosslinker_base() {
 std::set<fillament_base*>& crosslinker_base::get_connectedFillaments() {
 	return connectedFillaments;
 }
-ofPoint& crosslinker_base::get_force(unsigned long long iTimeStamp) {
+ofVec2d& crosslinker_base::get_force(unsigned long long iTimeStamp) {
 	if (timeStamp != iTimeStamp) {
 		return force;
 	} else {
@@ -567,10 +637,10 @@ fillament_base::~fillament_base(){
 	delete associatedVisualObj;
 }
 void fillament_base::set_positions(double iX1, double iY1, double iX2, double iY2){
-	positions.at(0).x = iX1;
-	positions.at(0).y = iY1;
-	positions.at(1).x = iX2;
-	positions.at(1).y = iY2;
+	positions[0].x = iX1;
+	positions[0].y = iY1;
+	positions[1].x = iX2;
+	positions[1].y = iY2;
 }
 void fillament_base::add_connectedCrosslinker(crosslinker_base* iCrosslinker){
 	connectedCrosslinkers.insert(iCrosslinker);
@@ -588,8 +658,8 @@ void fillament_base::make_timeStep(double &iTime){
 
 actin::actin(
 		grid_base* iGrid,
-		ofPoint& iStart,
-		ofPoint& iTmVelocity,
+		ofVec2d& iStart,
+		ofVec2d& iTmVelocity,
 		double iMaxLength,
 		double iLifeTime,
 		double iStallingForce
@@ -608,11 +678,11 @@ actin::~actin() {
 		delete tail;
 	}
 }
-ofPoint& actin::get_force(unsigned long long iTimeStamp) {
+ofVec2d& actin::get_force(unsigned long long iTimeStamp) {
 	if(timeStamp == iTimeStamp) {
 		return force;
 	} else {
-		force = ofPoint();
+		force = ofVec2d();
 		if(tail != NULL){
 			force += tail->get_force(iTimeStamp);
 		}
@@ -627,7 +697,7 @@ void actin::make_timeStep(double iTime, unsigned long long iTimeStamp) {
 	// search and update for possible contacts or splittings
 
 	// get forces
-	ofPoint force;
+	ofVec2d force;
 	for(auto& it : connectedCrosslinkers){
 		force += it->get_force(iTimeStamp);
 	}
@@ -656,8 +726,8 @@ membrane_part::membrane_part(
 		double iX2,double iY2
 ): cell_base(iGrid) {
 	positions.clear();
-	positions.push_back(ofPoint(iX1,iY1));
-	positions.push_back(ofPoint(iX2,iY2));
+	positions.push_back(ofVec2d(iX1,iY1));
+	positions.push_back(ofVec2d(iX2,iY2));
 	neighbours.push_back(this);
 	neighbours.push_back(this);
 	associatedVisualObj = new visual_line(this);
@@ -671,8 +741,8 @@ void membrane_part::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 	iVisualObjs.push_back(associatedVisualObj);
 }
 void membrane_part::set_neighbours(membrane_part& iPartA,membrane_part& iPartB){
-	neighbours.at(0) = &iPartA;
-	neighbours.at(1) = &iPartB;
+	neighbours[0] = &iPartA;
+	neighbours[1] = &iPartB;
 };
 void membrane_part::make_timeStep(double iTime, unsigned long long iTimeStamp){
 
@@ -702,14 +772,14 @@ membrane_base::membrane_base(
 		));
 	};
 	for (unsigned long long i = 0; i < iResolution; i++) {
-		parts.at(i)->set_neighbours(*parts[(i-1)%iResolution],*parts[(i+1)%iResolution]);
+		parts[i]->set_neighbours(*parts[(i-1)%iResolution],*parts[(i+1)%iResolution]);
 	};
 	updatedVolume = false;
 	initialVolume = calc_currentVolume();
 };
 membrane_base::~membrane_base() {
 	for (unsigned long long i = 0; i < parts.size(); i++) {
-		delete parts.at(i);
+		delete parts[i];
 	}
 }
 
@@ -719,8 +789,8 @@ double membrane_base::calc_currentVolume() {
 		double volume = 0;
 		/* calculate 2D volume aka the area */
 		for(auto& it : parts) {
-			const ofPoint& posA = it->get_positions().at(0);
-			const ofPoint& posB = it->get_positions().at(1);
+			const ofVec2d& posA = it->get_positions()[0];
+			const ofVec2d& posB = it->get_positions()[1];
 			volume += -1 * posB.x * posA.y + posA.x * posB.y;
 		};
 		currentVolume = abs(volume * 0.5);
@@ -731,7 +801,7 @@ double membrane_base::calc_currentVolume() {
 /* */
 void membrane_base::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
 	for(unsigned long long i = 0; i < parts.size(); i++) {
-		parts.at(i)->obtain_visualObjs(oVisualComponents);
+		parts[i]->obtain_visualObjs(oVisualComponents);
 	}
 }
 
@@ -797,7 +867,7 @@ fac::fac(
 	parameters.push_back(iRadius);
 	parameters.push_back(iRadius);
 	positions.clear();
-	positions.push_back(ofPoint(iX,iY));
+	positions.push_back(ofVec2d(iX,iY));
 	associatedVisualObj = new visual_ellipse(this);
 	associatedVisualObj->set_color(1.0,0.0,0.0);
 	associatedVisualObj->set_fillColor(1.0,0.0,0.0);
@@ -814,7 +884,7 @@ void fac::set_radius(double iRadius) {
 }
 void fac::set_position(double iX, double iY) {
 	positions.clear();
-	positions.push_back(ofPoint(iX,iY));
+	positions.push_back(ofVec2d(iX,iY));
 }
 
 /***************************
@@ -824,28 +894,28 @@ void fac::set_position(double iX, double iY) {
 simple_surface::simple_surface(grid_base* iGrid, double iSideLength): matrix_base(iGrid) {
 	sideLength = iSideLength;
 	positions.clear();
-	positions.push_back(ofPoint(0,0));
-	positions.push_back(ofPoint(0,iSideLength));
-	positions.push_back(ofPoint(iSideLength,0));
-	positions.push_back(ofPoint(iSideLength,iSideLength));
+	positions.push_back(ofVec2d(0,0));
+	positions.push_back(ofVec2d(0,iSideLength));
+	positions.push_back(ofVec2d(iSideLength,0));
+	positions.push_back(ofVec2d(iSideLength,iSideLength));
 	associatedVisualObj = new visual_rectangle(this);
 	associatedVisualObj->set_fillColor(1.0,1.0,1.0);
 	associatedVisualObj->set_color(1.0,1.0,1.0);
 }
 simple_surface::~simple_surface(){
 	for (unsigned long long i = 0; i < facs.size(); i++) {
-		delete facs.at(i);
+		delete facs[i];
 	}
 }
 void simple_surface::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
 	oVisualComponents.push_back(associatedVisualObj);
 	for(unsigned long long i = 0; i < facs.size(); i++) {
-		facs.at(i)->obtain_visualObjs(oVisualComponents);
+		facs[i]->obtain_visualObjs(oVisualComponents);
 	}
 }
 void simple_surface::create_facs(unsigned iType, unsigned long long iCount, double iRadius) {
-	boost::random::uniform_real_distribution <double> rndPosX(positions.at(0).x + iRadius, positions.at(3).x - iRadius);
-	boost::random::uniform_real_distribution <double> rndPosY(positions.at(0).y + iRadius, positions.at(3).y - iRadius);
+	boost::random::uniform_real_distribution <double> rndPosX(positions[0].x + iRadius, positions[3].x - iRadius);
+	boost::random::uniform_real_distribution <double> rndPosY(positions[0].y + iRadius, positions[3].y - iRadius);
 	switch(iType) {
 		case 0: {
 			for(unsigned long long i = 0; i < iCount; i++) {
