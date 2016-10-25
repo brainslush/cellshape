@@ -115,6 +115,7 @@ class grid_base {
 		void update_component(components_base* iComponent);
 		void update_components();
 	protected:
+		bool lineSegmentIntersection();
 		std::vector<std::vector<grid_cell>> cells;
 		std::set<components_base*> components;
 		double sideLength;
@@ -369,15 +370,25 @@ class fac:public matrix_base {
 	protected:
 };
 
+class surface_border : public matrix_base {
+	public:
+		surface_border(grid_base* iGrid, simple_surface* iSurface, ofVec2d& iStart, ofVec2d& iEnd);
+		virtual ~surface_border();
+		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+	protected:
+		simple_surface* surface;
+};
+
 class simple_surface : public matrix_base {
 	public:
-		simple_surface (grid_base* iGrid,double iSideLength);
+		simple_surface(grid_base* iGrid,double iSideLength);
 		virtual ~simple_surface();
 
 		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		virtual void create_facs(unsigned iType, unsigned long long iCount, double iRadius);
 	protected:
 		double sideLength;
+		std::vector<surface_border*> borders;
 		std::vector<fac*> facs;
 };
 

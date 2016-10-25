@@ -142,100 +142,99 @@ std::set<components_base*>& grid_cell::get_components() {
 	return components;
 }
 
-/*
-template<class T> T grid_cell::determine_shape(unsigned iID, components_base* iComponent) {
-
-	// get data
-	std::vector<ofVec2d>& positions = iComponent->get_positions();
-	std::vector<double>& parameters = iComponent->get_parameters();
-
-	// get shapes
-	switch (iComponent->get_visualObj()->get_type()) {
-		case 1: {
-			if (iID == 0) {
-				boost::geometry::clear(lineA);
-				boost::geometry::append(lineA,point_t(positions[0].x,positions[0].y));
-				boost::geometry::append(lineA,point_t(positions[1].x,positions[1].y));
-				return lineA;
-			} else if (iID == 1) {
-				boost::geometry::clear(lineB);
-				boost::geometry::append(lineB,point_t(positions[0].x,positions[0].y));
-				boost::geometry::append(lineB,point_t(positions[1].x,positions[1].y));
-				return lineB;
-			}
-		}
-		break;
-		case 2: {
-			if (iID == 0) {
-				boost::geometry::clear(ringA);
-				double angle = 360/__GRID_CIRCLE_SEGMENTS;
-				for(unsigned long long i = 0; i < __GRID_CIRCLE_SEGMENTS; i++) {
-					double x = positions[0].x + parameters[0] * cos(angle * i);
-					double y = positions[0].y + parameters[0] * sin(angle * i);
-					boost::geometry::append(ringA,point_t(x,y));
-				}
-				return ringA;
-			} else if (iID == 1) {
-				boost::geometry::clear(ringB);
-				double angle = 360/__GRID_CIRCLE_SEGMENTS;
-				for(unsigned long long i = 0; i < __GRID_CIRCLE_SEGMENTS; i++) {
-					double x = positions[0].x + parameters[0] * cos(angle * i);
-					double y = positions[0].y + parameters[0] * sin(angle * i);
-					boost::geometry::append(ringB,point_t(x,y));
-				}
-				return ringB;
-			}
-		}
-		break;
-		case 3: {
-			if (iID == 0) {
-				boost::geometry::clear(boxA);
-				boost::geometry::append(boxA,point_t(positions[0].x,positions[0].y));
-				boost::geometry::append(boxA,point_t(positions[3].x,positions[3].y));
-				return(boxA);
-			} else if (iID == 1) {
-				boost::geometry::clear(boxB);
-				boost::geometry::append(boxB,point_t(positions[0].x,positions[0].y));
-				boost::geometry::append(boxB,point_t(positions[3].x,positions[3].y));
-				return(boxB);
-			}
-		}
-		break;
-	}
-}
-*/
-
 std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(components_base* iRef, components_base* iCom) {
 	std::vector<ofVec2d>& posRef = iRef->get_positions();
 	std::vector<ofVec2d>& posCom = iCom->get_positions();
 	std::vector<double>& parCom = iRef->get_parameters();
-	for (unsigned long long i = 0; i < posRef.size() - 1; i++) {
-		ofVec2d vecA = posRef[i+1] - posRef[i];
-		ofVec2d vecB = posCom[0] - posRef[i];
-		double angle = vecA.angleRad(vecB);
-		if (angle < )
-		if (vecB.length() * sin(angle))
+	ofVec2d d, f, r;
+
+	for (unsigned long long i = 0; i < posRef.size(); i++) {
+
+		d = posRef[(i+1)%posRef.size()] - posRef[i];
+		f = posRef[i] - posCom[0];
+
+		double a = d.dot(d);
+		double b = 2*f.dot(d);
+		double c = f.dot(f) - parCom[0]*parCom[0];
+		double D = b*b - 4*a*c;
+
+		if (D < 0) {
+			// no intersection
+			return std::make_pair(iRef,d);
+		} else {
+			D = sqrt(D);
+			double t1 = (-D-b)/(2*a);
+			double t2 = (D-b)/(2*a);
+
+			if ( t1 >= 0 && t1 <= 1) {
+				r = ofVec2d(posRef[i].x + t1 * d.x,posRef[i].y + t1 * d.x);
+				r -= posCom[0];
+				r.normalize();
+				return std::make_pair(iCom,r);
+			}
+			if ( t2 >= 0 && t2 <= 1) {
+				r = ofVec2d(posRef[i].x + t1 * d.x,posRef[i].y + t1 * d.x);
+				r -= posCom[0];
+				r.normalize();
+				return std::make_pair(iCom,r);
+			}
+			// no intersection
+			return std::make_pair(iRef,d);
+		}
 	}
+	return std::make_pair(iRef,posRef[0]);
 }
 
 std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingLineLine(components_base* iRef, components_base* iCom) {
+	std::vector<ofVec2d>& posRef = iRef->get_positions();
+	std::vector<ofVec2d>& posCom = iCom->get_positions();
+	ofVec2d& l1S, l1E, l2S, l2E;
+	ofVec2d diffLA, diffLB;
+	for (unsigned long long i = 0; i < posRef.size(); i++) {
+		for (unsigned long long j = 0; j < posCom.size(); j++) {
+			l1S = posRef[i];
+			l1E = posRef[(i+1)%posRef.size()];
+			l2S = posCom[j];
+			l2E = posCom[(j+1)%posCom.size()];
 
+			double compareA, compareB;
+			diffLA = l1E - l1S;
+			diffLB = l2E - l2S;
+			compareA = diffLA.x*l1S.y - diffLA.y*l1S.x;
+			compareB = diffLB.x*l2S.y - diffLB.y*l2S.x;
+			if ((
+					( ( diffLA.x*l2S.y - diffLA.y*l2S.x ) < compareA ) ^
+					( ( diffLA.x*l2E.y - diffLA.y*l2E.x ) < compareA )
+			)&&(
+					( ( diffLB.x*l1S.y - diffLB.y*l1S.x ) < compareB ) ^
+					( ( diffLB.x*l1E.y - diffLB.y*l1E.x) < compareB )
+			)) {
+				double lDetDivInv = 1 / ((diffLA.x*diffLB.y) - (diffLA.y*diffLB.x));
+				return ;
+			}
+		}
+	}
+	return
 }
 
 std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(components_base* iComponent) {
 	std::vector<std::pair<components_base*,ofVec2d>> intersecting;
+	std::pair<components_base*,ofVec2d> temp;
 
 	// get data of reference object
 	unsigned& typeRef = iComponent->get_visualObj()->get_type();
+	unsigned& typeCom;
 	std::vector<ofVec2d>& posRef = iComponent->get_positions();
+	std::vector<ofVec2d>& posCom;
 	std::vector<double>& parRef = iComponent->get_parameters();
+	std::vector<double>& parCom;
 
 	for (auto& it : components) {
 		if (it != iComponent) {
 			// get data of neighbor object
-			unsigned& typeCom = it->get_visualObj()->get_type();
-			std::vector<ofVec2d>& posCom = it->get_positions();
-			std::vector<double>& parCom = it->get_parameters();
+			typeCom = it->get_visualObj()->get_type();
+			posCom = it->get_positions();
+			parCom = it->get_parameters();
 
 			// handle two circles
 			if (typeRef == typeCom && typeRef == 2) {
@@ -248,10 +247,17 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 			} else
 			// handle circle and line like
 			if ((typeRef == 1 || typeRef == 3 || typeRef == 4) && typeCom == 2) {
-				intersecting.push_back(obtain_intersectingCircleLine(iComponent,it));
+				temp = obtain_intersectingCircleLine(iComponent,it);
+				if(temp.first != iComponent) {
+					intersecting.push_back(temp);
+				}
 			} else
 			if ((typeCom == 1 || typeCom == 3 || typeCom == 4) && typeRef == 2) {
-				intersecting.push_back(obtain_intersectingCircleLine(it,iComponent));
+				temp = obtain_intersectingCircleLine(it,iComponent);
+				if(temp.first == iComponent) {
+					temp.second = it;
+					intersecting.push_back(temp);
+				}
 			} else
 			// handle multiline objects
 			if (
@@ -890,6 +896,32 @@ void fac::set_position(double iX, double iY) {
 }
 
 /***************************
+ * surface_borders
+ ***************************/
+
+surface_border::surface_border(
+		grid_base* iGrid,
+		simple_surface* iSurface,
+		ofVec2d& iStart,
+		ofVec2d& iEnd
+): matrix_base(iGrid) {
+	surface = iSurface;
+	positions.clear();
+	positions.push_back(iStart);
+	positions.push_back(iEnd);
+	associatedVisualObj = new visual_line(this);
+	associatedVisualObj->set_fillColor(1.0,1.0,1.0);
+	associatedVisualObj->set_color(1.0,1.0,1.0);
+	//grid = iGrid;
+}
+surface_border::~surface_border() {
+	delete associatedVisualObj;
+}
+void surface_border::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
+	oVisualComponents.push_back(associatedVisualObj);
+}
+
+/***************************
  * simple surface
  ***************************/
 
@@ -898,29 +930,35 @@ simple_surface::simple_surface(grid_base* iGrid, double iSideLength): matrix_bas
 	positions.clear();
 	positions.push_back(ofVec2d(0,0));
 	positions.push_back(ofVec2d(0,iSideLength));
-	positions.push_back(ofVec2d(iSideLength,0));
 	positions.push_back(ofVec2d(iSideLength,iSideLength));
-	associatedVisualObj = new visual_rectangle(this);
-	associatedVisualObj->set_fillColor(1.0,1.0,1.0);
-	associatedVisualObj->set_color(1.0,1.0,1.0);
+	positions.push_back(ofVec2d(iSideLength,0));
+	borders.push_back(new surface_border(iGrid,this,positions[0],positions[1]));
+	borders.push_back(new surface_border(iGrid,this,positions[1],positions[2]));
+	borders.push_back(new surface_border(iGrid,this,positions[2],positions[3]));
+	borders.push_back(new surface_border(iGrid,this,positions[3],positions[0]));
 }
 simple_surface::~simple_surface(){
-	for (unsigned long long i = 0; i < facs.size(); i++) {
-		delete facs[i];
+	for (auto& it : borders) {
+		delete it;
+	}
+	for (auto& it : facs) {
+		delete it;
 	}
 }
 void simple_surface::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
-	oVisualComponents.push_back(associatedVisualObj);
-	for(unsigned long long i = 0; i < facs.size(); i++) {
-		facs[i]->obtain_visualObjs(oVisualComponents);
+	for (auto& it : borders) {
+		it->obtain_visualObjs(oVisualComponents);
+	}
+	for (auto& it : facs) {
+		it->obtain_visualObjs(oVisualComponents);
 	}
 }
 void simple_surface::create_facs(unsigned iType, unsigned long long iCount, double iRadius) {
-	boost::random::uniform_real_distribution <double> rndPosX(positions[0].x + iRadius, positions[3].x - iRadius);
-	boost::random::uniform_real_distribution <double> rndPosY(positions[0].y + iRadius, positions[3].y - iRadius);
+	boost::random::uniform_real_distribution <double> rndPosX(positions[0].x + iRadius, positions[2].x - iRadius);
+	boost::random::uniform_real_distribution <double> rndPosY(positions[0].y + iRadius, positions[2].y - iRadius);
 	switch(iType) {
 		case 0: {
-			for(unsigned long long i = 0; i < iCount; i++) {
+			for (unsigned long long i = 0; i < iCount; i++) {
 				facs.push_back(new fac(grid,iRadius,rndPosX(RandomGen),rndPosY(RandomGen)));
 			}
 		}
