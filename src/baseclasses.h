@@ -86,6 +86,7 @@ class grid_cell {
 		virtual ~grid_cell();
 		std::set<components_base*>& get_components();
 		std::vector<std::pair<components_base*,ofVec2d>> obtain_intersecting(components_base* iComponent);
+		void update_intersecting();
 		void remove_component(components_base* iComponent);
 		void add_component(components_base* iComponent);
 	protected:
@@ -196,10 +197,12 @@ class components_base {
 		virtual unsigned long long& get_timeStamp();
 		virtual std::vector<grid_cell*>& get_gridCells();
 		virtual visual_base* get_visualObj();
+		virtual bool get_intersectingChecked(grid_cell* iGridCell);
 
 		virtual void set_canMove(bool iCanMove);
 		virtual void set_canColide(bool iCanColide);
-		virtual void set_gridCells(std::vector<grid_cell*> iGridCells);
+		virtual void set_gridCells(std::vector<std::pair<grid_cell*,bool>> iGridCells);
+		virtual void set_intersectingChecked(grid_cell* iGridCell);
 
 		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		virtual void add_ignoreColide(components_base* iIgnore);
@@ -213,7 +216,7 @@ class components_base {
 		unsigned long long timeStamp;
 		visual_base* associatedVisualObj;
 		std::set<components_base*> ignoreColide;
-		std::vector<grid_cell*> gridCells;
+		std::vector<std::pair<grid_cell*,bool>> gridCells;
 		grid_base* grid;
 };
 
@@ -369,10 +372,10 @@ class fac:public matrix_base {
 		virtual void set_position(double iX, double iY);
 	protected:
 };
-
+class simple_surface;
 class surface_border : public matrix_base {
 	public:
-		surface_border(grid_base* iGrid, simple_surface* iSurface, ofVec2d& iStart, ofVec2d& iEnd);
+		surface_border(grid_base* iGrid, simple_surface* iSurface, ofVec2d iStart, ofVec2d iEnd);
 		virtual ~surface_border();
 		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 	protected:

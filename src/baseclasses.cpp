@@ -146,41 +146,38 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(com
 	std::vector<ofVec2d>& posRef = iRef->get_positions();
 	std::vector<ofVec2d>& posCom = iCom->get_positions();
 	std::vector<double>& parCom = iRef->get_parameters();
-	ofVec2d d, f, r;
+	ofVec2d r;
 
-	for (unsigned long long i = 0; i < posRef.size(); i++) {
+	ofVec2d d = posRef[1] - posRef[0];
+	ofVec2d f = posRef[1] - posCom[0];
 
-		d = posRef[(i+1)%posRef.size()] - posRef[i];
-		f = posRef[i] - posCom[0];
+	double a = d.dot(d);
+	double b = 2*f.dot(d);
+	double c = f.dot(f) - parCom[0]*parCom[0];
+	double D = b*b - 4*a*c;
 
-		double a = d.dot(d);
-		double b = 2*f.dot(d);
-		double c = f.dot(f) - parCom[0]*parCom[0];
-		double D = b*b - 4*a*c;
+	if (D < 0) {
+		// no intersection
+		return std::make_pair(iRef,d);
+	} else {
+		D = sqrt(D);
+		double t1 = (-D-b)/(2*a);
+		double t2 = (D-b)/(2*a);
 
-		if (D < 0) {
-			// no intersection
-			return std::make_pair(iRef,d);
-		} else {
-			D = sqrt(D);
-			double t1 = (-D-b)/(2*a);
-			double t2 = (D-b)/(2*a);
-
-			if ( t1 >= 0 && t1 <= 1) {
-				r = ofVec2d(posRef[i].x + t1 * d.x,posRef[i].y + t1 * d.x);
-				r -= posCom[0];
-				r.normalize();
-				return std::make_pair(iCom,r);
-			}
-			if ( t2 >= 0 && t2 <= 1) {
-				r = ofVec2d(posRef[i].x + t1 * d.x,posRef[i].y + t1 * d.x);
-				r -= posCom[0];
-				r.normalize();
-				return std::make_pair(iCom,r);
-			}
-			// no intersection
-			return std::make_pair(iRef,d);
+		if ( t1 >= 0 && t1 <= 1) {
+			r = ofVec2d(posRef[0].x + t1 * d.x,posRef[0].y + t1 * d.x);
+			r -= posCom[0];
+			r.normalize();
+			return std::make_pair(iCom,r);
 		}
+		if ( t2 >= 0 && t2 <= 1) {
+			r = ofVec2d(posRef[0].x + t1 * d.x,posRef[0].y + t1 * d.x);
+			r -= posCom[0];
+			r.normalize();
+			return std::make_pair(iCom,r);
+		}
+		// no intersection
+		return std::make_pair(iRef,d);
 	}
 	return std::make_pair(iRef,posRef[0]);
 }
@@ -188,33 +185,29 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(com
 std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingLineLine(components_base* iRef, components_base* iCom) {
 	std::vector<ofVec2d>& posRef = iRef->get_positions();
 	std::vector<ofVec2d>& posCom = iCom->get_positions();
-	ofVec2d& l1S, l1E, l2S, l2E;
-	ofVec2d diffLA, diffLB;
-	for (unsigned long long i = 0; i < posRef.size(); i++) {
-		for (unsigned long long j = 0; j < posCom.size(); j++) {
-			l1S = posRef[i];
-			l1E = posRef[(i+1)%posRef.size()];
-			l2S = posCom[j];
-			l2E = posCom[(j+1)%posCom.size()];
 
-			double compareA, compareB;
-			diffLA = l1E - l1S;
-			diffLB = l2E - l2S;
-			compareA = diffLA.x*l1S.y - diffLA.y*l1S.x;
-			compareB = diffLB.x*l2S.y - diffLB.y*l2S.x;
-			if ((
-					( ( diffLA.x*l2S.y - diffLA.y*l2S.x ) < compareA ) ^
-					( ( diffLA.x*l2E.y - diffLA.y*l2E.x ) < compareA )
-			)&&(
-					( ( diffLB.x*l1S.y - diffLB.y*l1S.x ) < compareB ) ^
-					( ( diffLB.x*l1E.y - diffLB.y*l1E.x) < compareB )
-			)) {
-				double lDetDivInv = 1 / ((diffLA.x*diffLB.y) - (diffLA.y*diffLB.x));
-				return ;
-			}
-		}
+	ofVec2d& l1S = posRef[0];
+	ofVec2d& l1E = posRef[1];
+	ofVec2d& l2S = posCom[0];
+	ofVec2d& l2E = posCom[1];
+
+	double compareA, compareB;
+	ofVec2d diffLA = l1E - l1S;
+	ofVec2d diffLB = l2E - l2S;
+	compareA = diffLA.x*l1S.y - diffLA.y*l1S.x;
+	compareB = diffLB.x*l2S.y - diffLB.y*l2S.x;
+	if ((
+			( ( diffLA.x*l2S.y - diffLA.y*l2S.x ) < compareA ) ^
+			( ( diffLA.x*l2E.y - diffLA.y*l2E.x ) < compareA )
+	)&&(
+			( ( diffLB.x*l1S.y - diffLB.y*l1S.x ) < compareB ) ^
+			( ( diffLB.x*l1E.y - diffLB.y*l1E.x) < compareB )
+	)) {
+		//double lDetDivInv = 1 / ((diffLA.x*diffLB.y) - (diffLA.y*diffLB.x));
+		diffLB.normalize();
+		return std::make_pair(iCom,diffLB);
 	}
-	return
+	return std::make_pair(iRef,l1S);
 }
 
 std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(components_base* iComponent) {
@@ -223,18 +216,15 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 
 	// get data of reference object
 	unsigned& typeRef = iComponent->get_visualObj()->get_type();
-	unsigned& typeCom;
 	std::vector<ofVec2d>& posRef = iComponent->get_positions();
-	std::vector<ofVec2d>& posCom;
 	std::vector<double>& parRef = iComponent->get_parameters();
-	std::vector<double>& parCom;
 
 	for (auto& it : components) {
 		if (it != iComponent) {
 			// get data of neighbor object
-			typeCom = it->get_visualObj()->get_type();
-			posCom = it->get_positions();
-			parCom = it->get_parameters();
+			unsigned& typeCom = it->get_visualObj()->get_type();
+			std::vector<ofVec2d>& posCom = it->get_positions();
+			std::vector<double>& parCom = it->get_parameters();
 
 			// handle two circles
 			if (typeRef == typeCom && typeRef == 2) {
@@ -255,7 +245,7 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 			if ((typeCom == 1 || typeCom == 3 || typeCom == 4) && typeRef == 2) {
 				temp = obtain_intersectingCircleLine(it,iComponent);
 				if(temp.first == iComponent) {
-					temp.second = it;
+					temp.first = it;
 					intersecting.push_back(temp);
 				}
 			} else
@@ -270,6 +260,15 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 	}
 	return intersecting;
 }
+
+void grid_cell::update_intersecting() {
+	for (auto& it : components) {
+		for (auto& it : ) {
+
+		}
+	}
+}
+
 void grid_cell::remove_component(components_base* iComponent) {
 	components.erase(iComponent);
 }
@@ -312,7 +311,7 @@ void grid_base::update_component(components_base* iComponent) {
 		it->remove_component(iComponent);
 	}
 	//assign new cells
-	std::vector<grid_cell*> assignedCells;
+	std::vector<std::pair<grid_cell*,bool>> assignedCells;
 	switch (iComponent->get_visualObj()->get_type()) {
 		case 1: {
 			const ofVec2d& posA = iComponent->get_positions()[0];
@@ -330,9 +329,12 @@ void grid_base::update_component(components_base* iComponent) {
 				double xMin = std::min(posA.x,posB.x);
 				double xMax = std::max(posA.x,posB.x);
 				while (xMin < xMax) {
-					assignedCells.push_back(&(cells
+					assignedCells.push_back(std::make_pair(
+							&(cells
 							[floor(xMin / cellLength)]
-							[floor((m * xMin + f0) / cellLength)]));
+							[floor((m * xMin + f0) / cellLength)]),
+							false
+					));
 					xMin += cellLength;
 				}
 			} else {
@@ -340,7 +342,10 @@ void grid_base::update_component(components_base* iComponent) {
 				double yMax = std::max(posA.y,posB.y);
 				unsigned long long x = floor(posA.x / cellLength);
 				while (yMin < yMax) {
-					assignedCells.push_back(&cells[x][floor(yMin / cellLength)]);
+					assignedCells.push_back(std::make_pair(
+							&cells[x][floor(yMin / cellLength)],
+							false
+					));
 					yMin += cellLength;
 				}
 			}
@@ -361,10 +366,19 @@ void grid_base::update_component(components_base* iComponent) {
 				unsigned long long yB = floor((-y + pos.y) / cellLength);
 				unsigned long long x = floor(xMin / cellLength);
 				if (y != 0) {
-					assignedCells.push_back(&cells[x][yA]);
-					assignedCells.push_back(&cells[x][yB]);
+					assignedCells.push_back(std::make_pair(
+							&cells[x][yA],
+							false
+					));
+					assignedCells.push_back(std::make_pair(
+							&cells[x][yB],
+							false
+					));
 				} else {
-					assignedCells.push_back(&cells[x][yA]);
+					assignedCells.push_back(std::make_pair(
+							&cells[x][yA],
+							false
+					));
 				}
 				xMin += cellLength;
 			}
@@ -386,20 +400,27 @@ void grid_base::update_component(components_base* iComponent) {
 			unsigned long long yB = floor(yMax / cellLength);
 			while (xMin < xMax) {
 				unsigned long long x = floor(xMin / cellLength);
-				assignedCells.push_back(&cells[x][yA]);
-				assignedCells.push_back(&cells[x][yB]);
+				assignedCells.push_back(std::make_pair(
+						&cells[x][yA],
+						false
+				));
+				assignedCells.push_back(std::make_pair(
+						&cells[x][yB],
+						false
+				));
 				xMin += cellLength;
 			}
 			while (yMin < yMax) {
 				unsigned long long y = floor(yMin / cellLength);
-				assignedCells.push_back(&cells[xA][y]);
-				assignedCells.push_back(&cells[xB][y]);
+				assignedCells.push_back(std::make_pair(
+						&cells[xA][y],false
+				));
+				assignedCells.push_back(std::make_pair(
+						&cells[xB][y],
+						false
+				));
 				yMin += cellLength;
 			}
-		}
-		break;
-		case 4: {
-
 		}
 		break;
 	}
@@ -555,7 +576,15 @@ std::vector<grid_cell*>& components_base::get_gridCells() {
 visual_base* components_base::get_visualObj() {
 	return associatedVisualObj;
 }
-void components_base::set_gridCells(std::vector<grid_cell*> iGridCells) {
+bool components_base::get_intersectingChecked(grid_cell* iGridCell) {
+	for (auto& it : gridCells) {
+		if (it.first == iGridCell) {
+			return it.second;
+		}
+	}
+	return false;
+}
+void components_base::set_gridCells(std::vector<std::pair<grid_cell*,bool>> iGridCells) {
 	gridCells = iGridCells;
 }
 void components_base::set_canMove(bool iCanMove) {
@@ -563,6 +592,13 @@ void components_base::set_canMove(bool iCanMove) {
 }
 void components_base::set_canColide(bool iCanColide) {
 	canColide = iCanColide;
+}
+void components_base::set_intersectingChecked(grid_cell* iGridCell) {
+	for (auto& it : gridCells) {
+		if (it.first == iGridCell) {
+			it.second = true;
+		}
+	}
 }
 void components_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 	/*do nothing*/
@@ -902,8 +938,8 @@ void fac::set_position(double iX, double iY) {
 surface_border::surface_border(
 		grid_base* iGrid,
 		simple_surface* iSurface,
-		ofVec2d& iStart,
-		ofVec2d& iEnd
+		ofVec2d iStart,
+		ofVec2d iEnd
 ): matrix_base(iGrid) {
 	surface = iSurface;
 	positions.clear();
