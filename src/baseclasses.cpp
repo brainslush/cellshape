@@ -263,8 +263,10 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 
 void grid_cell::update_intersecting() {
 	for (auto& it : components) {
-		for (auto& it : ) {
+		for (auto& check : components) {
+			if (!check->get_intersectingChecked(this)) {
 
+			}
 		}
 	}
 }
