@@ -203,59 +203,58 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingLineLine(compo
 			( ( diffLB.x*l1S.y - diffLB.y*l1S.x ) < compareB ) ^
 			( ( diffLB.x*l1E.y - diffLB.y*l1E.x) < compareB )
 	)) {
-		//double lDetDivInv = 1 / ((diffLA.x*diffLB.y) - (diffLA.y*diffLB.x));
 		diffLB.normalize();
 		return std::make_pair(iCom,diffLB);
 	}
 	return std::make_pair(iRef,l1S);
 }
 
-std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(components_base* iComponent) {
+std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
+		components_base* iComponentA,
+		components_base* iComponentB
+) {
 	std::vector<std::pair<components_base*,ofVec2d>> intersecting;
 	std::pair<components_base*,ofVec2d> temp;
 
-	// get data of reference object
-	unsigned& typeRef = iComponent->get_visualObj()->get_type();
-	std::vector<ofVec2d>& posRef = iComponent->get_positions();
-	std::vector<double>& parRef = iComponent->get_parameters();
+	// get data of reference and neighbor object object
+	unsigned& typeA = iComponentA->get_visualObj()->get_type();
+	unsigned& typeB = iComponentB->get_visualObj()->get_type();
+	std::vector<ofVec2d>& posA = iComponentA->get_positions();
+	std::vector<double>& parA = iComponentA->get_parameters();
+	std::vector<ofVec2d>& posB = iComponentB->get_positions();
+	std::vector<double>& parB = iComponentB->get_parameters();
 
-	for (auto& it : components) {
-		if (it != iComponent) {
-			// get data of neighbor object
-			unsigned& typeCom = it->get_visualObj()->get_type();
-			std::vector<ofVec2d>& posCom = it->get_positions();
-			std::vector<double>& parCom = it->get_parameters();
+	if (iComponentA != iComponentB) {
 
-			// handle two circles
-			if (typeRef == typeCom && typeRef == 2) {
-				// check whether the two circles overlap
-				if (posRef[0].distance(posCom[0]) < parRef[0] + parCom[0]) {
-					ofVec2d v = posCom[0] - posRef[0];
-					v.normalize();
-					intersecting.push_back(std::make_pair(it,v));
-				}
-			} else
-			// handle circle and line like
-			if ((typeRef == 1 || typeRef == 3 || typeRef == 4) && typeCom == 2) {
-				temp = obtain_intersectingCircleLine(iComponent,it);
-				if(temp.first != iComponent) {
-					intersecting.push_back(temp);
-				}
-			} else
-			if ((typeCom == 1 || typeCom == 3 || typeCom == 4) && typeRef == 2) {
-				temp = obtain_intersectingCircleLine(it,iComponent);
-				if(temp.first == iComponent) {
-					temp.first = it;
-					intersecting.push_back(temp);
-				}
-			} else
-			// handle multiline objects
-			if (
-					(typeRef == 1 || typeRef == 3 || typeRef == 4)
-					&& (typeCom == 1 || typeCom == 3 || typeCom == 4)
-			) {
-				intersecting.push_back(obtain_intersectingLineLine(iComponent,it));
+		// handle two circles
+		if (typeA == typeB && typeA == 2) {
+			// check whether the two circles overlap
+			if (posA[0].distance(posB[0]) < parA[0] + parB[0]) {
+				ofVec2d v = posB[0] - posA[0];
+				v.normalize();
+				intersecting.push_back(std::make_pair(iComponentB,v));
 			}
+		} else
+		// handle circle and line like
+		if ((typeA == 1 || typeA == 3 || typeA == 4) && typeB == 2) {
+			temp = obtain_intersectingCircleLine(iComponentA,iComponentB);
+			if(temp.first != iComponentA) {
+				intersecting.push_back(temp);
+			}
+		} else
+		if ((typeB == 1 || typeB == 3 || typeB == 4) && typeA == 2) {
+			temp = obtain_intersectingCircleLine(iComponentB,iComponentA);
+			if(temp.first == iComponentA) {
+				temp.first = iComponentB;
+				intersecting.push_back(temp);
+			}
+		} else
+		// handle multi-line objects
+		if (
+				(typeA == 1 || typeA == 3 || typeA == 4)
+				&& (typeB == 1 || typeB == 3 || typeB == 4)
+		) {
+			intersecting.push_back(obtain_intersectingLineLine(iComponentA,iComponentB));
 		}
 	}
 	return intersecting;
