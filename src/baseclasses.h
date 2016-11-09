@@ -85,13 +85,13 @@ class grid_cell {
 		grid_cell();
 		virtual ~grid_cell();
 		std::set<components_base*>& get_components();
-		std::vector<std::pair<components_base*,ofVec2d>> obtain_intersecting(components_base* iComponent);
+		void obtain_intersecting(components_base* iComponentA,components_base* iComponentB);
 		void update_intersecting();
 		void remove_component(components_base* iComponent);
 		void add_component(components_base* iComponent);
 	protected:
 		std::pair<components_base*,ofVec2d> obtain_intersectingCircleLine(components_base* iRef, components_base* iCom);
-		std::pair<components_base*,ofVec2d> obtain_intersectingLineLine(components_base* iRef, components_base* iCom);
+		std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> obtain_intersectingLineLine(components_base* iRef, components_base* iCom);
 		std::set<components_base*> components;
 		typedef boost::geometry::model::point<
 				double,
@@ -195,28 +195,32 @@ class components_base {
 		virtual std::vector<ofVec2d>& get_positions();
 		virtual std::vector<double>& get_parameters();
 		virtual unsigned long long& get_timeStamp();
+		virtual std::set<std::type_info>& get_ignoreIntersect();
+		virtual std::set<components_base*>& get_intersectorsChecked();
 		virtual std::vector<grid_cell*>& get_gridCells();
 		virtual visual_base* get_visualObj();
-		virtual bool get_intersectingChecked(grid_cell* iGridCell);
 
 		virtual void set_canMove(bool iCanMove);
 		virtual void set_canColide(bool iCanColide);
-		virtual void set_gridCells(std::vector<std::pair<grid_cell*,bool>> iGridCells);
-		virtual void set_intersectingChecked(grid_cell* iGridCell);
+		virtual void set_gridCells(std::vector<grid_cell*> iGridCells);
 
 		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
-		virtual void add_ignoreColide(components_base* iIgnore);
+		virtual void clear_intersectors();
+		virtual void add_intersector(std::pair<components_base*,ofVec2d>);
+		virtual void add_ignoreIntersect(std::type_info iIgnore);
 		virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
 	protected:
 		virtual void update_timeStamp();
-		bool canMove;
-		bool canColide;
-		std::vector<ofVec2d> positions;
-		std::vector<double> parameters;
-		unsigned long long timeStamp;
-		visual_base* associatedVisualObj;
-		std::set<components_base*> ignoreColide;
-		std::vector<std::pair<grid_cell*,bool>> gridCells;
+		bool canMove; // is it a fixed object
+		bool canColide; // can this object collide aka does it have physics?
+		std::vector<ofVec2d> positions; // position of object
+		std::vector<double> parameters; // additional parameters of the object
+		unsigned long long timeStamp; // timestamp is relevant for update features
+		visual_base* associatedVisualObj; // assignes a visual object
+		std::set<std::type_info> ignoreIntersect; // ignore class types for collision
+		std::set<std::pair<components_base*,ofVec2d>> intersectors; // list of objects which intersect with
+		std::set<components_base*> intersectorsChecked;
+		std::vector<grid_cell*> gridCells; // gridcells in which object lies
 		grid_base* grid;
 };
 

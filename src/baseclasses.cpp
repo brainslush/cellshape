@@ -182,7 +182,7 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(com
 	return std::make_pair(iRef,posRef[0]);
 }
 
-std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingLineLine(components_base* iRef, components_base* iCom) {
+std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> grid_cell::obtain_intersectingLineLine(components_base* iRef, components_base* iCom) {
 	std::vector<ofVec2d>& posRef = iRef->get_positions();
 	std::vector<ofVec2d>& posCom = iCom->get_positions();
 
@@ -204,16 +204,12 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingLineLine(compo
 			( ( diffLB.x*l1E.y - diffLB.y*l1E.x) < compareB )
 	)) {
 		diffLB.normalize();
-		return std::make_pair(iCom,diffLB);
+		return std::make_pair(iCom,std::make_pair(diffLA,diffLB));
 	}
-	return std::make_pair(iRef,l1S);
+	return std::make_pair(iRef,std::make_pair(l1S,l2S));
 }
 
-std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
-		components_base* iComponentA,
-		components_base* iComponentB
-) {
-	std::vector<std::pair<components_base*,ofVec2d>> intersecting;
+void grid_cell::obtain_intersecting(components_base* iComponentA,components_base* iComponentB) {
 	std::pair<components_base*,ofVec2d> temp;
 
 	// get data of reference and neighbor object object
@@ -232,21 +228,28 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 			if (posA[0].distance(posB[0]) < parA[0] + parB[0]) {
 				ofVec2d v = posB[0] - posA[0];
 				v.normalize();
-				intersecting.push_back(std::make_pair(iComponentB,v));
+				iComponentA->add_intersector(std::make_pair(iComponentB,v));
+				iComponentB->add_intersector(std::make_pair(iComponentA,-v));
 			}
 		} else
 		// handle circle and line like
 		if ((typeA == 1 || typeA == 3 || typeA == 4) && typeB == 2) {
 			temp = obtain_intersectingCircleLine(iComponentA,iComponentB);
 			if(temp.first != iComponentA) {
-				intersecting.push_back(temp);
+				iComponentA->add_intersector(temp);
+				temp.first = iComponentA;
+				temp.second = -temp.second;
+				iComponentB->add_intersector(temp);
 			}
 		} else
 		if ((typeB == 1 || typeB == 3 || typeB == 4) && typeA == 2) {
 			temp = obtain_intersectingCircleLine(iComponentB,iComponentA);
 			if(temp.first == iComponentA) {
 				temp.first = iComponentB;
-				intersecting.push_back(temp);
+				iComponentA->add_intersector(temp);
+				temp.first = iComponentA;
+				temp.second = -temp.second;
+				iComponentB->add_intersector(temp);
 			}
 		} else
 		// handle multi-line objects
@@ -254,17 +257,31 @@ std::vector<std::pair<components_base*,ofVec2d>> grid_cell::obtain_intersecting(
 				(typeA == 1 || typeA == 3 || typeA == 4)
 				&& (typeB == 1 || typeB == 3 || typeB == 4)
 		) {
-			intersecting.push_back(obtain_intersectingLineLine(iComponentA,iComponentB));
+			std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> temp2 = obtain_intersectingLineLine(iComponentA,iComponentB);
+			if (temp2.first == iComponentA) {
+				temp.first = iComponentB;
+				temp.second = temp2.second.first;
+				iComponentA->add_intersector(temp);
+				temp.first = iComponentA;
+				temp.second = temp2.second.second;
+				iComponentB->add_intersector(temp);
+			}
 		}
 	}
-	return intersecting;
 }
 
 void grid_cell::update_intersecting() {
+	std::set<type_info>::iterator itType;
 	for (auto& it : components) {
-		for (auto& check : components) {
-			if (!check->get_intersectingChecked(this)) {
-
+		it->clear_intersectors();
+	}
+	for (auto& itA : components) {
+		for (auto& itB : components) {
+			if (
+					(itA->get_ignoreIntersect().find(typeid(itA)) == itA->get_ignoreIntersect().end()) &&
+					(itB->get_ignoreIntersect().find(typeid(itA)) == itB->get_ignoreIntersect().end())
+			) {
+				obtain_intersecting(itA,itB);
 			}
 		}
 	}
@@ -312,7 +329,7 @@ void grid_base::update_component(components_base* iComponent) {
 		it->remove_component(iComponent);
 	}
 	//assign new cells
-	std::vector<std::pair<grid_cell*,bool>> assignedCells;
+	std::vector<grid_cell*> assignedCells;
 	switch (iComponent->get_visualObj()->get_type()) {
 		case 1: {
 			const ofVec2d& posA = iComponent->get_positions()[0];
@@ -330,12 +347,11 @@ void grid_base::update_component(components_base* iComponent) {
 				double xMin = std::min(posA.x,posB.x);
 				double xMax = std::max(posA.x,posB.x);
 				while (xMin < xMax) {
-					assignedCells.push_back(std::make_pair(
+					assignedCells.push_back(
 							&(cells
 							[floor(xMin / cellLength)]
-							[floor((m * xMin + f0) / cellLength)]),
-							false
-					));
+							[floor((m * xMin + f0) / cellLength)])
+					);
 					xMin += cellLength;
 				}
 			} else {
@@ -343,10 +359,7 @@ void grid_base::update_component(components_base* iComponent) {
 				double yMax = std::max(posA.y,posB.y);
 				unsigned long long x = floor(posA.x / cellLength);
 				while (yMin < yMax) {
-					assignedCells.push_back(std::make_pair(
-							&cells[x][floor(yMin / cellLength)],
-							false
-					));
+					assignedCells.push_back(&cells[x][floor(yMin / cellLength)]);
 					yMin += cellLength;
 				}
 			}
@@ -367,19 +380,10 @@ void grid_base::update_component(components_base* iComponent) {
 				unsigned long long yB = floor((-y + pos.y) / cellLength);
 				unsigned long long x = floor(xMin / cellLength);
 				if (y != 0) {
-					assignedCells.push_back(std::make_pair(
-							&cells[x][yA],
-							false
-					));
-					assignedCells.push_back(std::make_pair(
-							&cells[x][yB],
-							false
-					));
+					assignedCells.push_back(&cells[x][yA]);
+					assignedCells.push_back(&cells[x][yB]);
 				} else {
-					assignedCells.push_back(std::make_pair(
-							&cells[x][yA],
-							false
-					));
+					assignedCells.push_back(&cells[x][yA]);
 				}
 				xMin += cellLength;
 			}
@@ -401,25 +405,14 @@ void grid_base::update_component(components_base* iComponent) {
 			unsigned long long yB = floor(yMax / cellLength);
 			while (xMin < xMax) {
 				unsigned long long x = floor(xMin / cellLength);
-				assignedCells.push_back(std::make_pair(
-						&cells[x][yA],
-						false
-				));
-				assignedCells.push_back(std::make_pair(
-						&cells[x][yB],
-						false
-				));
+				assignedCells.push_back(&cells[x][yA]);
+				assignedCells.push_back(&cells[x][yB]);
 				xMin += cellLength;
 			}
 			while (yMin < yMax) {
 				unsigned long long y = floor(yMin / cellLength);
-				assignedCells.push_back(std::make_pair(
-						&cells[xA][y],false
-				));
-				assignedCells.push_back(std::make_pair(
-						&cells[xB][y],
-						false
-				));
+				assignedCells.push_back(&cells[xA][y]);
+				assignedCells.push_back(&cells[xB][y]);
 				yMin += cellLength;
 			}
 		}
@@ -544,7 +537,7 @@ visual_triangle::~visual_triangle() {
 components_base::components_base(grid_base* iGrid){
 	canMove = true;
 	canColide = true;
-	ignoreColide.insert(this);
+	//ignoreColide.insert(this);
 	associatedVisualObj = NULL;
 	timeStamp = ofGetFrameNum();
 	grid = iGrid;
@@ -571,21 +564,21 @@ std::vector<double>& components_base::get_parameters() {
 unsigned long long& components_base::get_timeStamp() {
 	return timeStamp;
 }
+std::set<std::type_info>& components_base::get_ignoreIntersect() {
+	return ignoreIntersect;
+}
+std::set<components_base*>& components_base::get_intersectorsChecked() {
+	return intersectorsChecked;
+}
 std::vector<grid_cell*>& components_base::get_gridCells() {
 	return gridCells;
 }
 visual_base* components_base::get_visualObj() {
 	return associatedVisualObj;
 }
-bool components_base::get_intersectingChecked(grid_cell* iGridCell) {
-	for (auto& it : gridCells) {
-		if (it.first == iGridCell) {
-			return it.second;
-		}
-	}
-	return false;
-}
-void components_base::set_gridCells(std::vector<std::pair<grid_cell*,bool>> iGridCells) {
+
+
+void components_base::set_gridCells(std::vector<grid_cell*> iGridCells) {
 	gridCells = iGridCells;
 }
 void components_base::set_canMove(bool iCanMove) {
@@ -594,18 +587,20 @@ void components_base::set_canMove(bool iCanMove) {
 void components_base::set_canColide(bool iCanColide) {
 	canColide = iCanColide;
 }
-void components_base::set_intersectingChecked(grid_cell* iGridCell) {
-	for (auto& it : gridCells) {
-		if (it.first == iGridCell) {
-			it.second = true;
-		}
-	}
+
+void components_base::add_intersector(std::pair<components_base*,ofVec2d> iIntersector) {
+	intersectors.insert(iIntersector);
+	intersectorsChecked.insert(iIntersector.first);
+}
+void components_base::clear_intersectors() {
+	intersectors.clear();
+	intersectorsChecked.clear();
 }
 void components_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 	/*do nothing*/
 }
-void components_base::add_ignoreColide(components_base* iIgnore) {
-	ignoreColide.insert(iIgnore);
+void components_base::add_ignoreIntersect(std::type_info iIgnore) {
+	ignoreIntersect.insert(iIgnore);
 }
 void components_base::make_timeStep(
 		double iTime,
@@ -648,6 +643,7 @@ crosslinker_base::crosslinker_base(grid_base* iGrid): cell_base(iGrid) {
 	canColide = false;
 	canMove = true;
 	force = ofVec2d(0,0);
+	iGrid->register_component(this);
 };
 crosslinker_base::~crosslinker_base() {
 
@@ -677,6 +673,7 @@ fillament_base::fillament_base(grid_base* iGrid): cell_base(iGrid){
 	canColide = true;
 	canMove = true;
 	associatedVisualObj = new visual_line(this);
+	iGrid->register_component(this);
 }
 fillament_base::~fillament_base(){
 	delete associatedVisualObj;
@@ -778,6 +775,7 @@ membrane_part::membrane_part(
 	associatedVisualObj = new visual_line(this);
 	associatedVisualObj->set_color(0.0,0.0,0.0);
 	associatedVisualObj->set_fillColor(0.0,0.0,0.0);
+	iGrid->register_component(this);
 };
 membrane_part::~membrane_part(){
 
@@ -916,6 +914,7 @@ fac::fac(
 	associatedVisualObj = new visual_ellipse(this);
 	associatedVisualObj->set_color(1.0,0.0,0.0);
 	associatedVisualObj->set_fillColor(1.0,0.0,0.0);
+	iGrid->register_component(this);
 }
 fac::~fac() {
 }
@@ -949,7 +948,7 @@ surface_border::surface_border(
 	associatedVisualObj = new visual_line(this);
 	associatedVisualObj->set_fillColor(1.0,1.0,1.0);
 	associatedVisualObj->set_color(1.0,1.0,1.0);
-	//grid = iGrid;
+	iGrid->register_component(this);
 }
 surface_border::~surface_border() {
 	delete associatedVisualObj;

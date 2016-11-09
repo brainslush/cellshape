@@ -26,6 +26,7 @@
 #include <cmath>
 #include <set>
 #include <utility>
+#include <typeinfo>
 
 #include "ofColor.h"
 //#include "ofPoint.h"
