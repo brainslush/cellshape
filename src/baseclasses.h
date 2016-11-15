@@ -206,7 +206,7 @@ class components_base {
 
 		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		virtual void clear_intersectors();
-		virtual void add_intersector(std::pair<components_base*,ofVec2d>);
+		virtual void add_intersector(components_base* iIntersector, ofVec2d iIntersectorVec);
 		virtual void add_ignoreIntersect(std::type_info iIgnore);
 		virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
 	protected:
@@ -218,7 +218,8 @@ class components_base {
 		unsigned long long timeStamp; // timestamp is relevant for update features
 		visual_base* associatedVisualObj; // assignes a visual object
 		std::set<std::type_info> ignoreIntersect; // ignore class types for collision
-		std::set<std::pair<components_base*,ofVec2d>> intersectors; // list of objects which intersect with
+		std::vector<components_base*> intersectors; // list of objects which intersect with
+		std::vector<ofVec2d> intersectorsVectors; // list of collision vectors of intersectors
 		std::set<components_base*> intersectorsChecked;
 		std::vector<grid_cell*> gridCells; // gridcells in which object lies
 		grid_base* grid;

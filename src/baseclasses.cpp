@@ -228,28 +228,23 @@ void grid_cell::obtain_intersecting(components_base* iComponentA,components_base
 			if (posA[0].distance(posB[0]) < parA[0] + parB[0]) {
 				ofVec2d v = posB[0] - posA[0];
 				v.normalize();
-				iComponentA->add_intersector(std::make_pair(iComponentB,v));
-				iComponentB->add_intersector(std::make_pair(iComponentA,-v));
+				iComponentA->add_intersector(iComponentB,v);
+				iComponentB->add_intersector(iComponentA,-v);
 			}
 		} else
 		// handle circle and line like
 		if ((typeA == 1 || typeA == 3 || typeA == 4) && typeB == 2) {
 			temp = obtain_intersectingCircleLine(iComponentA,iComponentB);
 			if(temp.first != iComponentA) {
-				iComponentA->add_intersector(temp);
-				temp.first = iComponentA;
-				temp.second = -temp.second;
-				iComponentB->add_intersector(temp);
+				iComponentA->add_intersector(iComponentB, temp.second);
+				iComponentB->add_intersector(iComponentA,-temp.second);
 			}
 		} else
 		if ((typeB == 1 || typeB == 3 || typeB == 4) && typeA == 2) {
 			temp = obtain_intersectingCircleLine(iComponentB,iComponentA);
 			if(temp.first == iComponentA) {
-				temp.first = iComponentB;
-				iComponentA->add_intersector(temp);
-				temp.first = iComponentA;
-				temp.second = -temp.second;
-				iComponentB->add_intersector(temp);
+				iComponentA->add_intersector(iComponentB,temp.second);
+				iComponentB->add_intersector(iComponentA,temp.second);
 			}
 		} else
 		// handle multi-line objects
@@ -259,12 +254,8 @@ void grid_cell::obtain_intersecting(components_base* iComponentA,components_base
 		) {
 			std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> temp2 = obtain_intersectingLineLine(iComponentA,iComponentB);
 			if (temp2.first == iComponentA) {
-				temp.first = iComponentB;
-				temp.second = temp2.second.first;
-				iComponentA->add_intersector(temp);
-				temp.first = iComponentA;
-				temp.second = temp2.second.second;
-				iComponentB->add_intersector(temp);
+				iComponentA->add_intersector(iComponentB,temp2.second.first);
+				iComponentB->add_intersector(iComponentA,temp2.second.second);
 			}
 		}
 	}
@@ -588,19 +579,21 @@ void components_base::set_canColide(bool iCanColide) {
 	canColide = iCanColide;
 }
 
-void components_base::add_intersector(std::pair<components_base*,ofVec2d> iIntersector) {
-	intersectors.insert(iIntersector);
-	intersectorsChecked.insert(iIntersector.first);
+void components_base::add_intersector(components_base* iIntersector, ofVec2d iIntersectorVec) {
+	intersectors.push_back(iIntersector);
+	intersectorsVectors.push_back(iIntersectorVec);
+	intersectorsChecked.insert(iIntersector);
 }
 void components_base::clear_intersectors() {
 	intersectors.clear();
+	intersectorsVectors.clear();
 	intersectorsChecked.clear();
 }
 void components_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 	/*do nothing*/
 }
 void components_base::add_ignoreIntersect(std::type_info iIgnore) {
-	ignoreIntersect.insert(iIgnore);
+	//ignoreIntersect.insert(iIgnore);
 }
 void components_base::make_timeStep(
 		double iTime,
