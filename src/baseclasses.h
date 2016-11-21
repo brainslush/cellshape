@@ -195,10 +195,11 @@ class components_base {
 		virtual std::vector<ofVec2d>& get_positions();
 		virtual std::vector<double>& get_parameters();
 		virtual unsigned long long& get_timeStamp();
-		virtual std::set<std::type_info>& get_ignoreIntersect();
+		virtual std::set<unsigned>& get_ignoreIntersect();
 		virtual std::set<components_base*>& get_intersectorsChecked();
 		virtual std::vector<grid_cell*>& get_gridCells();
 		virtual visual_base* get_visualObj();
+		virtual unsigned get_typeID();
 
 		virtual void set_canMove(bool iCanMove);
 		virtual void set_canColide(bool iCanColide);
@@ -207,7 +208,7 @@ class components_base {
 		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		virtual void clear_intersectors();
 		virtual void add_intersector(components_base* iIntersector, ofVec2d iIntersectorVec);
-		virtual void add_ignoreIntersect(std::type_info iIgnore);
+		virtual void add_ignoreIntersect(unsigned iIgnore);
 		virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
 	protected:
 		virtual void update_timeStamp();
@@ -216,8 +217,9 @@ class components_base {
 		std::vector<ofVec2d> positions; // position of object
 		std::vector<double> parameters; // additional parameters of the object
 		unsigned long long timeStamp; // timestamp is relevant for update features
+		unsigned typeID; // since type_info doesn't work we need to use this
 		visual_base* associatedVisualObj; // assignes a visual object
-		std::set<std::type_info> ignoreIntersect; // ignore class types for collision
+		std::set<unsigned> ignoreIntersect; // ignore class types for collision
 		std::vector<components_base*> intersectors; // list of objects which intersect with
 		std::vector<ofVec2d> intersectorsVectors; // list of collision vectors of intersectors
 		std::set<components_base*> intersectorsChecked;

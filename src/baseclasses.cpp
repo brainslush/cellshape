@@ -181,7 +181,6 @@ std::pair<components_base*,ofVec2d> grid_cell::obtain_intersectingCircleLine(com
 	}
 	return std::make_pair(iRef,posRef[0]);
 }
-
 std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> grid_cell::obtain_intersectingLineLine(components_base* iRef, components_base* iCom) {
 	std::vector<ofVec2d>& posRef = iRef->get_positions();
 	std::vector<ofVec2d>& posCom = iCom->get_positions();
@@ -260,24 +259,22 @@ void grid_cell::obtain_intersecting(components_base* iComponentA,components_base
 		}
 	}
 }
-
 void grid_cell::update_intersecting() {
-	std::set<type_info>::iterator itType;
+	std::set<unsigned>::iterator itType;
 	for (auto& it : components) {
 		it->clear_intersectors();
 	}
 	for (auto& itA : components) {
 		for (auto& itB : components) {
 			if (
-					(itA->get_ignoreIntersect().find(typeid(itA)) == itA->get_ignoreIntersect().end()) &&
-					(itB->get_ignoreIntersect().find(typeid(itA)) == itB->get_ignoreIntersect().end())
+					(itA->get_ignoreIntersect().find(itA->get_typeID()) == itA->get_ignoreIntersect().end()) &&
+					(itB->get_ignoreIntersect().find(itA->get_typeID()) == itB->get_ignoreIntersect().end())
 			) {
 				obtain_intersecting(itA,itB);
 			}
 		}
 	}
 }
-
 void grid_cell::remove_component(components_base* iComponent) {
 	components.erase(iComponent);
 }
@@ -533,6 +530,7 @@ components_base::components_base(grid_base* iGrid){
 	timeStamp = ofGetFrameNum();
 	grid = iGrid;
 	grid->register_component(this);
+	typeID = 0;
 }
 components_base::~components_base() {
 	grid->unregister_component(this);
@@ -555,7 +553,7 @@ std::vector<double>& components_base::get_parameters() {
 unsigned long long& components_base::get_timeStamp() {
 	return timeStamp;
 }
-std::set<std::type_info>& components_base::get_ignoreIntersect() {
+std::set<unsigned>& components_base::get_ignoreIntersect() {
 	return ignoreIntersect;
 }
 std::set<components_base*>& components_base::get_intersectorsChecked() {
@@ -567,7 +565,9 @@ std::vector<grid_cell*>& components_base::get_gridCells() {
 visual_base* components_base::get_visualObj() {
 	return associatedVisualObj;
 }
-
+unsigned components_base::get_typeID() {
+	return typeID;
+}
 
 void components_base::set_gridCells(std::vector<grid_cell*> iGridCells) {
 	gridCells = iGridCells;
@@ -592,7 +592,7 @@ void components_base::clear_intersectors() {
 void components_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 	/*do nothing*/
 }
-void components_base::add_ignoreIntersect(std::type_info iIgnore) {
+void components_base::add_ignoreIntersect(unsigned iIgnore) {
 	//ignoreIntersect.insert(iIgnore);
 }
 void components_base::make_timeStep(
@@ -611,6 +611,7 @@ void components_base::update_timeStamp() {
 
 cell_base::cell_base(grid_base* iGrid): components_base(iGrid) {
 	canMove = true;
+	typeID += 10000;
 }
 cell_base::~cell_base(){
 
@@ -623,6 +624,7 @@ cell_base::~cell_base(){
 matrix_base::matrix_base(grid_base* iGrid): components_base(iGrid) {
 	canColide = false;
 	canMove = false;
+	typeID += 20000;
 }
 matrix_base::~matrix_base(){
 
@@ -636,6 +638,7 @@ crosslinker_base::crosslinker_base(grid_base* iGrid): cell_base(iGrid) {
 	canColide = false;
 	canMove = true;
 	force = ofVec2d(0,0);
+	typeID += 100;
 	iGrid->register_component(this);
 };
 crosslinker_base::~crosslinker_base() {
@@ -666,6 +669,7 @@ fillament_base::fillament_base(grid_base* iGrid): cell_base(iGrid){
 	canColide = true;
 	canMove = true;
 	associatedVisualObj = new visual_line(this);
+	typeID += 200;
 	iGrid->register_component(this);
 }
 fillament_base::~fillament_base(){
@@ -707,6 +711,7 @@ actin::actin(
 	lifeTime = iLifeTime;
 	stallingForce = iStallingForce;
 	tail = NULL;
+	typeID += 1;
 }
 actin::~actin() {
 	if(tail != NULL) {
@@ -745,7 +750,7 @@ void actin::make_timeStep(double iTime, unsigned long long iTimeStamp) {
  ***************************/
 
 volume_base::volume_base(grid_base* iGrid): cell_base(iGrid) {
-
+	typeID += 300;
 };
 volume_base::~volume_base() {
 
@@ -768,6 +773,7 @@ membrane_part::membrane_part(
 	associatedVisualObj = new visual_line(this);
 	associatedVisualObj->set_color(0.0,0.0,0.0);
 	associatedVisualObj->set_fillColor(0.0,0.0,0.0);
+	typeID += 400;
 	iGrid->register_component(this);
 };
 membrane_part::~membrane_part(){
@@ -812,6 +818,7 @@ membrane_base::membrane_base(
 	};
 	updatedVolume = false;
 	initialVolume = calc_currentVolume();
+	typeID += 500;
 };
 membrane_base::~membrane_base() {
 	for (unsigned long long i = 0; i < parts.size(); i++) {
@@ -851,7 +858,7 @@ void membrane_base::make_timeStep(double iTime, unsigned long long iTimeStamp) {
 }
 
 /***************************
- * cell base
+ * cell
  ***************************/
 
 cell::cell(
@@ -862,6 +869,7 @@ cell::cell(
 ): cell_base(iGrid) {
 	membrane.insert(new membrane_base(iGrid,iX,iY,200,iResolution));
 	maxFillamentLength = 1;
+	typeID += 600;
 }
 cell::~cell(){
 	for (auto& it : membrane) {
@@ -907,6 +915,7 @@ fac::fac(
 	associatedVisualObj = new visual_ellipse(this);
 	associatedVisualObj->set_color(1.0,0.0,0.0);
 	associatedVisualObj->set_fillColor(1.0,0.0,0.0);
+	typeID += 100;
 	iGrid->register_component(this);
 }
 fac::~fac() {
@@ -941,6 +950,7 @@ surface_border::surface_border(
 	associatedVisualObj = new visual_line(this);
 	associatedVisualObj->set_fillColor(1.0,1.0,1.0);
 	associatedVisualObj->set_color(1.0,1.0,1.0);
+	typeID += 200;
 	iGrid->register_component(this);
 }
 surface_border::~surface_border() {
@@ -965,6 +975,7 @@ simple_surface::simple_surface(grid_base* iGrid, double iSideLength): matrix_bas
 	borders.push_back(new surface_border(iGrid,this,positions[1],positions[2]));
 	borders.push_back(new surface_border(iGrid,this,positions[2],positions[3]));
 	borders.push_back(new surface_border(iGrid,this,positions[3],positions[0]));
+	typeID += 300;
 }
 simple_surface::~simple_surface(){
 	for (auto& it : borders) {
