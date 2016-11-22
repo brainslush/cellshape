@@ -1,90 +1,22 @@
 #include "extIncludes.h"
-#ifndef __H_CLASSES_BASE
-#define __H_CLASSES_BASE
+#include "random.h"
+#include "base.h"
 
+#ifndef __H_CLASSES_BASE2
+#define __H_CLASSES_BASE2
 
 #define __GRID_CIRCLE_SEGMENTS 100
-
-//typedef boost::geometry::model::d2::point_xy<double> ofVec2d;
-
-class random_base {
-	public:
-		/*
-		 * boost/random/uniform_smallint.hpp
-		 */
-		random_base(
-				boost::random::mt19937* iGen,
-				std::string iType,
-				long long iA,
-				long long iB);
-		/*
-		 * boost/random/uniform_real_distribution.hpp
-		 * boost/random/normal_distribution.hpp
-		 * boost/random/lognormal_distribution.hpp
-		 */
-		random_base(
-				boost::random::mt19937* iGen,
-				std::string iType,
-				double iA,
-				double iB);
-		/*
-		 * boost/random/bernoulli_distribution.hpp
-		 * boost/random/exponential_distribution.hpp
-		 */
-		random_base(
-				boost::random::mt19937* iGen,
-				std::string iType,
-				double iA);
-		/*
-		 * boost/random/uniform_01.hpp
-		 */
-		random_base(
-				boost::random::mt19937* iGen,
-				std::string iType);
-		template<class T> T draw ();
-	protected:
-		unsigned type;
-		boost::random::mt19937* gen;
-		boost::variant<
-			boost::random::uniform_smallint<>*,
-			boost::random::uniform_01<>*,
-			boost::random::uniform_real_distribution<>*,
-			boost::random::bernoulli_distribution<>*,
-			boost::random::normal_distribution<>*,
-			boost::random::lognormal_distribution<>*,
-			boost::random::exponential_distribution<>*
-		> dist;
-};
-
-class random_container {
-	public:
-		random_container();
-		~random_container();
-		unsigned long long& get_seed();
-		void set_seed();
-		void set_seed(unsigned long long iSeed);
-		template<typename... A > random_base* register_random(
-				std::string iType,
-				A... args
-		);
-		void unregister_random(random_base* iDist);
-	protected:
-		unsigned long long seed;
-		boost::random::mt19937 gen;
-		std::set<random_base*> distributions;
-};
-
 /*
  *  The Grid is supposed to ease up workload for finding near neighbors and to increase overall performance
  *  The grid contains cells and each grid cell stores pointers to all components which are located in the gird cell
  */
 
-class components_base;
-class grid_cell {
+class grid_cell : public base {
 	public:
-		grid_cell();
-		virtual ~grid_cell();
+		grid_cell(ofVec2d iA,ofVec2d iB);
+		~grid_cell();
 		std::set<components_base*>& get_components();
+		void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		void obtain_intersecting(components_base* iComponentA,components_base* iComponentB);
 		void update_intersecting();
 		void remove_component(components_base* iComponent);
@@ -93,6 +25,7 @@ class grid_cell {
 		std::pair<components_base*,ofVec2d> obtain_intersectingCircleLine(components_base* iRef, components_base* iCom);
 		std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> obtain_intersectingLineLine(components_base* iRef, components_base* iCom);
 		std::set<components_base*> components;
+		visual_base* associatedVisualObj;
 		typedef boost::geometry::model::point<
 				double,
 				2,
@@ -110,7 +43,8 @@ class grid_base {
 	public:
 		//grid_base();
 		grid_base(unsigned long long iResolution, double iSideLength);
-		virtual ~grid_base();
+		~grid_base();
+		void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		void register_component(components_base* iComponent);
 		void unregister_component(components_base* iComponent);
 		void update_component(components_base* iComponent);
@@ -124,66 +58,11 @@ class grid_base {
 };
 
 /*
- *  Those are all accessible visual elements which can be used to represent the components.
- *  The name might be misleading as the visual element also determines the physical form of the component.
- */
-
-class visual_base {
-	public:
-		//visual_base();
-		visual_base(unsigned iType, components_base* iComponent);
-		virtual ~visual_base();
-
-		virtual components_base& get_associatedComponent();
-		virtual ofFloatColor& get_color();
-		virtual ofFloatColor& get_fillColor();
-		virtual unsigned& get_type();
-		virtual std::vector<ofVec2d>& get_positions();
-		virtual std::vector<double>& get_parameters();
-
-		virtual void set_associatedComponent(components_base* iComponent);
-		virtual void set_color(double iRed,double iGreen, double iBlue, double iAlpha);
-		virtual void set_color(double iRed,double iGreen, double iBlue);
-		virtual void set_fillColor(double iRed,double iGreen, double iBlue, double iAlpha);
-		virtual void set_fillColor(double iRed,double iGreen, double iBlue);
-	protected:
-		components_base* associatedComponent;
-		ofFloatColor color;
-		ofFloatColor fillColor;
-		unsigned type;
-};
-
-class visual_line:public visual_base {
-	public:
-		visual_line(components_base* iComponent);
-		virtual ~visual_line();
-	protected:
-};
-class visual_ellipse:public visual_base {
-	public:
-		visual_ellipse(components_base* iComponent);
-		virtual ~visual_ellipse();
-	protected:
-};
-class visual_rectangle:public visual_base {
-	public:
-		visual_rectangle(components_base* iComponent);
-		virtual ~visual_rectangle();
-	protected:
-};
-class visual_triangle:public visual_base {
-	public:
-		visual_triangle(components_base* iComponent);
-		virtual ~visual_triangle();
-	protected:
-};
-
-/*
  * Base function for all physical components.
  * It is the base call for cells and substrates
  */
 
-class components_base {
+class components_base : public base {
 	public:
 		components_base(grid_base* iGrid);
 
@@ -192,8 +71,6 @@ class components_base {
 		virtual bool& get_canMove();
 		virtual bool& get_canColide();
 
-		virtual std::vector<ofVec2d>& get_positions();
-		virtual std::vector<double>& get_parameters();
 		virtual unsigned long long& get_timeStamp();
 		virtual std::set<unsigned>& get_ignoreIntersect();
 		virtual std::set<components_base*>& get_intersectorsChecked();
@@ -205,7 +82,6 @@ class components_base {
 		virtual void set_canColide(bool iCanColide);
 		virtual void set_gridCells(std::vector<grid_cell*> iGridCells);
 
-		virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 		virtual void clear_intersectors();
 		virtual void add_intersector(components_base* iIntersector, ofVec2d iIntersectorVec);
 		virtual void add_ignoreIntersect(unsigned iIgnore);
@@ -214,8 +90,6 @@ class components_base {
 		virtual void update_timeStamp();
 		bool canMove; // is it a fixed object
 		bool canColide; // can this object collide aka does it have physics?
-		std::vector<ofVec2d> positions; // position of object
-		std::vector<double> parameters; // additional parameters of the object
 		unsigned long long timeStamp; // timestamp is relevant for update features
 		unsigned typeID; // since type_info doesn't work we need to use this
 		visual_base* associatedVisualObj; // assignes a visual object

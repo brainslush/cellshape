@@ -1,139 +1,12 @@
 #include "baseclasses.h"
 
-boost::random::mt19937 RandomGen;
-
-/***************************
- * random_base
- ***************************/
-random_base::random_base(
-		boost::random::mt19937* iGen,
-		std::string iType,
-		long long iA,
-		long long iB)
-{
-	gen = iGen;
-	type = 0;
-	if (iType == "uniform_smallint") {
-		type = 10;
-		dist = new boost::random::uniform_smallint<> (iA,iB);
-	}
-}
-random_base::random_base(
-		boost::random::mt19937* iGen,
-		std::string iType,
-		double iA,
-		double iB)
-{
-	gen = iGen;
-	type = 0;
-	if (iType == "uniform_real_distribution") {
-		type = 20;
-		dist = new boost::random::uniform_real_distribution<> (iA,iB);
-	}
-	if (iType == "normal_distribution") {
-		type = 21;
-		dist = new boost::random::normal_distribution<> (iA,iB);
-	}
-	if (iType == "lognormal_distribution") {
-		type = 22;
-		dist = new boost::random::lognormal_distribution<> (iA,iB);
-	}
-}
-random_base::random_base(
-		boost::random::mt19937* iGen,
-		std::string iType,
-		double iA)
-{
-	gen = iGen;
-	type = 0;
-	if (iType == "bernoulli_distribution") {
-		type = 30;
-		dist = new boost::random::bernoulli_distribution<> (iA);
-	}
-	if (iType == "exponential_distribution") {
-		type = 31;
-		dist = new boost::random::exponential_distribution<> (iA);
-	}
-}
-random_base::random_base(
-		boost::random::mt19937* iGen,
-		std::string iType)
-{
-	gen = iGen;
-	type = 0;
-	if (iType == "uniform_01") {
-		type = 40;
-		dist = new boost::random::uniform_01<>();
-	}
-}
-
-template<class T> T random_base::draw() {
-	switch(type) {
-		case 10:
-			return (*boost::get<boost::random::uniform_smallint<>*>(dist))(*gen);
-		break;
-		case 20:
-			return (*boost::get<boost::random::uniform_real_distribution<>*>(dist))(*gen);
-		break;
-		case 21:
-			return (*boost::get<boost::random::normal_distribution<>*>(dist))(*gen);
-		break;
-		case 22:
-			return (*boost::get<boost::random::lognormal_distribution<>*>(dist))(*gen);
-		break;
-		case 30:
-			return (*boost::get<boost::random::bernoulli_distribution<>*>(dist))(*gen);
-		break;
-		case 31:
-			return (*boost::get<boost::random::exponential_distribution<>*>(dist))(*gen);
-		break;
-		case 32:
-			return (*boost::get<boost::random::uniform_01<>*>(dist))(*gen);
-		break;
-	}
-}
-
-/***************************
- * random_container
- ***************************/
-
-random_container::random_container() {
-	seed = gen.default_seed;
-}
-random_container::~random_container() {
-	for (auto& it : distributions) {
-		delete it;
-	}
-}
-unsigned long long& random_container::get_seed() {
-	return seed;
-}
-void random_container::set_seed() {
-
-}
-void random_container::set_seed(unsigned long long iSeed) {
-	seed = iSeed;
-	gen.seed(seed);
-}
-template<typename... A> random_base* random_container::register_random(
-		std::string iType,
-		A... args
-) {
-	random_base* temp = new random_base(&gen,iType,args...);
-	distributions.insert(temp);
-	return temp;
-}
-void random_container::unregister_random(random_base* iDist) {
-	delete iDist;
-	distributions.erase(iDist);
-}
 
 /***************************
  * grid_cell
  ***************************/
 
-grid_cell::grid_cell() {
-
+grid_cell::grid_cell(ofVec2d iA, ofVec2d iB) {
+	associatedVisualObj = new visual_rectangle(this);
 }
 grid_cell::~grid_cell() {
 
@@ -208,6 +81,9 @@ std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> grid_cell::obtain_interse
 	return std::make_pair(iRef,std::make_pair(l1S,l2S));
 }
 
+void grid_cell::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
+	iVisualObjs.push_back(associatedVisualObj);
+}
 void grid_cell::obtain_intersecting(components_base* iComponentA,components_base* iComponentB) {
 	std::pair<components_base*,ofVec2d> temp;
 
@@ -289,10 +165,11 @@ void grid_cell::add_component(components_base* iComponent) {
 grid_base::grid_base(unsigned long long iResolution, double iSideLength) {
 	sideLength = iSideLength;
 	resolution = iResolution;
+	double stepLength = iSideLength / (double) iResolution;
 	for(unsigned long long i = 0; i < resolution; i++) {
 		std::vector<grid_cell> temp;
 		for(unsigned long long j = 0; j < resolution; j++) {
-			temp.push_back(grid_cell());
+			temp.push_back(grid_cell(ofVec2d(stepLength * i, stepLength * i),ofVec2d(stepLength * j, stepLength * j)));
 		}
 		cells.push_back(temp);
 	}
@@ -300,9 +177,21 @@ grid_base::grid_base(unsigned long long iResolution, double iSideLength) {
 grid_base::~grid_base(){
 
 }
+
+void grid_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
+	for (auto& it : cells) {
+		for (auto& it2 : it) {
+			it2.obtain_visualObjs(iVisualObjs);
+		}
+	}
+}
 void grid_base::register_component(components_base* iComponent) {
-	components.insert(iComponent);
-	update_component(iComponent);
+	if (iComponent->get_visualObj()) {
+		components.insert(iComponent);
+		update_component(iComponent);
+	} else {
+		std::cout << "Could not register object with ID: " << iComponent->get_typeID() << "\n Visual object is missing";
+	}
 }
 void grid_base::unregister_component(components_base* iComponent) {
 	for (auto& it : iComponent->get_gridCells()) {
@@ -529,7 +418,6 @@ components_base::components_base(grid_base* iGrid){
 	associatedVisualObj = NULL;
 	timeStamp = ofGetFrameNum();
 	grid = iGrid;
-	grid->register_component(this);
 	typeID = 0;
 }
 components_base::~components_base() {
@@ -543,12 +431,6 @@ bool& components_base::get_canMove() {
 }
 bool& components_base::get_canColide() {
 	return canColide;
-}
-std::vector<ofVec2d>& components_base::get_positions() {
-	return positions;
-}
-std::vector<double>& components_base::get_parameters() {
-	return parameters;
 }
 unsigned long long& components_base::get_timeStamp() {
 	return timeStamp;
@@ -588,9 +470,6 @@ void components_base::clear_intersectors() {
 	intersectors.clear();
 	intersectorsVectors.clear();
 	intersectorsChecked.clear();
-}
-void components_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
-	/*do nothing*/
 }
 void components_base::add_ignoreIntersect(unsigned iIgnore) {
 	//ignoreIntersect.insert(iIgnore);
