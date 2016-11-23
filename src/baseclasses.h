@@ -1,11 +1,13 @@
 #include "extIncludes.h"
-#include "random.h"
 #include "base.h"
+#include "random.h"
 
 #ifndef __H_CLASSES_BASE2
 #define __H_CLASSES_BASE2
 
 #define __GRID_CIRCLE_SEGMENTS 100
+class components_base;
+
 /*
  *  The Grid is supposed to ease up workload for finding near neighbors and to increase overall performance
  *  The grid contains cells and each grid cell stores pointers to all components which are located in the gird cell
@@ -13,7 +15,7 @@
 
 class grid_cell : public base {
 	public:
-		grid_cell(ofVec2d iA,ofVec2d iB);
+		grid_cell(std::vector<ofVec2d> iPositions);
 		~grid_cell();
 		std::set<components_base*>& get_components();
 		void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
@@ -57,6 +59,7 @@ class grid_base {
 		unsigned long long resolution;
 };
 
+
 /*
  * Base function for all physical components.
  * It is the base call for cells and substrates
@@ -71,12 +74,9 @@ class components_base : public base {
 		virtual bool& get_canMove();
 		virtual bool& get_canColide();
 
-		virtual unsigned long long& get_timeStamp();
 		virtual std::set<unsigned>& get_ignoreIntersect();
 		virtual std::set<components_base*>& get_intersectorsChecked();
 		virtual std::vector<grid_cell*>& get_gridCells();
-		virtual visual_base* get_visualObj();
-		virtual unsigned get_typeID();
 
 		virtual void set_canMove(bool iCanMove);
 		virtual void set_canColide(bool iCanColide);
@@ -87,12 +87,8 @@ class components_base : public base {
 		virtual void add_ignoreIntersect(unsigned iIgnore);
 		virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
 	protected:
-		virtual void update_timeStamp();
 		bool canMove; // is it a fixed object
 		bool canColide; // can this object collide aka does it have physics?
-		unsigned long long timeStamp; // timestamp is relevant for update features
-		unsigned typeID; // since type_info doesn't work we need to use this
-		visual_base* associatedVisualObj; // assignes a visual object
 		std::set<unsigned> ignoreIntersect; // ignore class types for collision
 		std::vector<components_base*> intersectors; // list of objects which intersect with
 		std::vector<ofVec2d> intersectorsVectors; // list of collision vectors of intersectors

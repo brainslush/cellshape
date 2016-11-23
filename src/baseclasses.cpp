@@ -1,11 +1,12 @@
 #include "baseclasses.h"
 
+boost::random::mt19937 RandomGen;
 
 /***************************
  * grid_cell
  ***************************/
 
-grid_cell::grid_cell(ofVec2d iA, ofVec2d iB) {
+grid_cell::grid_cell(std::vector<ofVec2d> iPositions): base(iPositions) {
 	associatedVisualObj = new visual_rectangle(this);
 }
 grid_cell::~grid_cell() {
@@ -166,10 +167,16 @@ grid_base::grid_base(unsigned long long iResolution, double iSideLength) {
 	sideLength = iSideLength;
 	resolution = iResolution;
 	double stepLength = iSideLength / (double) iResolution;
+	std::vector<ofVec2d> pos;
 	for(unsigned long long i = 0; i < resolution; i++) {
 		std::vector<grid_cell> temp;
 		for(unsigned long long j = 0; j < resolution; j++) {
-			temp.push_back(grid_cell(ofVec2d(stepLength * i, stepLength * i),ofVec2d(stepLength * j, stepLength * j)));
+			pos.clear();
+			pos.push_back(ofVec2d(stepLength * i, stepLength * j));
+			pos.push_back(ofVec2d(stepLength * i, stepLength * (j + 1)));
+			pos.push_back(ofVec2d(stepLength * (i + 1), stepLength * (j +1)));
+			pos.push_back(ofVec2d(ofVec2d(stepLength * (i + 1), stepLength * j)));
+			temp.push_back(grid_cell(pos));
 		}
 		cells.push_back(temp);
 	}
@@ -304,136 +311,21 @@ void grid_base::update_components() {
 }
 
 /***************************
- * visual_base
- ***************************/
-
-visual_base::visual_base(unsigned iType, components_base* iComponent) {
-	type = iType;
-	color.r = 0.0;
-	color.g = 0.0;
-	color.b = 0.0;
-	color.a = 0.0;
-	fillColor.r = 0.0;
-	fillColor.g = 0.0;
-	fillColor.b = 0.0;
-	fillColor.a = 0.0;
-	associatedComponent = iComponent;
-}
-visual_base::~visual_base(){
-
-}
-components_base& visual_base::get_associatedComponent() {
-	return *associatedComponent;
-}
-ofFloatColor& visual_base::get_color() {
-	return color;
-}
-ofFloatColor& visual_base::get_fillColor() {
-	return fillColor;
-}
-unsigned& visual_base::get_type() {
-	return type;
-}
-std::vector<ofVec2d>& visual_base::get_positions() {
-	return associatedComponent->get_positions();
-}
-std::vector<double>& visual_base::get_parameters() {
-	return associatedComponent->get_parameters();
-}
-void visual_base::set_associatedComponent(components_base* iComponent) {
-	associatedComponent = iComponent;
-}
-void visual_base::set_color(double iRed, double iGreen, double iBlue, double iAlpha) {
-	color.r = iRed;
-	color.g = iGreen;
-	color.b = iBlue;
-	color.a = iAlpha;
-}
-void visual_base::set_color(double iRed, double iGreen, double iBlue) {
-	color.r = iRed;
-	color.g = iGreen;
-	color.b = iBlue;
-	color.a = 1.0;
-}
-void visual_base::set_fillColor(double iRed, double iGreen, double iBlue, double iAlpha) {
-	fillColor.r = iRed;
-	fillColor.g = iGreen;
-	fillColor.b = iBlue;
-	fillColor.a = iAlpha;
-}
-void visual_base::set_fillColor(double iRed, double iGreen, double iBlue) {
-	fillColor.r = iRed;
-	fillColor.g = iGreen;
-	fillColor.b = iBlue;
-	fillColor.a = 1.0;
-}
-
-/***************************
- * visual_line
- ***************************/
-visual_line::visual_line(components_base* iComponent) : visual_base(1,iComponent) {
-
-}
-visual_line::~visual_line() {
-
-}
-
-/***************************
- * visual_ellipse
- ***************************/
-visual_ellipse::visual_ellipse(components_base* iComponent) : visual_base(2,iComponent) {
-
-}
-visual_ellipse::~visual_ellipse() {
-
-}
-
-/***************************
- * visual_rectangle
- ***************************/
-visual_rectangle::visual_rectangle(components_base* iComponent) : visual_base(3,iComponent) {
-
-}
-visual_rectangle::~visual_rectangle() {
-
-}
-
-/***************************
- * visual_triangle
- ***************************/
-visual_triangle::visual_triangle(components_base* iComponent) : visual_base(4,iComponent) {
-
-}
-visual_triangle::~visual_triangle() {
-
-}
-
-/***************************
  * Components Base
  ***************************/
-components_base::components_base(grid_base* iGrid){
+components_base::components_base(grid_base* iGrid): base(){
 	canMove = true;
 	canColide = true;
-	//ignoreColide.insert(this);
-	associatedVisualObj = NULL;
-	timeStamp = ofGetFrameNum();
 	grid = iGrid;
-	typeID = 0;
 }
 components_base::~components_base() {
 	grid->unregister_component(this);
-	if (associatedVisualObj != NULL) {
-		delete associatedVisualObj;
-	}
 }
 bool& components_base::get_canMove() {
 	return canMove;
 }
 bool& components_base::get_canColide() {
 	return canColide;
-}
-unsigned long long& components_base::get_timeStamp() {
-	return timeStamp;
 }
 std::set<unsigned>& components_base::get_ignoreIntersect() {
 	return ignoreIntersect;
@@ -443,12 +335,6 @@ std::set<components_base*>& components_base::get_intersectorsChecked() {
 }
 std::vector<grid_cell*>& components_base::get_gridCells() {
 	return gridCells;
-}
-visual_base* components_base::get_visualObj() {
-	return associatedVisualObj;
-}
-unsigned components_base::get_typeID() {
-	return typeID;
 }
 
 void components_base::set_gridCells(std::vector<grid_cell*> iGridCells) {
@@ -480,9 +366,6 @@ void components_base::make_timeStep(
 ) {
 	/* do nothing */
 }
-void components_base::update_timeStamp() {
-	timeStamp = ofGetFrameNum();
-};
 
 /***************************
  * Cell Base

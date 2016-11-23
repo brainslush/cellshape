@@ -1,7 +1,5 @@
 #include "random.h"
 
-boost::random::mt19937 RandomGen;
-
 /***************************
  * random_base
  ***************************/
