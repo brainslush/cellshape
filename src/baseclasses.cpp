@@ -6,8 +6,18 @@ boost::random::mt19937 RandomGen;
  * grid_cell
  ***************************/
 
-grid_cell::grid_cell(std::vector<ofVec2d> iPositions): base(iPositions) {
+grid_cell::grid_cell(
+		double iX1,
+		double iY1,
+		double iX2,
+		double iY2
+	): base() {
 	associatedVisualObj = new visual_rectangle(this);
+	positions.clear();
+	positions.push_back(ofVec2d(iX1,iY1));
+	positions.push_back(ofVec2d(iX1,iY2));
+	positions.push_back(ofVec2d(iX2,iY2));
+	positions.push_back(ofVec2d(iX2,iY1));
 }
 grid_cell::~grid_cell() {
 
@@ -172,11 +182,11 @@ grid_base::grid_base(unsigned long long iResolution, double iSideLength) {
 		std::vector<grid_cell> temp;
 		for(unsigned long long j = 0; j < resolution; j++) {
 			pos.clear();
-			pos.push_back(ofVec2d(stepLength * i, stepLength * j));
-			pos.push_back(ofVec2d(stepLength * i, stepLength * (j + 1)));
-			pos.push_back(ofVec2d(stepLength * (i + 1), stepLength * (j +1)));
-			pos.push_back(ofVec2d(ofVec2d(stepLength * (i + 1), stepLength * j)));
-			temp.push_back(grid_cell(pos));
+			double iX1 = stepLength * i;
+			double iY1 = stepLength * j;
+			double iX2 = stepLength * (i + 1);
+			double iY2 = stepLength * (j +1);
+			temp.push_back(grid_cell(iX1,iY1,iX2,iY2));
 		}
 		cells.push_back(temp);
 	}

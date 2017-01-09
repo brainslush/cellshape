@@ -15,7 +15,7 @@ class components_base;
 
 class grid_cell : public base {
 	public:
-		grid_cell(std::vector<ofVec2d> iPositions);
+		grid_cell(double iX1, double iY1, double iX2, double iY2);
 		~grid_cell();
 		std::set<components_base*>& get_components();
 		void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
