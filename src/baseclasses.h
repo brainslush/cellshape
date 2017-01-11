@@ -53,7 +53,7 @@ class grid_base {
 		void update_components();
 	protected:
 		bool lineSegmentIntersection();
-		std::vector<std::vector<grid_cell>> cells;
+		std::vector<grid_cell*> cells;
 		std::set<components_base*> components;
 		double sideLength;
 		unsigned long long resolution;

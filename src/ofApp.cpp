@@ -21,7 +21,7 @@ void ofApp::update(){
 void ofApp::draw(){
 	std::vector<visual_base*>visualObjs;
 	Grid->obtain_visualObjs(visualObjs);
-	//Surface->obtain_visualObjs(visualObjs);
+	Surface->obtain_visualObjs(visualObjs);
 	//Cell->obtain_visualObjs(visualObjs);
 
 	for (auto& it : visualObjs) {
