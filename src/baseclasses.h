@@ -12,6 +12,14 @@ class components_base;
  *  The Grid is supposed to ease up workload for finding near neighbors and to increase overall performance
  *  The grid contains cells and each grid cell stores pointers to all components which are located in the gird cell
  */
+class grid_border : public base {
+	public:
+		grid_border(double iX1, double iY1, double iX2, double iY2);
+		~grid_border();
+		void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+	protected:
+		visual_base* associatedVisualObj;
+};
 
 class grid_cell : public base {
 	public:
@@ -24,10 +32,11 @@ class grid_cell : public base {
 		void remove_component(components_base* iComponent);
 		void add_component(components_base* iComponent);
 	protected:
+		visual_base* associatedVisualObj;
+		std::vector<grid_border*> borders;
 		std::pair<components_base*,ofVec2d> obtain_intersectingCircleLine(components_base* iRef, components_base* iCom);
 		std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> obtain_intersectingLineLine(components_base* iRef, components_base* iCom);
 		std::set<components_base*> components;
-		visual_base* associatedVisualObj;
 		typedef boost::geometry::model::point<
 				double,
 				2,

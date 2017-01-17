@@ -3,6 +3,31 @@
 boost::random::mt19937 RandomGen;
 
 /***************************
+ * grid_borders
+ ***************************/
+
+grid_border::grid_border(
+		double iX1,
+		double iY1,
+		double iX2,
+		double iY2
+	): base() {
+	positions.clear();
+	positions.push_back(ofVec2d(iX1,iY1));
+	positions.push_back(ofVec2d(iX2,iY2));
+	associatedVisualObj = new visual_line(this);
+	associatedVisualObj->set_color(0,0,0,1);
+	associatedVisualObj->set_fillColor(0,0,0,1);
+}
+grid_border::~grid_border() {
+	delete associatedVisualObj;
+}
+void grid_border::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs){
+	iVisualObjs.push_back(associatedVisualObj);
+}
+
+
+/***************************
  * grid_cell
  ***************************/
 
@@ -12,15 +37,24 @@ grid_cell::grid_cell(
 		double iX2,
 		double iY2
 	): base() {
-	associatedVisualObj = new visual_rectangle(this);
+	borders.clear();
+	borders.push_back(new grid_border(iX1,iY1,iX1,iY2));
+	borders.push_back(new grid_border(iX1,iY2,iX2,iY2));
+	borders.push_back(new grid_border(iX2,iY2,iX2,iY1));
+	borders.push_back(new grid_border(iX2,iY1,iX1,iY1));
 	positions.clear();
 	positions.push_back(ofVec2d(iX1,iY1));
 	positions.push_back(ofVec2d(iX1,iY2));
 	positions.push_back(ofVec2d(iX2,iY2));
 	positions.push_back(ofVec2d(iX2,iY1));
+	associatedVisualObj = new visual_rectangle(this);
+	associatedVisualObj->set_color(1,0,0,1);
+	associatedVisualObj->set_fillColor(1,0,0,1);
 }
 grid_cell::~grid_cell() {
-
+	for (auto& it : borders) {
+		delete it;
+	}
 }
 std::set<components_base*>& grid_cell::get_components() {
 	return components;
@@ -93,7 +127,12 @@ std::pair<components_base*,std::pair<ofVec2d,ofVec2d>> grid_cell::obtain_interse
 }
 
 void grid_cell::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
-	iVisualObjs.push_back(associatedVisualObj);
+	if (components.size() > 0) {
+		iVisualObjs.push_back(associatedVisualObj);
+	}
+	for (auto& it : borders) {
+		it->obtain_visualObjs(iVisualObjs);
+	}
 }
 void grid_cell::obtain_intersecting(components_base* iComponentA,components_base* iComponentB) {
 	std::pair<components_base*,ofVec2d> temp;
@@ -202,7 +241,7 @@ void grid_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 void grid_base::register_component(components_base* iComponent) {
 	if (iComponent->get_visualObj()) {
 		components.insert(iComponent);
-		update_component(iComponent);
+		//update_component(iComponent);
 	} else {
 		std::cout << "Could not register object with ID: " << iComponent->get_typeID() << "\n Visual object is missing";
 	}
@@ -238,9 +277,9 @@ void grid_base::update_component(components_base* iComponent) {
 				double xMin = std::min(posA.x,posB.x);
 				double xMax = std::max(posA.x,posB.x);
 				while (xMin < xMax) {
-					assignedCells.push_back(
-							(cells[floor(xMin / cellLength) * resolution + floor((m * xMin + f0) / cellLength)])
-					);
+					unsigned long long index = floor(xMin / cellLength) * resolution + floor((m * xMin + f0) / cellLength);
+					assignedCells.push_back(cells[index]);
+					cells[index]->add_component(iComponent);
 					xMin += cellLength;
 				}
 			} else {
@@ -248,7 +287,9 @@ void grid_base::update_component(components_base* iComponent) {
 				double yMax = std::max(posA.y,posB.y);
 				unsigned long long x = floor(posA.x / cellLength);
 				while (yMin < yMax) {
-					assignedCells.push_back(cells[x * resolution + floor(yMin / cellLength)]);
+					unsigned long long index = x * resolution + floor(yMin / cellLength);
+					assignedCells.push_back(cells[index]);
+					cells[index]->add_component(iComponent);
 					yMin += cellLength;
 				}
 			}
@@ -269,10 +310,16 @@ void grid_base::update_component(components_base* iComponent) {
 				unsigned long long yB = floor((-y + pos.y) / cellLength);
 				unsigned long long x = floor(xMin / cellLength);
 				if (y != 0) {
-					assignedCells.push_back(cells[x * resolution + yA]);
-					assignedCells.push_back(cells[x * resolution + yB]);
+					unsigned long long indexA = x * resolution + yA;
+					unsigned long long indexB = x * resolution + yB;
+					assignedCells.push_back(cells[indexA]);
+					assignedCells.push_back(cells[indexB]);
+					cells[indexA]->add_component(iComponent);
+					cells[indexB]->add_component(iComponent);
 				} else {
-					assignedCells.push_back(cells[x * resolution + yA]);
+					unsigned long long index = x * resolution + yA;
+					assignedCells.push_back(cells[index]);
+					cells[index]->add_component(iComponent);
 				}
 				xMin += cellLength;
 			}
@@ -294,14 +341,20 @@ void grid_base::update_component(components_base* iComponent) {
 			unsigned long long yB = floor(yMax / cellLength);
 			while (xMin < xMax) {
 				unsigned long long x = floor(xMin / cellLength);
-				assignedCells.push_back(cells[x * resolution + yA]);
-				assignedCells.push_back(cells[x * resolution + yB]);
+				unsigned long long indexA = x * resolution + yA;
+				unsigned long long indexB = x * resolution + yB;
+				assignedCells.push_back(cells[indexA]);
+				assignedCells.push_back(cells[indexB]);
+				cells[indexA]->add_component(iComponent);
+				cells[indexB]->add_component(iComponent);
 				xMin += cellLength;
 			}
 			while (yMin < yMax) {
 				unsigned long long y = floor(yMin / cellLength);
-				assignedCells.push_back(cells[xA * resolution + y]);
-				assignedCells.push_back(cells[xB * resolution + y]);
+				unsigned long long indexA = xA * resolution + y;
+				unsigned long long indexB = xB * resolution + y;
+				assignedCells.push_back(cells[indexA]);
+				assignedCells.push_back(cells[indexB]);
 				yMin += cellLength;
 			}
 		}

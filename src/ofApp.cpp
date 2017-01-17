@@ -2,14 +2,15 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	unsigned long long sideLength = 510;
 	ofBackground(200,200,200);
-
 	// create mayors
-	Grid = new grid_base(2,2);
+	Grid = new grid_base(20,sideLength);
 	// Create Components
 	Cell = new cell(Grid,250,250,1000);
-	Surface = new simple_surface(Grid,510);
+	Surface = new simple_surface(Grid,sideLength);
 	Surface->create_facs(0,100,10);
+	Grid->update_components();
 }
 
 //--------------------------------------------------------------
@@ -22,7 +23,7 @@ void ofApp::draw(){
 	std::vector<visual_base*>visualObjs;
 	Grid->obtain_visualObjs(visualObjs);
 	Surface->obtain_visualObjs(visualObjs);
-	//Cell->obtain_visualObjs(visualObjs);
+	Cell->obtain_visualObjs(visualObjs);
 
 	for (auto& it : visualObjs) {
 		ofSetColor(it->get_fillColor());
