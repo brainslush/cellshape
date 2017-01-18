@@ -2,14 +2,14 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	unsigned long long sideLength = 510;
+	unsigned long long sideLength = 1000;
 	ofBackground(200,200,200);
 	// create mayors
-	Grid = new grid_base(20,sideLength);
+	Grid = new grid_base(30,sideLength);
 	// Create Components
-	Cell = new cell(Grid,250,250,1000);
+	//Cell = new cell(Grid,450,450,10);
 	Surface = new simple_surface(Grid,sideLength);
-	Surface->create_facs(0,100,10);
+	//Surface->create_facs(0,100,10);
 	Grid->update_components();
 }
 
@@ -23,7 +23,7 @@ void ofApp::draw(){
 	std::vector<visual_base*>visualObjs;
 	Grid->obtain_visualObjs(visualObjs);
 	Surface->obtain_visualObjs(visualObjs);
-	Cell->obtain_visualObjs(visualObjs);
+	//Cell->obtain_visualObjs(visualObjs);
 
 	for (auto& it : visualObjs) {
 		ofSetColor(it->get_fillColor());
@@ -48,8 +48,8 @@ void ofApp::draw(){
 				ofDrawRectangle(
 						it->get_positions()[0].x,
 						it->get_positions()[0].y,
-						it->get_positions()[3].x - it->get_positions()[0].x,
-						it->get_positions()[3].y - it->get_positions()[0].y
+						it->get_positions()[2].x - it->get_positions()[0].x,
+						it->get_positions()[2].y - it->get_positions()[0].y
 				);
 				break;
 			case 4:

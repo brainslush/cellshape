@@ -48,8 +48,8 @@ grid_cell::grid_cell(
 	positions.push_back(ofVec2d(iX2,iY2));
 	positions.push_back(ofVec2d(iX2,iY1));
 	associatedVisualObj = new visual_rectangle(this);
-	associatedVisualObj->set_color(1,0,0,1);
-	associatedVisualObj->set_fillColor(1,0,0,1);
+	associatedVisualObj->set_color(0,0,1,1);
+	associatedVisualObj->set_fillColor(0,0,1,1);
 }
 grid_cell::~grid_cell() {
 	for (auto& it : borders) {
@@ -277,7 +277,9 @@ void grid_base::update_component(components_base* iComponent) {
 				double xMin = std::min(posA.x,posB.x);
 				double xMax = std::max(posA.x,posB.x);
 				while (xMin < xMax) {
-					unsigned long long index = floor(xMin / cellLength) * resolution + floor((m * xMin + f0) / cellLength);
+					unsigned long long indexTestA = floor(xMin / cellLength);
+					unsigned long long indexTestB = floor((m * xMin + f0) / cellLength);
+					unsigned long long index = std::min(resolution-1,indexTestA) * resolution + std::min(resolution-1,indexTestB);
 					assignedCells.push_back(cells[index]);
 					cells[index]->add_component(iComponent);
 					xMin += cellLength;
@@ -287,7 +289,8 @@ void grid_base::update_component(components_base* iComponent) {
 				double yMax = std::max(posA.y,posB.y);
 				unsigned long long x = floor(posA.x / cellLength);
 				while (yMin < yMax) {
-					unsigned long long index = x * resolution + floor(yMin / cellLength);
+					unsigned long long indexTest = floor(yMin / cellLength);
+					unsigned long long index = std::min(resolution-1,x) * resolution + std::min(resolution-1,indexTest);
 					assignedCells.push_back(cells[index]);
 					cells[index]->add_component(iComponent);
 					yMin += cellLength;
@@ -623,7 +626,7 @@ membrane_base::membrane_base(
 		double iRadius,
 		unsigned long long iResolution
 ): cell_base(iGrid) {
-	double dAngle = 360 / (double)iResolution;
+	double dAngle = 2*PI/(double)iResolution;
 	for (unsigned long long i = 0; i < iResolution; i++) {
 		parts.push_back(new membrane_part(
 				iGrid,
