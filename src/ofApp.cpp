@@ -5,10 +5,10 @@ void ofApp::setup(){
 	unsigned long long sideLength = 1000;
 	ofBackground(200,200,200);
 	// create mayors
-	Grid = new grid_base(30,sideLength);
+	Grid = new grid_base(40,sideLength);
 	// Create Components
-	//Cell = new cell(Grid,450,450,10);
-	Surface = new simple_surface(Grid,sideLength);
+	Cell = new cell(Grid,450,450,10);
+	//Surface = new simple_surface(Grid,sideLength);
 	//Surface->create_facs(0,100,10);
 	Grid->update_components();
 }
@@ -22,8 +22,8 @@ void ofApp::update(){
 void ofApp::draw(){
 	std::vector<visual_base*>visualObjs;
 	Grid->obtain_visualObjs(visualObjs);
-	Surface->obtain_visualObjs(visualObjs);
-	//Cell->obtain_visualObjs(visualObjs);
+	//Surface->obtain_visualObjs(visualObjs);
+	Cell->obtain_visualObjs(visualObjs);
 
 	for (auto& it : visualObjs) {
 		ofSetColor(it->get_fillColor());

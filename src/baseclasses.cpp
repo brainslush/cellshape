@@ -268,23 +268,43 @@ void grid_base::update_component(components_base* iComponent) {
 			// get slope
 			double m = std::numeric_limits<double>::infinity();
 			if (posA.x != posB.x) {
-				m = (posA.y - posB.y) / (posA.x - posB.x);
+				m = (posA.y - posB.y) / ((posA.x - posB.x) * cellLength);
 			}
+			// get f(0)
+			double f0 = (posA.y - m * posA.x) / cellLength;
+			// get mins and maxs
+			double yMin = std::min(posA.y,posB.y);
+			double yMax = std::max(posA.y,posB.y);
+			double xMin = std::min(posA.x,posB.x);
+			double xMax = std::max(posA.x,posB.x);
+			unsigned long long indexXMin = floor(xMin/cellLength);
+			unsigned long long indexXMax = floor(xMax/cellLength);
+			unsigned long long indexYMin = floor(yMin/cellLength);
+			unsigned long long indexYMax = floor(yMax/cellLength);
 			// get cells
-			if (m < std::numeric_limits<double>::max()) {
-				// get f(0)
-				double f0 = posA.y - m * posA.x;
-				double xMin = std::min(posA.x,posB.x);
-				double xMax = std::max(posA.x,posB.x);
-				while (xMin < xMax) {
-					unsigned long long indexTestA = floor(xMin / cellLength);
-					unsigned long long indexTestB = floor((m * xMin + f0) / cellLength);
-					unsigned long long index = std::min(resolution-1,indexTestA) * resolution + std::min(resolution-1,indexTestB);
+			if (abs(m) < 1/cellLength) {
+				while (indexXMin < indexXMax) {
+					unsigned long long indexTest = floor(m * indexXMin + f0);
+					unsigned long long index = std::min(resolution-1,indexXMin) * resolution + std::min(resolution-1,indexTest);
 					assignedCells.push_back(cells[index]);
 					cells[index]->add_component(iComponent);
-					xMin += cellLength;
+					++indexXMin;
 				}
 			} else {
+				while (indexYMin < indexYMax) {
+					if (abs(m) < std::numeric_limits<double>::max()) {
+						unsigned long long indexTest = floor((indexYMin - f0) / m);
+						unsigned long long index = std::min(resolution-1,indexTest) * resolution + std::min(resolution-1,indexYMin);
+						assignedCells.push_back(cells[index]);
+						cells[index]->add_component(iComponent);
+					} else {
+						unsigned long long index = std::min(resolution-1,indexXMin) * resolution + std::min(resolution-1,indexYMin);
+						assignedCells.push_back(cells[index]);
+						cells[index]->add_component(iComponent);
+					}
+					++indexYMin;
+				}
+				/*
 				double yMin = std::min(posA.y,posB.y);
 				double yMax = std::max(posA.y,posB.y);
 				unsigned long long x = floor(posA.x / cellLength);
@@ -295,6 +315,7 @@ void grid_base::update_component(components_base* iComponent) {
 					cells[index]->add_component(iComponent);
 					yMin += cellLength;
 				}
+				*/
 			}
 		}
 		break;
