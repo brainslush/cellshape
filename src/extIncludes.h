@@ -9,6 +9,7 @@
 #define SRC_EXTINCLUDES_H_
 
 #include <vector>
+#include <boost/algorithm/clamp.hpp>
 #include <boost/variant.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_smallint.hpp>

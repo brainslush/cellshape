@@ -85,11 +85,11 @@ class components_base : public base {
 
 		virtual std::set<unsigned>& get_ignoreIntersect();
 		virtual std::set<components_base*>& get_intersectorsChecked();
-		virtual std::vector<grid_cell*>& get_gridCells();
+		virtual std::set<grid_cell*>& get_gridCells();
 
 		virtual void set_canMove(bool iCanMove);
 		virtual void set_canColide(bool iCanColide);
-		virtual void set_gridCells(std::vector<grid_cell*> iGridCells);
+		virtual void set_gridCells(std::set<grid_cell*> iGridCells);
 
 		virtual void clear_intersectors();
 		virtual void add_intersector(components_base* iIntersector, ofVec2d iIntersectorVec);
@@ -102,7 +102,7 @@ class components_base : public base {
 		std::vector<components_base*> intersectors; // list of objects which intersect with
 		std::vector<ofVec2d> intersectorsVectors; // list of collision vectors of intersectors
 		std::set<components_base*> intersectorsChecked;
-		std::vector<grid_cell*> gridCells; // gridcells in which object lies
+		std::set<grid_cell*> gridCells; // gridcells in which object lies
 		grid_base* grid;
 };
 

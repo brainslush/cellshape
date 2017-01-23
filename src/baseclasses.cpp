@@ -259,7 +259,7 @@ void grid_base::update_component(components_base* iComponent) {
 		it->remove_component(iComponent);
 	}
 	//assign new cells
-	std::vector<grid_cell*> assignedCells;
+	std::set<grid_cell*> assignedCells;
 	switch (iComponent->get_visualObj()->get_type()) {
 		case 1: {
 			const ofVec2d& posA = iComponent->get_positions()[0];
@@ -268,10 +268,11 @@ void grid_base::update_component(components_base* iComponent) {
 			// get slope
 			double m = std::numeric_limits<double>::infinity();
 			if (posA.x != posB.x) {
-				m = (posA.y - posB.y) / ((posA.x - posB.x) * cellLength);
+				m = (posA.y - posB.y) / (posA.x - posB.x);
 			}
 			// get f(0)
-			double f0 = (posA.y - m * posA.x) / cellLength;
+			double f0 = (posA.y - m * posA.x);
+			double f0Red = f0 / cellLength;
 			// get mins and maxs
 			double yMin = std::min(posA.y,posB.y);
 			double yMax = std::max(posA.y,posB.y);
@@ -282,24 +283,39 @@ void grid_base::update_component(components_base* iComponent) {
 			unsigned long long indexYMin = floor(yMin/cellLength);
 			unsigned long long indexYMax = floor(yMax/cellLength);
 			// get cells
-			if (abs(m) < 1/cellLength) {
-				while (indexXMin < indexXMax) {
-					unsigned long long indexTest = floor(m * indexXMin + f0);
-					unsigned long long index = std::min(resolution-1,indexXMin) * resolution + std::min(resolution-1,indexTest);
-					assignedCells.push_back(cells[index]);
-					cells[index]->add_component(iComponent);
+			if (abs(m) < 1) {
+				while (indexXMin <= indexXMax) {
+					// calculate y value
+					unsigned long long indexTestT = floor(f0Red + m * indexXMin);
+					unsigned long long indexTestB = boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),indexYMin,indexXMax);
+					unsigned long long indexT = std::min(resolution-1,indexXMin) * resolution + std::min(resolution-1,indexTestT);
+					unsigned long long indexB = std::min(resolution-1,indexXMin) * resolution + std::min(resolution-1,indexTestB);
+					assignedCells.insert(cells[indexT]);
+					cells[indexT]->add_component(iComponent);
+					if (indexT != indexB) {
+						assignedCells.insert(cells[indexB]);
+						cells[indexB]->add_component(iComponent);
+					}
 					++indexXMin;
 				}
 			} else {
-				while (indexYMin < indexYMax) {
+				while (indexYMin <= indexYMax) {
 					if (abs(m) < std::numeric_limits<double>::max()) {
-						unsigned long long indexTest = floor((indexYMin - f0) / m);
-						unsigned long long index = std::min(resolution-1,indexTest) * resolution + std::min(resolution-1,indexYMin);
-						assignedCells.push_back(cells[index]);
-						cells[index]->add_component(iComponent);
+						// calculate x value
+						unsigned long long indexTestL = floor((indexYMin - f0Red) / m);
+						unsigned long long indexTestR = boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),indexXMin,indexXMax);
+						unsigned long long indexL = std::min(resolution-1,indexTestL) * resolution + std::min(resolution-1,indexYMin);
+						unsigned long long indexR = std::min(resolution-1,indexTestR) * resolution + std::min(resolution-1,indexYMin);
+						assignedCells.insert(cells[indexL]);
+						cells[indexL]->add_component(iComponent);
+						if (indexL != indexR) {
+							assignedCells.insert(cells[indexR]);
+							cells[indexR]->add_component(iComponent);
+						}
 					} else {
+						// take care of vertical lines
 						unsigned long long index = std::min(resolution-1,indexXMin) * resolution + std::min(resolution-1,indexYMin);
-						assignedCells.push_back(cells[index]);
+						assignedCells.insert(cells[index]);
 						cells[index]->add_component(iComponent);
 					}
 					++indexYMin;
@@ -327,7 +343,21 @@ void grid_base::update_component(components_base* iComponent) {
 			// get lowest x
 			double xMin = pos.x - a;
 			double xMax = pos.x + a;
+			unsigned long long indexXMin = floor(xMin/cellLength);
+			unsigned long long indexXMax = floor(xMax/cellLength);
 			// get grid cells
+			while (indexXMin <= indexXMax) {
+				double x = boost::algorithm::clamp(indexXMin,xMin,xMax);
+				double y = sqrt(b*b * (1 - pow((x - pos.x) / a,2)));
+				unsigned long long indexYMin = floor(pos.y - y);
+				unsigned long long indexYMax = floor(pos.y + y);
+				while (indexYMin <= indexYMax) {
+					unsigned long long indexR = 0;
+					unsigned long long indexL = 0;
+				}
+				++indexXMin;
+			}
+			/*
 			while (xMin < xMax) {
 				double y = sqrt(pow(b,2) * (1 - pow((xMin - pos.x) / a,2)));
 				unsigned long long yA = floor((y + pos.y) / cellLength);
@@ -336,17 +366,18 @@ void grid_base::update_component(components_base* iComponent) {
 				if (y != 0) {
 					unsigned long long indexA = x * resolution + yA;
 					unsigned long long indexB = x * resolution + yB;
-					assignedCells.push_back(cells[indexA]);
-					assignedCells.push_back(cells[indexB]);
+					assignedCells.insert(cells[indexA]);
+					assignedCells.insert(cells[indexB]);
 					cells[indexA]->add_component(iComponent);
 					cells[indexB]->add_component(iComponent);
 				} else {
 					unsigned long long index = x * resolution + yA;
-					assignedCells.push_back(cells[index]);
+					assignedCells.insert(cells[index]);
 					cells[index]->add_component(iComponent);
 				}
 				xMin += cellLength;
 			}
+			*/
 		}
 		break;
 		case 3: {
@@ -367,8 +398,8 @@ void grid_base::update_component(components_base* iComponent) {
 				unsigned long long x = floor(xMin / cellLength);
 				unsigned long long indexA = x * resolution + yA;
 				unsigned long long indexB = x * resolution + yB;
-				assignedCells.push_back(cells[indexA]);
-				assignedCells.push_back(cells[indexB]);
+				assignedCells.insert(cells[indexA]);
+				assignedCells.insert(cells[indexB]);
 				cells[indexA]->add_component(iComponent);
 				cells[indexB]->add_component(iComponent);
 				xMin += cellLength;
@@ -377,8 +408,8 @@ void grid_base::update_component(components_base* iComponent) {
 				unsigned long long y = floor(yMin / cellLength);
 				unsigned long long indexA = xA * resolution + y;
 				unsigned long long indexB = xB * resolution + y;
-				assignedCells.push_back(cells[indexA]);
-				assignedCells.push_back(cells[indexB]);
+				assignedCells.insert(cells[indexA]);
+				assignedCells.insert(cells[indexB]);
 				yMin += cellLength;
 			}
 		}
@@ -415,11 +446,11 @@ std::set<unsigned>& components_base::get_ignoreIntersect() {
 std::set<components_base*>& components_base::get_intersectorsChecked() {
 	return intersectorsChecked;
 }
-std::vector<grid_cell*>& components_base::get_gridCells() {
+std::set<grid_cell*>& components_base::get_gridCells() {
 	return gridCells;
 }
 
-void components_base::set_gridCells(std::vector<grid_cell*> iGridCells) {
+void components_base::set_gridCells(std::set<grid_cell*> iGridCells) {
 	gridCells = iGridCells;
 }
 void components_base::set_canMove(bool iCanMove) {
