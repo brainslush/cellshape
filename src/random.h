@@ -5,10 +5,16 @@
 
 class random_base {
 	public:
+		random_base();
+		~random_base();
+};
+
+class random_dist : public random_base {
+	public:
 		/*
 		 * boost/random/uniform_smallint.hpp
 		 */
-		random_base(
+		random_dist(
 				boost::random::mt19937* iGen,
 				std::string iType,
 				long long iA,
@@ -18,7 +24,7 @@ class random_base {
 		 * boost/random/normal_distribution.hpp
 		 * boost/random/lognormal_distribution.hpp
 		 */
-		random_base(
+		random_dist(
 				boost::random::mt19937* iGen,
 				std::string iType,
 				double iA,
@@ -27,14 +33,14 @@ class random_base {
 		 * boost/random/bernoulli_distribution.hpp
 		 * boost/random/exponential_distribution.hpp
 		 */
-		random_base(
+		random_dist(
 				boost::random::mt19937* iGen,
 				std::string iType,
 				double iA);
 		/*
 		 * boost/random/uniform_01.hpp
 		 */
-		random_base(
+		random_dist(
 				boost::random::mt19937* iGen,
 				std::string iType);
 		template<class T> T draw ();
@@ -52,22 +58,24 @@ class random_base {
 		> dist;
 };
 
-class random_container {
+class random_container : public random_base {
 	public:
 		random_container();
 		~random_container();
 		unsigned long long& get_seed();
 		void set_seed();
 		void set_seed(unsigned long long iSeed);
-		template<typename... A > random_base* register_random(
+		template<typename... A > random_dist* register_random(
 				std::string iType,
 				A... args
 		);
-		void unregister_random(random_base* iDist);
+		void unregister_random(random_dist* iDist);
 	protected:
 		unsigned long long seed;
+		unsigned long long get_uptime();
 		boost::random::mt19937 gen;
-		std::set<random_base*> distributions;
+		std::set<random_dist*> distributions;
+
 };
 
 #endif

@@ -1,3 +1,3 @@
-ofxGeo
 ofxGui
 ofxXmlSettings
+ofxGeo

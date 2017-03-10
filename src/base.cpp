@@ -23,20 +23,30 @@ base::~base() {
 		delete associatedVisualObj;
 	}
 };
-std::vector<ofVec2d>& base::get_positions() {
-	return positions;
+
+void base::set_gridCells(std::set<grid_cell*> iGridCells) { gridCells = iGridCells; }
+
+std::vector<ofVec2d>& base::get_positions() {return positions;}
+std::vector<double>& base::get_parameters() {return parameters;}
+std::set<unsigned>& base::get_ignoreIntersect() { return ignoreIntersect; }
+std::set<base*>& base::get_intersectorsChecked() { return intersectorsChecked; }
+std::set<grid_cell*>& base::get_gridCells() { return gridCells; }
+visual_base* base::get_visualObj() {return associatedVisualObj;}
+unsigned& base::get_typeID() {return typeID;}
+unsigned long long& base::get_timeStamp() {return timeStamp;}
+
+void base::add_intersector(base * iIntersector, ofVec2d iIntersectorVec) {
+	intersectors.push_back(iIntersector);
+	intersectorsVectors.push_back(iIntersectorVec);
+	intersectorsChecked.insert(iIntersector);
 }
-std::vector<double>& base::get_parameters() {
-	return parameters;
+void base::add_ignoreIntersect(unsigned iIgnore) {
+	ignoreIntersect.insert(iIgnore);
 }
-visual_base* base::get_visualObj() {
-	return associatedVisualObj;
-}
-unsigned long long& base::get_timeStamp() {
-	return timeStamp;
-}
-unsigned& base::get_typeID() {
-	return typeID;
+void base::clear_intersectors() {
+	intersectors.clear();
+	intersectorsVectors.clear();
+	intersectorsChecked.clear();
 }
 void base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 	/*do nothing*/
@@ -114,38 +124,30 @@ void visual_base::set_fillColor(double iRed, double iGreen, double iBlue) {
  * visual_line
  ***************************/
 visual_line::visual_line(base* iComponent) : visual_base(1,iComponent) {
-
 }
 visual_line::~visual_line() {
-
 }
 
 /***************************
  * visual_ellipse
  ***************************/
 visual_ellipse::visual_ellipse(base* iComponent) : visual_base(2,iComponent) {
-
 }
 visual_ellipse::~visual_ellipse() {
-
 }
 
 /***************************
  * visual_rectangle
  ***************************/
 visual_rectangle::visual_rectangle(base* iComponent) : visual_base(3,iComponent) {
-
 }
 visual_rectangle::~visual_rectangle() {
-
 }
 
 /***************************
  * visual_triangle
  ***************************/
 visual_triangle::visual_triangle(base* iComponent) : visual_base(4,iComponent) {
-
 }
 visual_triangle::~visual_triangle() {
-
 }

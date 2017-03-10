@@ -1,9 +1,14 @@
 #include "random.h"
+/***************************
+* random_base for std containers
+***************************/
+random_base::random_base() {}
+random_base::~random_base() {}
 
 /***************************
- * random_base
+ * random_dist
  ***************************/
-random_base::random_base(
+random_dist::random_dist(
 		boost::random::mt19937* iGen,
 		std::string iType,
 		long long iA,
@@ -16,7 +21,7 @@ random_base::random_base(
 		dist = new boost::random::uniform_smallint<> (iA,iB);
 	}
 }
-random_base::random_base(
+random_dist::random_dist(
 		boost::random::mt19937* iGen,
 		std::string iType,
 		double iA,
@@ -37,7 +42,7 @@ random_base::random_base(
 		dist = new boost::random::lognormal_distribution<> (iA,iB);
 	}
 }
-random_base::random_base(
+random_dist::random_dist(
 		boost::random::mt19937* iGen,
 		std::string iType,
 		double iA)
@@ -53,7 +58,7 @@ random_base::random_base(
 		dist = new boost::random::exponential_distribution<> (iA);
 	}
 }
-random_base::random_base(
+random_dist::random_dist(
 		boost::random::mt19937* iGen,
 		std::string iType)
 {
@@ -65,7 +70,7 @@ random_base::random_base(
 	}
 }
 
-template<class T> T random_base::draw() {
+template<class T> T random_dist::draw() {
 	switch(type) {
 		case 10:
 			return (*boost::get<boost::random::uniform_smallint<>*>(dist))(*gen);
@@ -103,25 +108,44 @@ random_container::~random_container() {
 		delete it;
 	}
 }
-unsigned long long& random_container::get_seed() {
+unsigned long long& random_container::get_seed () {
 	return seed;
 }
-void random_container::set_seed() {
-
+void random_container::set_seed () {
+	seed = get_uptime();
 }
-void random_container::set_seed(unsigned long long iSeed) {
+void random_container::set_seed (unsigned long long iSeed) {
 	seed = iSeed;
 	gen.seed(seed);
 }
-template<typename... A> random_base* random_container::register_random(
+template<typename... A> random_dist* random_container::register_random (
 		std::string iType,
 		A... args
 ) {
-	random_base* temp = new random_base(&gen,iType,args...);
+	random_dist* temp = new random_dist (&gen,iType,args...);
 	distributions.insert(temp);
 	return temp;
 }
-void random_container::unregister_random(random_base* iDist) {
+void random_container::unregister_random(random_dist* iDist) {
 	delete iDist;
 	distributions.erase(iDist);
+}
+
+unsigned long long random_container::get_uptime() {
+#if defined(BOOST_WINDOWS)
+	return GetTickCount64();
+#elif defined(__linux__) || defined(__linux) || defined(linux)
+	double uptime_seconds;
+	if (std::ifstream("/proc/uptime", std::ios::in) >> uptime_seconds)	{
+		uptime = std::chrono::milliseconds(
+			static_cast<unsigned long long>(uptime_seconds) * 1000ULL
+		);
+	}
+#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
+	/* still missing */
+#elif (defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)) && defined(CLOCK_UPTIME)
+	/* still missing */
+#else
+	return 0;
+#endif
 }

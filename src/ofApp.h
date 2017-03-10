@@ -23,8 +23,8 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 	protected:
-		std::set<random_base> Rnd;
-		grid_base* Grid;
+		globalVars Globals;
 		cell* Cell;
 		simple_surface* Surface;
+		unsigned long long sideLength = 500;
 };
