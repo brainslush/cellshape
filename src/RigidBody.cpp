@@ -21,7 +21,7 @@ RigidBody::RigidBody(
   P = ofVec2d(0,0);
   L = 0;
   F = ofVec2d(0,0);
-  T = ofVec2d(0,0);
+  T = 0;
 }
 
 RigidBody::~RigidBody() {

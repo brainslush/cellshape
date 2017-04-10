@@ -33,6 +33,8 @@ protected:
   double M; // mass
   ofVec2d F; // forces
   double T; // torque
+  void do_verlet();
+  void do_rk4();
 };
 
 #endif /* SRC_RIGIDBODY_H_ */

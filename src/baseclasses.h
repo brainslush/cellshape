@@ -3,6 +3,7 @@
 #include "base.h"
 #include "random.h"
 #include "grid.h"
+#include "RigidBody.h"
 
 
 #ifndef __H_CLASSES_BASE2
