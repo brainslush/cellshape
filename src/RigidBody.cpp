@@ -1,3 +1,4 @@
+#include "RigidBody.h"
 /*
  * RigidBody.cpp
  *
@@ -51,4 +52,8 @@ void RigidBody::make_timeStep() {
   // reset forces and torque
   F.x, F.y = 0;
   T = 0;
+}
+
+void RigidBody::do_verlet () {
+
 }
