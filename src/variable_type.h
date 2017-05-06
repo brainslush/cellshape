@@ -68,14 +68,12 @@ template<class VT> inline VT& variable_type<VT>::get_lastValue() {return lastVal
 template<class VT> inline std::string& variable_type<VT>::get_name() {return name;}
 template<class VT> inline std::string& variable_type<VT>::get_label() {return label;}
 
-template<class VT>
-inline VT variable_type<VT>::operator+(variable_type& rhs) {
+template<class VT> inline VT variable_type<VT>::operator+(variable_type& rhs) {
 	VT temp;
 	temp = lhs.get_value() + rhs.get_value();
 	return temp;
 }
-template<class VT>
-inline VT variable_type<VT>::operator-(variable_type& rhs) {
+template<class VT> inline VT variable_type<VT>::operator-(variable_type& rhs) {
 	VT temp;
 	temp = lhs.get_value() - rhs.get_value();
 	return temp;

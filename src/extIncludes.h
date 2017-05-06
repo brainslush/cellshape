@@ -20,7 +20,7 @@
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/exponential_distribution.hpp>
 //#include <boost/geometry.hpp>
-//#include <boost/geometry/geometries/linestring.hpp> 
+//#include <boost/geometry/geometries/linestring.hpp>
 //#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <limits>
@@ -29,6 +29,8 @@
 #include <vector>
 #include <set>
 #include <string>
+
+#include <Eigen>
 
 #include "ofColor.h"
 //#include "ofPoint.h"
