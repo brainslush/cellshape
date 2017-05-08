@@ -30,7 +30,7 @@
 #include <set>
 #include <string>
 
-#include <Eigen/Eigen>
+//#include <eigen3/Eigen/Eigen>
 
 #include "ofColor.h"
 //#include "ofPoint.h"
