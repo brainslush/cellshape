@@ -84,13 +84,14 @@ void RigidBody3d::do_verlet (double& dT) {
         qk1t2 = qm + 0.5 * dT * qdk1t2;
     };
     Eigen::Quaterniond qdt = Eigen::Quaterniond (qm + dT * qdk1t2);
-    Eigen::Vector3d ldt = ;
+    Eigen::Vector3d ldt = L + dT * T;
+    ldt = L + 0.5 * dT  * (T + calcTorque(xdt,vdtt,qdt,ldt)); // estiamte ldt
     // calc new forces and torques
     Eigen::Vector3d adt = calcForce(xdt,vdtt,qdt,ldt);
-    Eigen::Vector3d Tdt = calcTorque(xdt,vdtt,qdt,ldt)
+    Eigen::Vector3d Tdt = calcTorque (xdt, vdtt, qdt, ldt);
     // translation part 2
-    Eigen::Vector3d vdt = v + 0.5 * dT;
-        v = v + 0.5 * dT * (a * adt);
+    Eigen::Vector3d vdt = v + 0.5 * dT * (a + adt);
+    Eigen::Vector3d ldt
     // rotation
     
 
@@ -119,7 +120,7 @@ double (*iCalcTorque)(
     X (iX),
     I (iI),
     M (iM),
-    R (iR);
+    R (iR),
     calcForce (iCalcForce),
     calcTorque (iCalcTorque)
 {
