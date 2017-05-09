@@ -2,6 +2,11 @@
 #include <vector>
 #include <string>
 
+class variable_base {
+    variable_base(){};
+    ~variable_base(){};
+};
+
 template <class VT>
 class variable_type {
 public:
@@ -11,6 +16,7 @@ public:
     void set_updated(bool iUpdated);
     void set_initValue(VT iInitValue);
     void set_value(VT iValue);
+    void set_value(VT& iValue);
     void set_lastValue(VT iLastValue);
     bool& isUpdated();
     VT& get_initValue();
@@ -24,12 +30,12 @@ public:
     void start_timeLine();
     void stop_timeLine();
     void reset_timeLine();
-    VT operator+ (variable_type<VT>& rhs);
-    VT operator- (variable_type<VT>& rhs);
-    VT operator* (variable_type<VT>& rhs);
-    VT operator/ (variable_type<VT>& rhs);
+    VT& operator+ (variable_type<VT>& rhs);
+    VT& operator- (variable_type<VT>& rhs);
+    VT& operator* (variable_type<VT>& rhs);
+    VT& operator/ (variable_type<VT>& rhs);
     variable_type<VT>& operator= (VT& rhs);
-    VT operator= (variable_type<VT>& rhs);
+    VT& operator= (variable_type<VT>& rhs);
     variable_type<VT>& operator+= (variable_type<VT>& rhs);
     variable_type<VT>& operator+= (VT& rhs);
     variable_type<VT>& operator-= (variable_type<VT>& rhs);
@@ -57,8 +63,6 @@ template<class VT> inline variable_type<VT>::variable_type():
     name(""),
     label("")
 {
-    mean = 0;
-    variance = 0;
     updated = false;
     meanUpdated = false;
     varianceUpdated = false;
@@ -135,64 +139,56 @@ template<class VT> inline std::vector<VT>& variable_type<VT>::get_timeLine() {
 
 /******************/
 /*Define operators*/
-template<class VT> inline VT variable_type<VT>::operator+(variable_type<VT>& rhs) {
+template<class VT> inline VT& variable_type<VT>::operator+(variable_type<VT>& rhs) {
     VT temp = *this + rhs.get_value();
     return temp;
 }
-template<class VT> inline VT variable_type<VT>::operator-(variable_type<VT>& rhs) {
+template<class VT> inline VT& variable_type<VT>::operator-(variable_type<VT>& rhs) {
     VT temp = *this - rhs.get_value();
     return temp;
 }
-template<class VT> inline VT variable_type<VT>::operator*(variable_type<VT>& rhs) {
+template<class VT> inline VT& variable_type<VT>::operator*(variable_type<VT>& rhs) {
     VT temp = *this * rhs.get_value();
     return VT();
 }
-template<class VT> inline VT variable_type<VT>::operator/(variable_type<VT>& rhs) {
+template<class VT> inline VT& variable_type<VT>::operator/(variable_type<VT>& rhs) {
     VT temp = *this / rhs.get_value();
     return VT();
 }
-template<class VT> inline variable_type<VT>& variable_type<VT>::operator=(variable_type<VT>& rhs) {
-    this->set_lastValue(this->get_lastValue());
-    this->set_value(rhs.get_value());
+template<class VT> inline VT& variable_type<VT>::operator=(variable_type<VT>& rhs) {
+    lastValue = value;
+    value = rhs.get_value();
     return *this;
 }
-template<class VT> inline variable_type<VT>& variable_type<VT>::operator=(VT& iValue) {
-    this->set_value(iValue);
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator=(VT& rhs) {
+    value = rhs;
     return *this;
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator+=(variable_type& iObj) {
-	this->set_value(value + iObj.get_value());
-	return *this;
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator+=(variable_type<VT>& rhs) {
+    this->set_value(value + rhs.get_value());
+    return *this;
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator+=(const VT iValue) {
-	this->set_value(value + iValue);
-	return *this;
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator+=(VT& rhs) {
+    this->set_value(value + rhs);
+    return *this;
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator-=(variable_type& iObj) {
-	this->set_value(value - iObj.get_value());
-	return *this;
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator-=(variable_type<VT>& rhs) {
+    value = value - rhs.get_value();
+    return *this;
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator-=(const VT iValue) {
-	this->set_value(value - iValue);
-	return *this;
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator-=(VT& rhs) {
+    value = value - rhs;
+    return *this;
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator*=(variable_type & iValue) {
-	// TODO: insert return statement here
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator*=(variable_type<VT>& rhs) {
+    value = value * rhs.get_value();
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator*=(const VT iValue) {
-	// TODO: insert return statement here
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator*=(VT& rhs) {
+    // TODO: insert return statement here
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator/=(variable_type & iValue) {
-	// TODO: insert return statement here
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator/=(variable_type<VT>& rhs) {
+    // TODO: insert return statement here
 }
-template<class VT>
-inline variable_type<VT>& variable_type<VT>::operator/=(const VT iValue) {
-	// TODO: insert return statement here
+template<class VT> inline variable_type<VT>& variable_type<VT>::operator/=(VT& rhs) {
+    // TODO: insert return statement here
 }

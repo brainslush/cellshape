@@ -7,37 +7,28 @@
  *      Author: siegbahn
  */
 
+using namespace physic;
 RigidBody3d::RigidBody3d (
     Eigen::Vector3d iX,
-    Eigen::Vector3d iR, // rotation in lab frame
+    Eigen::Quaterniond iQ, // rotation in lab frame
     Eigen::Matrix3d iI,
     double iM,
-    Eigen::Vector3d& (*iCalcForce)(
-        Eigen::Vector3d& X,
-        Eigen::Vector3d& v,
-        Eigen::Vector3d& R,
-        Eigen::Vector3d& L
-    ),
-    Eigen::Vector3d& (*iCalcTorque)(
-        Eigen::Vector3d& X,
-        Eigen::Vector3d& v,
-        Eigen::Vector3d& R,
-        Eigen::Vector3d& L
-    ),
-    double iEpsilon
+    double iEpsilon,
+    functor& iForceFunctor,
+    functor& iTorqueFunctor
 ):
     X(iX),
+    q(iQ),
     I(iI),
     M(iM),
-    calcForce(iCalcForce),
-    calcTorque(iCalcTorque),
-    epsilon(iEpsilon)
+    epsilon(iEpsilon),
+    forceFunctor(iForceFunctor),
+    torqueFunctor(iTorqueFunctor)
 {
     v = Eigen::Vector3d(0,0,0);
     L = Eigen::Vector3d(0,0,0);
     F = Eigen::Vector3d(0,0,0);
     T = Eigen::Vector3d(0,0,0);
-    q = Eigen::Quaterniond(0, 0, 0, 1);
 }
 RigidBody3d::~RigidBody3d() {
     // TODO Auto-generated destructor stub
@@ -45,7 +36,10 @@ RigidBody3d::~RigidBody3d() {
 Eigen::Vector3d& RigidBody3d::get_position() {
     return X;
 }
-Eigen::Quaterniond& RigidBody3d::get_rotation() {
+Eigen::Matrix3d RigidBody3d::get_rotationMatrix() {
+    return q.toRotationMatrix();
+}
+Eigen::Quaterniond& RigidBody3d::get_quaternion() {
     return q;
 }
 Eigen::Vector3d& RigidBody3d::get_velocity() {
@@ -66,8 +60,8 @@ void RigidBody3d::add_force(Eigen::Vector3d& iX, Eigen::Vector3d& iF) {
 }
 void RigidBody3d::do_timeStep(double& dT) {
     // update force and torque
-    F = calcForce(X,v,q,L);
-    T = calcTorque(X,v,q,L);
+    F = forceFunctor.calc(X,v,q,L);
+    T = torqueFunctor.calc(X,v,q,L);
     // do simulation via verlet
     do_verlet(dT);
 }
@@ -75,7 +69,7 @@ void RigidBody3d::do_verlet (double& dT) {
     Eigen::Vector3d a = F / M;
     // translation part 1
     Eigen::Vector3d xdt = X + dT * v + 0.5 * dT * dT * a;
-    Eigen::Vector3d vdtt = v + dT * a;
+    Eigen::Vector3d vdtt = v + dT * a; // something is missing here
     // rotational part 1
     q.normalize();
     Eigen::Matrix3d qm = q.matrix(); // transforming quaterinon to matrix increases speed
@@ -86,20 +80,20 @@ void RigidBody3d::do_verlet (double& dT) {
     Eigen::Vector3d lbt2 = lb + 0.5 * dT * (tb - (ib * lb).cross(lb)); // angular momentum in body frame after half time step
     Eigen::Matrix3d qkt2 = qm + 0.25 * dT * qm * (ib * lbt2); // quaternion at half time step at iteration k = 0
     Eigen::Vector3d lwt2 = L + 0.5 * dT * T; // angular momentum in lab frame
-    Eigen::Matrix3d qk1t2, qdk1t2;
+    Eigen::Matrix3d qk1t2, qdk1t2; // initialize variables for loop
     while ((qk1t2 - qkt2).norm () < epsilon) {
         Eigen::Vector3d lbt2k1 = qkt2.conjugate () *  lwt2 * qkt2; //
-        Eigen::Vector3d wk1t2 = ib * lbt2;
+        Eigen::Vector3d wk1t2 = ib * lbt2k1;
         qdk1t2 = 0.5 * qkt2 * wk1t2;
         qk1t2 = qm + 0.5 * dT * qdk1t2;
     };
     q = Eigen::Quaterniond (qm + dT * qdk1t2);
     Eigen::Vector3d ldt = L + dT * T;
-    ldt = L + 0.5 * dT  * (T + calcTorque(xdt,vdtt,q,ldt)); // estiamte ldt
+    ldt = L + 0.5 * dT  * (T + torqueFunctor.calc(xdt,vdtt,q,ldt)); // estiamte ldt
     // translation part 2
-    Eigen::Vector3d adt = calcForce(xdt,vdtt,q,ldt);
-    Eigen::Vector3d vdt = v + 0.5 * dT * (a + adt);
+    Eigen::Vector3d adt = forceFunctor.calc(xdt,vdtt,q,ldt);
+    v = v + 0.5 * dT * (a + adt);
     // rotation part 2
-    Eigen::Vector3d Tdt = calcTorque (xdt, vdtt, q, ldt);
+    Eigen::Vector3d Tdt = torqueFunctor.calc(xdt, vdtt, q, ldt);
     L = L + 0.5 * dT * (T + Tdt);
 }

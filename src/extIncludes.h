@@ -33,9 +33,13 @@
 //#include <eigen3/Eigen/Eigen>
 
 #include "ofColor.h"
-//#include "ofPoint.h"
 #include "ofxGeo.h"
 #include "ofMain.h"
+
+#ifdef Success
+    #undef Success
+#endif
+
 
 // system specific includes for getting systemtime
 //#include <boost/throw_exception.hpp>

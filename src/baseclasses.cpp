@@ -125,8 +125,8 @@ void fillament_base::make_timeStep(double &iTime){
 actin::actin(
 	globalVars& iGlobals,
 	cell_base& iCell,
-	ofVec2d& iStart,
-	ofVec2d& iTmVelocity,
+	ofVec2d iStart,
+	ofVec2d iTmVelocity,
 	double iMaxLength,
 	double iLifeTime,
 	double iStallingForce
@@ -172,8 +172,7 @@ void actin::make_timeStep() {
 	if (birthTime + lifeTime < globals.time) {
 		cell.destory_fillament(this);
 	} else {
-		if (force.get_value().ma < )
-		update_force();
+
 	}
 }
 
@@ -357,7 +356,8 @@ void cell::create_fillament() {
 	/* Needs to be enhanced */
 
 	if (fillaments.size() == 0) {
-		fillaments.insert(new actin(globals,*this,ofVec2d(0, 0),ofVec2d(0.01, 0),100,2000,10));
+
+	    fillaments.insert(new actin(globals,*this,ofVec2d(0,0),ofVec2d(0.01,0),100,2000,10));
 	}
 }
 void cell::destory_fillament(fillament_base * iFillament) {

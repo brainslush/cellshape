@@ -135,16 +135,18 @@ unsigned long long random_container::get_uptime() {
 #if defined(BOOST_WINDOWS)
 	return GetTickCount64();
 #elif defined(__linux__) || defined(__linux) || defined(linux)
+	unsigned long long uptime;
 	double uptime_seconds;
 	if (std::ifstream("/proc/uptime", std::ios::in) >> uptime_seconds)	{
-		uptime = std::chrono::milliseconds(
-			static_cast<unsigned long long>(uptime_seconds) * 1000ULL
-		);
+		uptime = static_cast<unsigned long long>(uptime_seconds) * 1000ULL;
 	}
+	return uptime;
 #elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
 	/* still missing */
+	return 0;
 #elif (defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)) && defined(CLOCK_UPTIME)
 	/* still missing */
+	return 0;
 #else
 	return 0;
 #endif

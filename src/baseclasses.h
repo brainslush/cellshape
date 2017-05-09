@@ -112,8 +112,8 @@ class actin : public fillament_base {
 public:
 	actin(
 		globalVars& iGlobals, cell_base& iCell,
-		ofVec2d& iStart,
-		ofVec2d& iTmVelocity,
+		ofVec2d iStart,
+		ofVec2d iTmVelocity,
 		double iMaxLength,
 		double iLifeTime,
 		double iStallingForce);
