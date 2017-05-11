@@ -108,27 +108,59 @@ public:
 protected:
 	std::set<crosslinker_base*> connectedCrosslinkers;
 };
+class functor_actin_force;
+class functor_actin_torque;
 class actin : public fillament_base {
 public:
-	actin(
-		globalVars& iGlobals, cell_base& iCell,
-		ofVec2d iStart,
-		ofVec2d iTmVelocity,
-		double iMaxLength,
-		double iLifeTime,
-		double iStallingForce);
-	virtual ~actin();
-	virtual void update_force();
-	virtual variable_type<ofVec2d>& get_force();
-	virtual void make_timeStep();
+    actin(
+        globalVars& iGlobals, cell_base& iCell,
+        ofVec2d iStart,
+        ofVec2d iTmVelocity,
+        double iMaxLength,
+        double iLifeTime,
+        double iStallingForce
+    );
+    virtual ~actin();
+    virtual void update_force();
+    virtual variable_type<ofVec2d>& get_force();
+    virtual void make_timeStep();
 protected:
-	variable_type<ofVec2d> tmVelocity; // treadmilling velocity
-	variable_type<ofVec2d> force; // current force vector in actin element
-	const uint64_t birthTime; // time when object is created
-	const double maxLength; // maximum length
-	const double lifeTime; // dies after lifetime
-	const double stallingForce;
-	actin* tail;
+    functor_actin_force* forceF;
+    functor_actin_torque* torqueF;
+    physic::RigidBody3d* rigidBody;
+    variable_type<ofVec2d> tmVelocity; // treadmilling velocity
+    variable_type<ofVec2d> force; // current force vector in actin element
+    const uint64_t birthTime; // time when object is created
+    const double maxLength; // maximum length
+    const double lifeTime; // dies after lifetime
+    const double stallingForce; // force at which actin doesn't treadmills anymore
+    actin* tail;
+};
+class functor_actin_force: public physic::functor {
+public:
+    functor_actin_force (actin* iFillament);
+    virtual ~functor_actin_force ();
+    virtual Eigen::Vector3d calc (
+        Eigen::Vector3d& X,
+        Eigen::Vector3d& v,
+        Eigen::Quaterniond& R,
+        Eigen::Vector3d& L
+    );
+protected:
+    actin* fillament;
+};
+class functor_actin_torque: public physic::functor {
+public:
+    functor_actin_torque (actin* iFillament);
+    virtual ~functor_actin_torque ();
+    virtual Eigen::Vector3d calc (
+        Eigen::Vector3d& X,
+        Eigen::Vector3d& v,
+        Eigen::Quaterniond& R,
+        Eigen::Vector3d& L
+    );
+protected:
+    actin* fillament;
 };
 /***************************
 * volume

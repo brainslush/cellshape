@@ -13,6 +13,7 @@ void ofApp::setup(){
 
 	// Create Components
 	Cell = new cell(Globals,250,250,20);
+	Cell->create_fillament();
 	Surface = new simple_surface(Globals,sideLength);
 	Surface->create_facs(0,30,5);
 	Globals.grid->update_components();

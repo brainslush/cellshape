@@ -123,31 +123,47 @@ void fillament_base::make_timeStep(double &iTime){
  ***************************/
 
 actin::actin(
-	globalVars& iGlobals,
-	cell_base& iCell,
-	ofVec2d iStart,
-	ofVec2d iTmVelocity,
-	double iMaxLength,
-	double iLifeTime,
-	double iStallingForce
+    globalVars& iGlobals,
+    cell_base& iCell,
+    ofVec2d iStart,
+    ofVec2d iTmVelocity,
+    double iMaxLength,
+    double iLifeTime,
+    double iStallingForce
 ):
-	fillament_base(iGlobals,iCell),
-	birthTime(iGlobals.time),
-	maxLength(iMaxLength),
-	lifeTime(iLifeTime),
-	stallingForce(iStallingForce)
+    fillament_base(iGlobals,iCell),
+    birthTime(iGlobals.time),
+    maxLength(iMaxLength),
+    lifeTime(iLifeTime),
+    stallingForce(iStallingForce)
 {
-	positions.clear();
-	positions.push_back(iStart);
-	positions.push_back(iStart);
-	tmVelocity = iTmVelocity;
-	tail = NULL;
-	typeID += 1;
+    positions.clear();
+    positions.push_back(iStart);
+    positions.push_back(iStart);
+    tmVelocity = iTmVelocity;
+    tail = NULL;
+    typeID += 1;
+    forceF = new functor_actin_force(this);
+    torqueF = new functor_actin_torque(this);
+    // test variables, remove them later
+
+    rigidBody = new physic::RigidBody3d(
+        Eigen::Vector3d(0,0,0),
+        Eigen::Quaterniond(0,1,0,0),
+        Eigen::Matrix3d(),
+        0.1,
+        0.1,
+        forceF,
+        torqueF
+    );
 }
 actin::~actin() {
-	if(tail != NULL) {
-		delete tail;
-	}
+    if(tail != NULL) {
+        delete tail;
+    }
+    delete forceF;
+    delete torqueF;
+    delete rigidBody;
 }
 void actin::update_force() {
 	if (!force.isUpdated()) {
@@ -174,6 +190,45 @@ void actin::make_timeStep() {
 	} else {
 
 	}
+}
+/***************************
+ * actin functors
+ ***************************/
+functor_actin_force::functor_actin_force(
+    actin* iFillament
+):
+    fillament(iFillament)
+{
+
+}
+functor_actin_force::~functor_actin_force(){
+
+}
+Eigen::Vector3d functor_actin_force::calc(
+    Eigen::Vector3d& X,
+    Eigen::Vector3d& v,
+    Eigen::Quaterniond& R,
+    Eigen::Vector3d& L
+){
+    return Eigen::Vector3d(0,0,0);
+}
+functor_actin_torque::functor_actin_torque(
+    actin* iFillament
+):
+    fillament(iFillament)
+{
+
+}
+functor_actin_torque::~functor_actin_torque(){
+
+}
+Eigen::Vector3d functor_actin_torque::calc (
+    Eigen::Vector3d& X,
+    Eigen::Vector3d& v,
+    Eigen::Quaterniond& R,
+    Eigen::Vector3d& L
+){
+    return Eigen::Vector3d(0,0,0);
 }
 
 /***************************

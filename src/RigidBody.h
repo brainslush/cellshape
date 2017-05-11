@@ -35,8 +35,8 @@ namespace physic {
         Eigen::Matrix3d iI,
         double iM,
         double iEpsilon,
-        functor& iForceFunctor,
-        functor& iTorqueFunctor
+        functor* iForceFunctor,
+        functor* iTorqueFunctor
       );
       virtual ~RigidBody3d();
       virtual Eigen::Vector3d& get_position ();
@@ -55,8 +55,8 @@ namespace physic {
       Eigen::Matrix3d I; // moment of inertia
       double M; // mass
       double epsilon; // precision for rotation calculation
-      functor& forceFunctor;
-      functor& torqueFunctor;
+      functor* forceFunctor;
+      functor* torqueFunctor;
       Eigen::Vector3d v; // velocity
       Eigen::Vector3d L; // angular momentum
       Eigen::Vector3d F; // forces

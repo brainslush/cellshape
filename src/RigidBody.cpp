@@ -8,14 +8,30 @@
  */
 
 using namespace physic;
+
+functor::functor(){
+
+}
+functor::~functor(){
+
+}
+Eigen::Vector3d functor::calc(
+    Eigen::Vector3d& X,
+    Eigen::Vector3d& v,
+    Eigen::Quaterniond& R,
+    Eigen::Vector3d& L
+){
+    return Eigen::Vector3d(0,0,0);
+}
+
 RigidBody3d::RigidBody3d (
     Eigen::Vector3d iX,
     Eigen::Quaterniond iQ, // rotation in lab frame
     Eigen::Matrix3d iI,
     double iM,
     double iEpsilon,
-    functor& iForceFunctor,
-    functor& iTorqueFunctor
+    functor* iForceFunctor,
+    functor* iTorqueFunctor
 ):
     X(iX),
     q(iQ),
@@ -31,7 +47,6 @@ RigidBody3d::RigidBody3d (
     T = Eigen::Vector3d(0,0,0);
 }
 RigidBody3d::~RigidBody3d() {
-    // TODO Auto-generated destructor stub
 }
 Eigen::Vector3d& RigidBody3d::get_position() {
     return X;
@@ -60,8 +75,8 @@ void RigidBody3d::add_force(Eigen::Vector3d& iX, Eigen::Vector3d& iF) {
 }
 void RigidBody3d::do_timeStep(double& dT) {
     // update force and torque
-    F = forceFunctor.calc(X,v,q,L);
-    T = torqueFunctor.calc(X,v,q,L);
+    F = forceFunctor->calc(X,v,q,L);
+    T = torqueFunctor->calc(X,v,q,L);
     // do simulation via verlet
     do_verlet(dT);
 }
@@ -74,9 +89,9 @@ void RigidBody3d::do_verlet (double& dT) {
     q.normalize();
     Eigen::Matrix3d qm = q.matrix(); // transforming quaterinon to matrix increases speed
     Eigen::Matrix3d qc = qm.conjugate(); // conjugate of the quaternion matrix form
-    Eigen::Vector3d lb = qc * L * qm; // angular momentum in body frame
-    Eigen::Vector3d tb = qc * T * qm; // torque in body frame
-    Eigen::Matrix3d ib = (qc * I * qm).diagonal().inverse(); // moment of inertia in body frame diagonalized and inversed
+    /*Eigen::Vector3d lb = qc * L * qm; // angular momentum in body frame
+    Eigen::Vector3d tb = (qc * T) * qm; // torque in body frame
+    Eigen::Matrix3d ib = (qc * I) * qm.diagonal().inverse(); // moment of inertia in body frame diagonalized and inversed
     Eigen::Vector3d lbt2 = lb + 0.5 * dT * (tb - (ib * lb).cross(lb)); // angular momentum in body frame after half time step
     Eigen::Matrix3d qkt2 = qm + 0.25 * dT * qm * (ib * lbt2); // quaternion at half time step at iteration k = 0
     Eigen::Vector3d lwt2 = L + 0.5 * dT * T; // angular momentum in lab frame
@@ -96,4 +111,5 @@ void RigidBody3d::do_verlet (double& dT) {
     // rotation part 2
     Eigen::Vector3d Tdt = torqueFunctor.calc(xdt, vdtt, q, ldt);
     L = L + 0.5 * dT * (T + Tdt);
+    */
 }
