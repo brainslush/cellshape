@@ -25,43 +25,42 @@ struct globalVars {
 
 class components_base : public base {
 public:
-	components_base(globalVars& iGlobals);
-
-	virtual ~components_base();
-
-	virtual bool& get_canMove();
-	virtual bool& get_canColide();
-
-	virtual void set_canMove(bool iCanMove);
-	virtual void set_canColide(bool iCanColide);
-	virtual void set_componentModel(std::string, std::string);
-
-	virtual void make_timeStep();
+    components_base(globalVars& iGlobals);
+    virtual ~components_base();
+    virtual bool& get_canMove();
+    virtual bool& get_canColide();
+    virtual void set_canMove(bool iCanMove);
+    virtual void set_canColide(bool iCanColide);
+    virtual void set_componentModel(std::string, std::string);
+    virtual void make_timeStep(double& dT);
 protected:
-	bool canMove; // is it a fixed object
-	bool canColide; // can this object collide aka does it have physics?
-	std::set<variable_base*> variables;
-	globalVars& globals;
+    bool canMove; // is it a fixed object
+    bool canColide; // can this object collide aka does it have physics?
+    std::set<variable_base*> variables;
+    globalVars& globals;
 };
+
 class fillament_base;
 class cell_base : public components_base {
 public:
-	cell_base(globalVars& iGlobals);
-	virtual ~cell_base();
-	virtual void destory_fillament(fillament_base* iFillament);
+    cell_base(globalVars& iGlobals);
+    virtual ~cell_base();
+    virtual void destory_fillament(fillament_base* iFillament);
 protected:
 };
+
 class cellcomponents_base : public components_base {
 public:
-	cellcomponents_base(globalVars& iGlobals,cell_base& iCell);
-	virtual ~cellcomponents_base();
+    cellcomponents_base(globalVars& iGlobals,cell_base& iCell);
+    virtual ~cellcomponents_base();
 protected:
-	cell_base& cell;
+    cell_base& cell;
 };
+
 class matrix_base : public components_base {
 public:
-	matrix_base(globalVars& iGlobals);
-	virtual ~matrix_base();
+    matrix_base(globalVars& iGlobals);
+    virtual ~matrix_base();
 protected:
 };
 
@@ -71,27 +70,29 @@ protected:
 ***************************/
 class crosslinker_base : public cellcomponents_base {
 public:
-	crosslinker_base(globalVars& iGlobals,cell_base& iCell);
-	virtual ~crosslinker_base();
+    crosslinker_base(globalVars& iGlobals,cell_base& iCell);
+    virtual ~crosslinker_base();
 
-	virtual std::set<fillament_base*>& get_connectedFillaments();
-	virtual ofVec2d& get_force(unsigned long long iTimeStamp);
+    virtual std::set<fillament_base*>& get_connectedFillaments();
+    virtual ofVec2d& get_force(unsigned long long iTimeStamp);
 
-	virtual void add_connectedFillament(fillament_base* iFillament);
-	virtual void remove_connectedFillament(fillament_base* iFillament);
+    virtual void add_connectedFillament(fillament_base* iFillament);
+    virtual void remove_connectedFillament(fillament_base* iFillament);
 protected:
-	std::set<fillament_base*> connectedFillaments;
-	ofVec2d force;
+    std::set<fillament_base*> connectedFillaments;
+    ofVec2d force;
 };
+
 class crosslinker_static : public crosslinker_base {
 public:
-	crosslinker_static(globalVars& iGlobals,cell_base& iCell);
-	virtual ~crosslinker_static();
+    crosslinker_static(globalVars& iGlobals,cell_base& iCell);
+    virtual ~crosslinker_static();
 };
+
 class crosslinker_friction : public crosslinker_base {
 public:
-	crosslinker_friction(globalVars& iGlobals,cell_base& iCell);
-	virtual ~crosslinker_friction();
+    crosslinker_friction(globalVars& iGlobals,cell_base& iCell);
+    virtual ~crosslinker_friction();
 };
 
 /***************************
@@ -99,12 +100,12 @@ public:
 ***************************/
 class fillament_base : public cellcomponents_base {
 public:
-	fillament_base(globalVars& iGlobals, cell_base& iCell);
-	virtual ~fillament_base();
-	virtual void set_positions(double iX1, double iY1, double iX2, double iY2);
-	virtual void add_connectedCrosslinker(crosslinker_base* iCrosslinker);
-	virtual void remove_connectedCrosslinker(crosslinker_base* iCrosslinker);
-	virtual void make_timeStep(double& iTime);
+    fillament_base(globalVars& iGlobals, cell_base& iCell);
+    virtual ~fillament_base();
+    virtual void set_positions(double iX1, double iY1, double iX2, double iY2);
+    virtual void add_connectedCrosslinker(crosslinker_base* iCrosslinker);
+    virtual void remove_connectedCrosslinker(crosslinker_base* iCrosslinker);
+    virtual void make_timeStep(double& dT);
 protected:
 	std::set<crosslinker_base*> connectedCrosslinkers;
 };
@@ -123,7 +124,7 @@ public:
     virtual ~actin();
     virtual void update_force();
     virtual variable_type<ofVec2d>& get_force();
-    virtual void make_timeStep();
+    virtual void make_timeStep(double& dT);
 protected:
     functor_actin_force* forceF;
     functor_actin_torque* torqueF;
@@ -177,77 +178,77 @@ protected:
 ***************************/
 class membrane_part : public cellcomponents_base {
 public:
-	// 2D membrane part
-	membrane_part(
-		globalVars& iGlobals, cell_base& iCell,
-		double iX1,double iY1,
-		double iX2,double iY2
-	);
-	virtual ~membrane_part();
-	virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
-	virtual void set_neighbours(membrane_part& iPartA,membrane_part& iPartB);
-	virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
+    // 2D membrane part
+    membrane_part(
+        globalVars& iGlobals, cell_base& iCell,
+        double iX1,double iY1,
+        double iX2,double iY2
+    );
+    virtual ~membrane_part();
+    virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+    virtual void set_neighbours(membrane_part& iPartA,membrane_part& iPartB);
+    virtual void make_timeStep(double& dT);
 protected:
 	std::vector<membrane_part*> neighbours;
 };
 class membrane_base : public cellcomponents_base {
 public:
-	membrane_base(
-		globalVars& iGlobals, cell_base& iCell,
-		double iX, double iY,
-		double iRadius,
-		unsigned long long iResolution
-	);
-	virtual ~membrane_base();
-	virtual variable_type<double>& get_area();
-	virtual variable_type<double>& get_length();
-	virtual void obtain_visualObjs(std::vector<visual_base*>& oVisualComponents);
-	virtual void make_timeStep(double iTime, unsigned long long iTimeStamp);
+    membrane_base(
+        globalVars& iGlobals, cell_base& iCell,
+        double iX, double iY,
+        double iRadius,
+        unsigned long long iResolution
+    );
+    virtual ~membrane_base();
+    virtual variable_type<double>& get_area();
+    virtual variable_type<double>& get_length();
+    virtual void obtain_visualObjs(std::vector<visual_base*>& oVisualComponents);
+    virtual void make_timeStep(double& dT);
 protected:
-	variable_type<double> area = variable_type<double>("Area","A");
-	variable_type<double> length = variable_type<double>("Length","l");
-	const bool canColide = true;
-	std::vector<membrane_part*> parts;
-	virtual void update_area();
-	virtual void update_length();
+    variable_type<double> area = variable_type<double>("Area","A");
+    variable_type<double> length = variable_type<double>("Length","l");
+    const bool canColide = true;
+    std::vector<membrane_part*> parts;
+    virtual void update_area();
+    virtual void update_length();
 };
 /***************************
 * cell
 ***************************/
 class cell : public cell_base {
 public:
-	cell(
-		globalVars& iGlobals,
-		double iX,
-		double iY,
-		unsigned long long iResolution
-	);
-	virtual ~cell();
-	virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
-	virtual void create_fillament();
-	virtual void destory_fillament(fillament_base* iFillament);
-	virtual void make_timeStep();
+    cell(
+        globalVars& iGlobals,
+        double iX,
+        double iY,
+        unsigned long long iResolution
+    );
+    virtual ~cell();
+    virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+    virtual void create_fillament();
+    virtual void destory_fillament(fillament_base* iFillament);
+    virtual void make_timeStep(double& dT);
 protected:
-	double maxFillamentLength;
-	std::set<membrane_base*> membrane;
-	std::set<fillament_base*> fillaments;
-	std::set<volume_base*> volumes;
+    double maxFillamentLength;
+    std::set<membrane_base*> membrane;
+    std::set<fillament_base*> fillaments;
+    std::set<volume_base*> volumes;
 };
 /***************************
 * fac
 ***************************/
 class fac:public matrix_base {
 public:
-	fac(
-		globalVars& iGlobals,
-		double iRadius,
-		double iX,
-		double iY
-	);
-	virtual ~fac();
-	virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
-	virtual void set_radius(double iRadius);
-	virtual void set_position(double iX, double iY);
+    fac(
+        globalVars& iGlobals,
+        double iRadius,
+        double iX,
+        double iY
+    );
+    virtual ~fac();
+    virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+    virtual void set_radius(double iRadius);
+    virtual void set_position(double iX, double iY);
 protected:
 };
 /***************************
@@ -256,34 +257,31 @@ protected:
 class simple_surface;
 class surface_border : public matrix_base {
 public:
-	surface_border(
-		globalVars& iGlobals,
-		simple_surface* iSurface,
-		ofVec2d iStart,
-		ofVec2d iEnd
-	);
-	virtual ~surface_border();
-	virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+    surface_border(
+        globalVars& iGlobals,
+        simple_surface* iSurface,
+        ofVec2d iStart,
+        ofVec2d iEnd
+    );
+    virtual ~surface_border();
+    virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
 protected:
-	simple_surface* surface;
+    simple_surface* surface;
 };
 
 class simple_surface : public matrix_base {
 public:
-	simple_surface(
-		globalVars& iGlobals,
-		double iSideLength
-	);
-	virtual ~simple_surface();
-
-	virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
-	virtual void create_facs(unsigned iType, unsigned long long iCount, double iRadius);
+    simple_surface(
+        globalVars& iGlobals,
+        double iSideLength
+    );
+    virtual ~simple_surface();
+    virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+    virtual void create_facs(unsigned iType, unsigned long long iCount, double iRadius);
 protected:
-	double sideLength;
-	std::vector<surface_border*> borders;
-	std::vector<fac*> facs;
+    double sideLength;
+    std::vector<surface_border*> borders;
+    std::vector<fac*> facs;
 };
-
-
 
 #endif

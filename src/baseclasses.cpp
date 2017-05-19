@@ -19,7 +19,7 @@ void components_base::set_canColide(bool iCanColide) {canColide = iCanColide;}
 void components_base::set_componentModel(std::string, std::string) {
 	/* TODO */
 }
-void components_base::make_timeStep() {
+void components_base::make_timeStep(double& dT) {
 	/* do nothing */
 }
 
@@ -28,8 +28,8 @@ void components_base::make_timeStep() {
  ***************************/
 
 cell_base::cell_base(globalVars& iGlobals): components_base(iGlobals) {
-	canMove = true;
-	typeID += 10000;
+    canMove = true;
+    typeID += 10000;
 }
 cell_base::~cell_base(){}
 void cell_base::destory_fillament(fillament_base * iFillament){}
@@ -39,9 +39,9 @@ void cell_base::destory_fillament(fillament_base * iFillament){}
  ***************************/
 
 matrix_base::matrix_base(globalVars& iGlobals): components_base(iGlobals) {
-	canColide = false;
-	canMove = false;
-	typeID += 20000;
+    canColide = false;
+    canMove = false;
+    typeID += 20000;
 }
 matrix_base::~matrix_base(){
 
@@ -88,31 +88,31 @@ void crosslinker_base::remove_connectedFillament(fillament_base* iFillament) {
  ***************************/
 
 fillament_base::fillament_base(
-	globalVars& iGlobals,
-	cell_base& iCell
+    globalVars& iGlobals,
+    cell_base& iCell
 ):
-	cellcomponents_base(iGlobals,iCell)
+    cellcomponents_base(iGlobals,iCell)
 {
-	canColide = true;
-	canMove = true;
-	associatedVisualObj = new visual_line(this);
-	typeID += 200;
-	iGlobals.grid->register_component(this);
+    canColide = true;
+    canMove = true;
+    associatedVisualObj = new visual_line(this);
+    typeID += 200;
+    iGlobals.grid->register_component(this);
 }
 fillament_base::~fillament_base(){
-	delete associatedVisualObj;
+    delete associatedVisualObj;
 }
 void fillament_base::set_positions(double iX1, double iY1, double iX2, double iY2){
-	positions[0].x = iX1;
-	positions[0].y = iY1;
-	positions[1].x = iX2;
-	positions[1].y = iY2;
+    positions[0].x = iX1;
+    positions[0].y = iY1;
+    positions[1].x = iX2;
+    positions[1].y = iY2;
 }
 void fillament_base::add_connectedCrosslinker(crosslinker_base* iCrosslinker){
-	connectedCrosslinkers.insert(iCrosslinker);
+    connectedCrosslinkers.insert(iCrosslinker);
 }
 void fillament_base::remove_connectedCrosslinker(crosslinker_base* iCrosslinker){
-	connectedCrosslinkers.erase(iCrosslinker);
+    connectedCrosslinkers.erase(iCrosslinker);
 }
 void fillament_base::make_timeStep(double &iTime){
 
@@ -166,30 +166,29 @@ actin::~actin() {
     delete rigidBody;
 }
 void actin::update_force() {
-	if (!force.isUpdated()) {
-
-		if (tail != NULL) {
-			force += tail->get_force();
-		}
-		/*
-		for (auto& it : connectedCrosslinkers) {
-			force += it->get_force();
-		}
-		*/
-		force.set_updated(true);
-	}
+    if (!force.isUpdated()) {
+        if (tail != NULL) {
+            force += tail->get_force();
+        }
+        /*
+        for (auto& it : connectedCrosslinkers) {
+            force += it->get_force();
+        }
+        */
+        force.set_updated(true);
+    }
 }
 variable_type<ofVec2d>& actin::get_force() {
-	update_force();
-	return force;
+    update_force();
+    return force;
 }
-void actin::make_timeStep() {
-	// destroy if it exceeds life time
-	if (birthTime + lifeTime < globals.time) {
-		cell.destory_fillament(this);
-	} else {
+void actin::make_timeStep(double& dT) {
+    // destroy if it exceeds life time
+    if (birthTime + lifeTime < globals.time) {
+        cell.destory_fillament(this);
+    } else {
 
-	}
+    }
 }
 /***************************
  * actin functors
@@ -236,12 +235,12 @@ Eigen::Vector3d functor_actin_torque::calc (
  ***************************/
 
 volume_base::volume_base(
-	globalVars& iGlobals,
-	cell_base& iCell
+    globalVars& iGlobals,
+    cell_base& iCell
 ):
-	cellcomponents_base(iGlobals,iCell)
+    cellcomponents_base(iGlobals,iCell)
 {
-	typeID += 300;
+    typeID += 300;
 };
 volume_base::~volume_base() {
 
@@ -252,21 +251,21 @@ volume_base::~volume_base() {
  ***************************/
 
 membrane_part::membrane_part(
-	globalVars& iGlobals,
-	cell_base& iCell,
-	double iX1,double iY1,
-	double iX2,double iY2
+    globalVars& iGlobals,
+    cell_base& iCell,
+    double iX1,double iY1,
+    double iX2,double iY2
 ): cellcomponents_base(iGlobals,iCell) {
-	positions.clear();
-	positions.push_back(ofVec2d(iX1,iY1));
-	positions.push_back(ofVec2d(iX2,iY2));
-	neighbours.push_back(this);
-	neighbours.push_back(this);
-	associatedVisualObj = new visual_line(this);
-	associatedVisualObj->set_color(0.0,0.0,0.0);
-	associatedVisualObj->set_fillColor(0.0,0.0,0.0);
-	typeID += 400;
-	iGlobals.grid->register_component(this);
+    positions.clear();
+    positions.push_back(ofVec2d(iX1,iY1));
+    positions.push_back(ofVec2d(iX2,iY2));
+    neighbours.push_back(this);
+    neighbours.push_back(this);
+    associatedVisualObj = new visual_line(this);
+    associatedVisualObj->set_color(0.0,0.0,0.0);
+    associatedVisualObj->set_fillColor(0.0,0.0,0.0);
+    typeID += 400;
+    iGlobals.grid->register_component(this);
 };
 membrane_part::~membrane_part(){
 
@@ -278,7 +277,7 @@ void membrane_part::set_neighbours(membrane_part& iPartA,membrane_part& iPartB){
 	neighbours[0] = &iPartA;
 	neighbours[1] = &iPartB;
 };
-void membrane_part::make_timeStep(double iTime, unsigned long long iTimeStamp){
+void membrane_part::make_timeStep(double& dT){
 
 };
 
@@ -367,7 +366,7 @@ variable_type<double>& membrane_base::get_length() {
 	return length;
 }
 /* update feature of the membrane */
-void membrane_base::make_timeStep(double iTime, unsigned long long iTimeStamp) {
+void membrane_base::make_timeStep(double& dT) {
 	
 }
 
@@ -386,40 +385,36 @@ cell::cell(
 	typeID += 600;
 }
 cell::~cell(){
-	for (auto& it : membrane) {
-		delete it;
-	}
-	for (auto& it : fillaments) {
-		delete it;
-	}
-	for (auto& it : volumes) {
-		delete it;
-	}
+    for (auto& it : membrane) {
+        delete it;
+    }
+    for (auto& it : fillaments) {
+        delete it;
+    }
+    for (auto& it : volumes) {
+        delete it;
+    }
 }
 void cell::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
-	for(auto& it : membrane) {
-		it->obtain_visualObjs(oVisualComponents);
-	}
-	for(auto& it : fillaments) {
-		it->obtain_visualObjs(oVisualComponents);
-	}
-	for(auto& it : volumes) {
-		it->obtain_visualObjs(oVisualComponents);
-	}
+    for(auto& it : membrane) {
+        it->obtain_visualObjs(oVisualComponents);
+    }
+    for(auto& it : fillaments) {
+        it->obtain_visualObjs(oVisualComponents);
+    }
+    for(auto& it : volumes) {
+            it->obtain_visualObjs(oVisualComponents);
+    }
 }
 void cell::create_fillament() {
-	/* Needs to be enhanced */
-
-	if (fillaments.size() == 0) {
-
-	    fillaments.insert(new actin(globals,*this,ofVec2d(0,0),ofVec2d(0.01,0),100,2000,10));
-	}
+    /* Needs to be enhanced */
+    fillaments.insert(new actin(globals,*this,ofVec2d(0,0),ofVec2d(0.01,0),100,2000,10));
 }
 void cell::destory_fillament(fillament_base * iFillament) {
-	fillaments.erase(iFillament);
-	delete iFillament;
+    fillaments.erase(iFillament);
+    delete iFillament;
 }
-void cell::make_timeStep() {
+void cell::make_timeStep(double& dT) {
 	
 }
 
@@ -428,21 +423,21 @@ void cell::make_timeStep() {
  ***************************/
 
 fac::fac(
-	globalVars& iGlobals,
-	double iRadius,
-	double iX,
-	double iY
+    globalVars& iGlobals,
+    double iRadius,
+    double iX,
+    double iY
 ): matrix_base(iGlobals) {
-	parameters.clear();
-	parameters.push_back(iRadius);
-	parameters.push_back(iRadius);
-	positions.clear();
-	positions.push_back(ofVec2d(iX,iY));
-	associatedVisualObj = new visual_ellipse(this);
-	associatedVisualObj->set_color(1.0,0.0,0.0);
-	associatedVisualObj->set_fillColor(1.0,0.0,0.0);
-	typeID += 100;
-	iGlobals.grid->register_component(this);
+    parameters.clear();
+    parameters.push_back(iRadius);
+    parameters.push_back(iRadius);
+    positions.clear();
+    positions.push_back(ofVec2d(iX,iY));
+    associatedVisualObj = new visual_ellipse(this);
+    associatedVisualObj->set_color(1.0,0.0,0.0);
+    associatedVisualObj->set_fillColor(1.0,0.0,0.0);
+    typeID += 100;
+    iGlobals.grid->register_component(this);
 }
 fac::~fac() {
 }
