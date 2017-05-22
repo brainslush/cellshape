@@ -380,12 +380,12 @@ cell::cell(
 	double iY,
 	unsigned long long iResolution
 ): cell_base(iGlobals) {
-	membrane.insert(new membrane_base(iGlobals,*this,iX,iY,200,iResolution));
+	membranes.insert(new membrane_base(iGlobals,*this,iX,iY,200,iResolution));
 	maxFillamentLength = 1;
 	typeID += 600;
 }
 cell::~cell(){
-    for (auto& it : membrane) {
+    for (auto& it : membranes) {
         delete it;
     }
     for (auto& it : fillaments) {
@@ -396,7 +396,7 @@ cell::~cell(){
     }
 }
 void cell::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
-    for(auto& it : membrane) {
+    for(auto& it : membranes) {
         it->obtain_visualObjs(oVisualComponents);
     }
     for(auto& it : fillaments) {
@@ -415,7 +415,15 @@ void cell::destory_fillament(fillament_base * iFillament) {
     delete iFillament;
 }
 void cell::make_timeStep(double& dT) {
-	
+    for(auto it: fillaments) {
+      it->make_timeStep(dT);
+    }
+    for(auto it: membranes) {
+      it->make_timeStep(dT);
+    }
+    for(auto it: volumes) {
+      it->make_timeStep(dT);
+    }
 }
 
 /***************************

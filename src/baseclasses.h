@@ -12,9 +12,11 @@
 class grid_base;
 
 struct globalVars {
-	grid_base* grid;
-	random_container* rndC;
-	uint64_t time;
+    grid_base* grid;
+    random_container* rndC;
+    uint64_t time;
+    uint64_t frameNo;
+    double deltaT;
 };
 
 
@@ -230,7 +232,7 @@ public:
     virtual void make_timeStep(double& dT);
 protected:
     double maxFillamentLength;
-    std::set<membrane_base*> membrane;
+    std::set<membrane_base*> membranes;
     std::set<fillament_base*> fillaments;
     std::set<volume_base*> volumes;
 };

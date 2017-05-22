@@ -10,6 +10,9 @@ void ofApp::setup(){
     Globals.rndC = new random_container();
     Globals.rndC->set_seed();
     unsigned long long seed = Globals.rndC->get_seed();
+    Globals.time = 0;
+    Globals.frameNo = 0;
+    Globals.deltaT = 0.00001;
 
     // Create Components
     Cell = new cell(Globals,250,250,20);
@@ -31,7 +34,7 @@ void ofApp::draw(){
     Surface->obtain_visualObjs(visualObjs);
     Cell->obtain_visualObjs(visualObjs);
 
-    Cell->make_timeStep()
+    Cell->make_timeStep(Globals.deltaT);
 
     // calculate scale factor when window is resized
     double scale = std::min(ofGetHeight() / (double)sideLength, ofGetWidth() / (double)sideLength);
