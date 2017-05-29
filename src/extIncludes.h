@@ -29,8 +29,7 @@
 #include <vector>
 #include <set>
 #include <string>
-
-//#include <eigen3/Eigen/Eigen>
+#include <typeinfo>
 
 #include "ofColor.h"
 #include "ofxGeo.h"
@@ -40,6 +39,7 @@
     #undef Success
 #endif
 
+#include <eigen3/Eigen/Eigen>
 
 // system specific includes for getting systemtime
 //#include <boost/throw_exception.hpp>

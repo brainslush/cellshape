@@ -1,7 +1,7 @@
 #include "extIncludes.h"
 
-#ifndef __H_CLASSES_RANDOM
-#define __H_CLASSES_RANDOM
+#ifndef SRC_RANDOM_H_
+#define SRC_RANDOM_H_
 
 class random_base {
 	public:

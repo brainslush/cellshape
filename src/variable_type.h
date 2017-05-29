@@ -2,6 +2,9 @@
 #include <vector>
 #include <string>
 
+#ifndef SRC_VARIABLETYPE_H_
+#define SRC_VARIABLETYPE_H_
+
 class variable_base {
     variable_base(){};
     ~variable_base(){};
@@ -30,20 +33,28 @@ public:
     void start_timeLine();
     void stop_timeLine();
     void reset_timeLine();
-    VT& operator+ (variable_type<VT>& rhs);
-    VT& operator- (variable_type<VT>& rhs);
-    VT& operator* (variable_type<VT>& rhs);
-    VT& operator/ (variable_type<VT>& rhs);
+    template <class EV> VT operator+ (variable_type<VT>& lhs, const EV& rhs);
+    template <class EV> VT operator+ (const EV& lhs, variable_type<VT>& rhs);
+    template <class EV> VT operator+ (variable_type<VT>& lhs, variable_type<EV>& rhs);
+    template <class EV> VT operator- (variable_type<VT>& lhs, const EV& rhs);
+    template <class EV> VT operator- (const EV& lhs, variable_type<VT>& rhs);
+    template <class EV> VT operator- (variable_type<VT>& lhs, variable_type<EV>& rhs);
+    template <class EV> VT operator* (variable_type<VT>& lhs, const EV& rhs);
+    template <class EV> VT operator* (const EV& lhs, variable_type<VT>& rhs);
+    template <class EV> VT operator* (variable_type<VT>& lhs, variable_type<EV>& rhs);
+    template <class EV> VT operator/ (variable_type<VT>& lhs, const EV& rhs);
+    template <class EV> VT operator/ (const EV& lhs, variable_type<VT>& rhs);
+    template <class EV> VT operator/ (variable_type<VT>& lhs, variable_type<EV>& rhs);
     variable_type<VT>& operator= (VT& rhs);
     VT& operator= (variable_type<VT>& rhs);
-    variable_type<VT>& operator+= (variable_type<VT>& rhs);
-    variable_type<VT>& operator+= (VT& rhs);
-    variable_type<VT>& operator-= (variable_type<VT>& rhs);
-    variable_type<VT>& operator-= (VT& rhs);
-    variable_type<VT>& operator*= (variable_type<VT>& rhs);
-    variable_type<VT>& operator*= (VT& rhs);
-    variable_type<VT>& operator/= (variable_type<VT>& rhs);
-    variable_type<VT>& operator/= (VT& rhs);
+    variable_type<VT>& operator+= (const variable_type<VT>& rhs);
+    variable_type<VT>& operator+= (const VT& rhs);
+    variable_type<VT>& operator-= (const variable_type<VT>& rhs);
+    variable_type<VT>& operator-= (const VT& rhs);
+    variable_type<VT>& operator*= (const variable_type<VT>& rhs);
+    variable_type<VT>& operator*= (const VT& rhs);
+    variable_type<VT>& operator/= (const variable_type<VT>& rhs);
+    variable_type<VT>& operator/= (const VT& rhs);
 private:
     VT initValue;
     VT lastValue;
@@ -139,21 +150,53 @@ template<class VT> inline std::vector<VT>& variable_type<VT>::get_timeLine() {
 
 /******************/
 /*Define operators*/
-template<class VT> inline VT& variable_type<VT>::operator+(variable_type<VT>& rhs) {
-    VT temp = *this + rhs.get_value();
+template<class VT> inline VT variable_type<VT>operator+(variable_type<VT>& lhs, const EV& rhs) {
+    VT temp = lhs.get_value() + rhs;
     return temp;
 }
-template<class VT> inline VT& variable_type<VT>::operator-(variable_type<VT>& rhs) {
-    VT temp = *this - rhs.get_value();
+template<class VT> template<class EV> inline VT variable_type<VT>::operator+(const EV& lhs, variable_type<VT>& rhs) {
+    VT temp = lhs + rhs.get_value();
     return temp;
 }
-template<class VT> inline VT& variable_type<VT>::operator*(variable_type<VT>& rhs) {
-    VT temp = *this * rhs.get_value();
-    return VT();
+template<class VT> template<class EV> inline VT variable_type<VT>::operator+(variable_type<VT>& lhs, variable_type<EV>& rhs) {
+    VT temp = lhs.get_value() + rhs.get_value();
+    return temp;
 }
-template<class VT> inline VT& variable_type<VT>::operator/(variable_type<VT>& rhs) {
-    VT temp = *this / rhs.get_value();
-    return VT();
+template<class VT> template<class EV> inline VT variable_type<VT>::operator-(variable_type<VT>& lhs, const EV& rhs) {
+    VT temp = lhs.get_value() - rhs;
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator-(const EV& lhs, variable_type<VT>& rhs) {
+    VT temp = lhs - rhs.get_value();
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator-(variable_type<VT>& lhs, variable_type<EV>& rhs) {
+    VT temp = lhs.get_value() - rhs.get_value();
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator*(variable_type<VT>& lhs, const EV& rhs) {
+    VT temp = lhs.get_value() * rhs;
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator*(const EV& lhs, variable_type<VT>& rhs) {
+    VT temp = lhs * rhs.get_value();
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator*(variable_type<VT>& lhs, variable_type<EV>& rhs) {
+    VT temp = lhs.get_value() * rhs.get_value();
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator/(variable_type<VT>& lhs, const EV& rhs) {
+    VT temp = lhs.get_value() / rhs;
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator/(const EV& lhs, variable_type<VT>& rhs) {
+    VT temp = lhs / rhs.get_value();
+    return temp;
+}
+template<class VT> template<class EV> inline VT variable_type<VT>::operator/(variable_type<VT>& lhs, variable_type<EV>& rhs) {
+    VT temp = lhs.get_value() / rhs.get_value();
+    return temp;
 }
 template<class VT> inline VT& variable_type<VT>::operator=(variable_type<VT>& rhs) {
     lastValue = value;
@@ -192,3 +235,5 @@ template<class VT> inline variable_type<VT>& variable_type<VT>::operator/=(varia
 template<class VT> inline variable_type<VT>& variable_type<VT>::operator/=(VT& rhs) {
     // TODO: insert return statement here
 }
+
+#endif
