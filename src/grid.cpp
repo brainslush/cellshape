@@ -61,50 +61,26 @@ std::set<base*>& grid_cell::get_components() {
 }
 
 std::pair<base*, Eigen::Vector3d> grid_cell::obtain_intersectingCircleLine(base* iRef, base* iCom) {
+    // get data
     std::vector<Eigen::Vector3d>& posRef = iRef->get_positions();
     std::vector<Eigen::Vector3d>& posCom = iCom->get_positions();
     std::vector<double>& parCom = iCom->get_parameters();
-    Eigen::ParametrizedLine(posRef[0],(posRef[1]-posRef[0]).normalized()) line;
+    // get vector direction
+    Eigen::Vector3d diff(posRef[1]-posRef[0]);
+    // get length
+    double length = diff.norm();
+    // create parameterized line and project sphere center onto it
+    Eigen::ParametrizedLine<double, 3> line(posRef[0],diff.normalized());
+    Eigen::Vector3d proj = line.projection(posCom[0]);
+    Eigen::Vector3d projDiff(proj - posCom[0]);
 
-    if (line.distance(posCom[0]) < parCom[0]) {
-        return std::make_pair(iCom, Eigen::Vector3d(0,0,0));
+    // check if projection lies on line and inside the sphere
+    if (
+        (proj - posRef[0]).norm() < length &&
+        projDiff.norm() < parCom[0]
+    ) {
+        return std::make_pair(iCom, projDiff);
     }
-
-    /*
-    Eigen::Vector3d r;
-
-    Eigen::Vector3d d = posRef[1] - posRef[0];
-    Eigen::Vector3d f = posRef[1] - posCom[0];
-
-    double a = d.dot(d);
-    double b = 2 * f.dot(d);
-    double c = f.dot(f) - parCom[0] * parCom[0];
-    double D = b*b - 4 * a*c;
-
-    if (D < 0) {
-        // no intersection
-        return std::make_pair(iRef, d);
-    }
-    else {
-        D = sqrt(D);
-        double t1 = (-D - b) / (2 * a);
-        double t2 = (D - b) / (2 * a);
-
-        if (t1 >= 0 && t1 <= 1) {
-            r = Eigen::Vector3d(posRef[0](0) + t1 * d(0), posRef[0](1) + t1 * d(0),0);
-            r -= posCom[0];
-            r.normalize();
-            return std::make_pair(iCom, r);
-        }
-        if (t2 >= 0 && t2 <= 1) {
-            r = Eigen::Vector3d(posRef[0](0) + t1 * d(0), posRef[0](1) + t1 * d(0),0);
-            r -= posCom[0];
-            r.normalize();
-            return std::make_pair(iCom, r);
-        }
-        // no intersection
-        return std::make_pair(iRef, d);
-    }*/
     return std::make_pair(iRef, posRef[0]);
 }
 std::pair<base*, std::pair<Eigen::Vector3d, Eigen::Vector3d>> grid_cell::obtain_intersectingLineLine(base* iRef, base* iCom) {

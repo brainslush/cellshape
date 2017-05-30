@@ -27,10 +27,17 @@ membrane_part::membrane_part(
     associatedVisualObj->set_fillColor(0.0,0.0,0.0);
     this->add_ignoreIntersect(typeid(*this).hash_code());
     iGlobals.grid->register_component(this);
+    length = (positions[1] - positions[0]).norm();
 };
 membrane_part::~membrane_part(){
-
+    delete associatedVisualObj;
 };
+double& membrane_part::get_length() {
+    return length;
+}
+Eigen::Vector3d& membrane_part::get_normal() {
+    return normal;
+}
 void membrane_part::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
@@ -108,14 +115,12 @@ void membrane_base::update_length() {
         //length.set_updated(true);
     //}
 }
-
 /* */
 void membrane_base::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
     for(unsigned long long i = 0; i < parts.size(); i++) {
         parts[i]->obtain_visualObjs(oVisualComponents);
     }
 }
-
 /* get volume */
 double& membrane_base::get_area() {
     update_area();
@@ -124,6 +129,9 @@ double& membrane_base::get_area() {
 double& membrane_base::get_length() {
     update_length();
     return length;
+}
+virtual std::vector<membrane_part*>& membrane_base::get_parts() {
+    return parts;
 }
 /* update feature of the membrane */
 void membrane_base::make_timeStep(double& dT) {

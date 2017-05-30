@@ -29,7 +29,7 @@ cell_base::cell_base(sGlobalVars& iGlobals): components_base(iGlobals) {
     canMove = true;
 }
 cell_base::~cell_base(){}
-void cell_base::destory_fillament(fillament_base * iFillament){}
+void cell_base::destory_filament(filament_base * iFilament){}
 
 /***************************
  * Matrix Base
@@ -61,8 +61,8 @@ crosslinker_base::crosslinker_base(
 crosslinker_base::~crosslinker_base() {
 
 };
-std::set<fillament_base*>& crosslinker_base::get_connectedFillaments() {
-    return connectedFillaments;
+std::set<filament_base*>& crosslinker_base::get_connectedFilaments() {
+    return connectedFilaments;
 }
 Eigen::Vector3d& crosslinker_base::get_force(unsigned long long iTimeStamp) {
     if (timeStamp != iTimeStamp) {
@@ -71,18 +71,18 @@ Eigen::Vector3d& crosslinker_base::get_force(unsigned long long iTimeStamp) {
         return force;
     }
 }
-void crosslinker_base::add_connectedFillament(fillament_base* iFillament) {
-    connectedFillaments.insert(iFillament);
+void crosslinker_base::add_connectedFilament(filament_base* iFilament) {
+    connectedFilaments.insert(iFilament);
 };
-void crosslinker_base::remove_connectedFillament(fillament_base* iFillament) {
-    connectedFillaments.erase(iFillament);
+void crosslinker_base::remove_connectedFilament(filament_base* iFilament) {
+    connectedFilaments.erase(iFilament);
 };
 
 /***************************
- * fillament base
+ * filament base
  ***************************/
 
-fillament_base::fillament_base(
+filament_base::filament_base(
     sGlobalVars& iGlobals,
     cell_base& iCell
 ):
@@ -93,25 +93,25 @@ fillament_base::fillament_base(
     associatedVisualObj = new visual_line(this);
     iGlobals.grid->register_component(this);
 }
-fillament_base::~fillament_base(){
+filament_base::~filament_base(){
     delete associatedVisualObj;
 }
-void fillament_base::set_positions(double iX1, double iY1, double iX2, double iY2){
+void filament_base::set_positions(double iX1, double iY1, double iX2, double iY2){
     positions[0](0) = iX1;
     positions[0](1) = iY1;
     positions[1](0) = iX2;
     positions[1](1) = iY2;
 }
-void fillament_base::add_connectedCrosslinker(crosslinker_base* iCrosslinker){
+void filament_base::add_connectedCrosslinker(crosslinker_base* iCrosslinker){
     connectedCrosslinkers.insert(iCrosslinker);
 }
-void fillament_base::remove_connectedCrosslinker(crosslinker_base* iCrosslinker){
+void filament_base::remove_connectedCrosslinker(crosslinker_base* iCrosslinker){
     connectedCrosslinkers.erase(iCrosslinker);
 }
-void fillament_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
+void filament_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
-void fillament_base::make_timeStep(double &iTime){
+void filament_base::make_timeStep(double &iTime){
 
 };
 

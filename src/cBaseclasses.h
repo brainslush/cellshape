@@ -33,12 +33,12 @@ protected:
     sGlobalVars& globals;
 };
 
-class fillament_base;
+class filament_base;
 class cell_base : public components_base {
 public:
     cell_base(sGlobalVars& iGlobals);
     virtual ~cell_base();
-    virtual void destory_fillament(fillament_base* iFillament);
+    virtual void destory_filament(filament_base* iFilament);
 protected:
 };
 
@@ -66,13 +66,13 @@ public:
     crosslinker_base(sGlobalVars& iGlobals,cell_base& iCell);
     virtual ~crosslinker_base();
 
-    virtual std::set<fillament_base*>& get_connectedFillaments();
+    virtual std::set<filament_base*>& get_connectedFilaments();
     virtual Eigen::Vector3d& get_force(unsigned long long iTimeStamp);
 
-    virtual void add_connectedFillament(fillament_base* iFillament);
-    virtual void remove_connectedFillament(fillament_base* iFillament);
+    virtual void add_connectedFilament(filament_base* iFilament);
+    virtual void remove_connectedFilament(filament_base* iFilament);
 protected:
-    std::set<fillament_base*> connectedFillaments;
+    std::set<filament_base*> connectedFilaments;
     Eigen::Vector3d force;
 };
 
@@ -89,12 +89,12 @@ public:
 };
 
 /***************************
-* fillaments
+* filaments
 ***************************/
-class fillament_base : public cellcomponents_base {
+class filament_base : public cellcomponents_base {
 public:
-    fillament_base(sGlobalVars& iGlobals, cell_base& iCell);
-    virtual ~fillament_base();
+    filament_base(sGlobalVars& iGlobals, cell_base& iCell);
+    virtual ~filament_base();
     virtual void set_positions(double iX1, double iY1, double iX2, double iY2);
     virtual void add_connectedCrosslinker(crosslinker_base* iCrosslinker);
     virtual void remove_connectedCrosslinker(crosslinker_base* iCrosslinker);

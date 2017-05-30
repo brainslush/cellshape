@@ -16,7 +16,7 @@ actin::actin(
     double iLifeTime,
     double iStallingForce
 ):
-    fillament_base(iGlobals,iCell),
+    filament_base(iGlobals,iCell),
     tmVelocity(iTmVelocity),
     birthTime(iGlobals.time),
     maxLength(iMaxLength),
@@ -71,7 +71,7 @@ Eigen::Vector3d actin::get_force() {
 void actin::make_timeStep(double& dT) {
     // destroy if it exceeds life time
     if (birthTime + lifeTime < globals.time) {
-        cell.destory_fillament(this);
+        cell.destory_filament(this);
     } else {
         positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
     }

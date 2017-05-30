@@ -6,6 +6,7 @@
  */
 
 #include "settings.h"
+#include "random.h"
 
 #ifndef SRC_GLOBALVARS_H_
 #define SRC_GLOBALVARS_H_

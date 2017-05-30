@@ -26,6 +26,7 @@ class ofApp : public ofBaseApp{
         void dragEvent(ofDragInfo dragInfo);
         void gotMessage(ofMessage msg);
     protected:
+        functor_cell_filamentCreation* FilamentF;
         sGlobalVars Globals;
         cell* Cell;
         simple_surface* Surface;

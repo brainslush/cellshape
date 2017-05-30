@@ -14,7 +14,7 @@
 
 class functor_actin_force;
 class functor_actin_torque;
-class actin : public fillament_base {
+class actin : public filament_base {
 public:
     actin(
         sGlobalVars& iGlobals,

@@ -21,8 +21,8 @@ void ofApp::setup(){
     Globals.frameNo = 0;
 
     // Create Components
-    Cell = new cell(Globals,250,250,20);
-    Cell->create_fillament();
+    FilamentF = new functor_cell_filamentCreation(Globals,100); // filament creation functor for cell
+    Cell = new cell(Globals,250,250,20,FilamentF);
     Surface = new simple_surface(Globals,sideLength);
     Surface->create_facs(0,30,5);
     Globals.grid->update_components();
