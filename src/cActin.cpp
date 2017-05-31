@@ -44,12 +44,14 @@ actin::actin(
     );
 }
 actin::~actin() {
-    if(tail != NULL) {
-        delete tail;
-    }
+    delete tail;
+    tail = NULL;
     delete forceF;
+    forceF = NULL;
     delete torqueF;
+    torqueF = NULL;
     delete rigidBody;
+    rigidBody = NULL;
 }
 void actin::update_force() {
     /*if (!force.isUpdated()) {
@@ -73,7 +75,12 @@ void actin::make_timeStep(double& dT) {
     if (birthTime + lifeTime < globals.time) {
         cell.destory_filament(this);
     } else {
-        positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
+        if (get_length() < maxLength) {
+            positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
+        } else {
+            positions[0] = positions[0] + tmVelocity * globals.settings.deltaT;
+            positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
+        }
     }
 }
 /***************************

@@ -20,6 +20,7 @@ grid_border::grid_border(
 }
 grid_border::~grid_border() {
     delete associatedVisualObj;
+    associatedVisualObj = NULL;
 }
 void grid_border::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
@@ -54,6 +55,7 @@ grid_cell::grid_cell(
 grid_cell::~grid_cell() {
     for (auto& it : borders) {
         delete it;
+        it = NULL;
     }
 }
 std::set<base*>& grid_cell::get_components() {
@@ -226,9 +228,10 @@ grid_base::grid_base(sSettings& iSettings, unsigned long long iResolution, doubl
     }
 }
 grid_base::~grid_base() {
-	for (auto& it : cells) {
-		delete it;
-	}
+    for (auto& it : cells) {
+        delete it;
+        it = NULL;
+    }
 }
 void grid_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
     if (settings.showGrid || settings.showGridOccupation) {
@@ -238,19 +241,18 @@ void grid_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
     }
 }
 void grid_base::register_component(base* iComponent) {
-	if (iComponent->get_visualObj()) {
-		components.insert(iComponent);
-		//update_component(iComponent);
-	}
-	else {
-		std::cout << "Could not register object with ID: " << typeid(*iComponent).name() << "\n Visual object is missing";
-	}
+    if (iComponent->get_visualObj()) {
+        components.insert(iComponent);
+        //update_component(iComponent);
+    } else {
+        std::cout << "Could not register object with ID: " << typeid(*iComponent).name() << "\n Visual object is missing";
+    }
 }
 void grid_base::unregister_component(base* iComponent) {
-	for (auto& it : iComponent->get_gridCells()) {
-		it->remove_component(iComponent);
-	}
-	components.erase(iComponent);
+    for (auto& it : iComponent->get_gridCells()) {
+        it->remove_component(iComponent);
+    }
+    components.erase(iComponent);
 }
 void grid_base::update_component(base* iComponent) {
     double cellLength = sideLength / (double)resolution;

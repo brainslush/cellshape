@@ -30,6 +30,7 @@ surface_border::surface_border(
 }
 surface_border::~surface_border() {
     delete associatedVisualObj;
+    associatedVisualObj = NULL;
 }
 void surface_border::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
     oVisualComponents.push_back(associatedVisualObj);
@@ -57,9 +58,11 @@ simple_surface::simple_surface(
 simple_surface::~simple_surface(){
     for (auto& it : borders) {
         delete it;
+        it = NULL;
     }
     for (auto& it : facs) {
         delete it;
+        it = NULL;
     }
 }
 void simple_surface::obtain_visualObjs(std::vector<visual_base*>& oVisualComponents) {
@@ -82,5 +85,3 @@ void simple_surface::create_facs(unsigned iType, unsigned long long iCount, doub
         break;
     }
 }
-
-

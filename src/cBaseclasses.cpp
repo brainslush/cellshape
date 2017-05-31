@@ -92,15 +92,21 @@ filament_base::filament_base(
     canMove = true;
     associatedVisualObj = new visual_line(this);
     iGlobals.grid->register_component(this);
+    length = 0;
 }
 filament_base::~filament_base(){
     delete associatedVisualObj;
+    associatedVisualObj = NULL;
 }
 void filament_base::set_positions(double iX1, double iY1, double iX2, double iY2){
     positions[0](0) = iX1;
     positions[0](1) = iY1;
     positions[1](0) = iX2;
     positions[1](1) = iY2;
+}
+double& filament_base::get_length() {
+    length = (positions[1] - positions[0]).norm();
+    return length;
 }
 void filament_base::add_connectedCrosslinker(crosslinker_base* iCrosslinker){
     connectedCrosslinkers.insert(iCrosslinker);

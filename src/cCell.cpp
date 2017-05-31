@@ -18,6 +18,7 @@ cell::cell(
     filamentF(iFunctor)
 {
     membranes.insert(new membrane_base(iGlobals,*this,iX,iY,200,iResolution));
+    filamentF->setup(this);
 }
 cell::~cell(){
     for (auto& it : membranes) {
@@ -35,6 +36,12 @@ functor_cell_filamentCreation*& cell::get_filamentCreationFunctor() {
 }
 std::set<membrane_base*>& cell::get_membranes() {
     return membranes;
+}
+std::set<filament_base*>& cell::get_filaments() {
+    return filaments;
+}
+std::set<volume_base*>& cell::get_volumes() {
+    return volumes;
 }
 void cell::set_filamentCreationFunctor(functor_cell_filamentCreation* iFunctor) {
     filamentF = iFunctor;
@@ -100,9 +107,9 @@ void functor_cell_filamentCreation::setup(cell* iCell) {
         pair<Eigen::Vector3d,membrane_part*> pos = find_creationPosition(iCell);
         actin* newActin = new actin(
             globals,
-            iCell,
-            pos.first(),
-            find_tmVelocity(iCell,pos.second()),
+            *iCell,
+            pos.first,
+            find_tmVelocity(iCell,pos.second),
             find_maxLength(iCell),
             find_lifeTime(iCell),
             find_stallingForce(iCell)
@@ -113,10 +120,13 @@ void functor_cell_filamentCreation::setup(cell* iCell) {
 void functor_cell_filamentCreation::make_timeStep(double& dT, cell* iCell) {
 
 }
+filament_base* functor_cell_filamentCreation::create_filament(cell* iCell) {
+     return NULL;
+}
 pair<Eigen::Vector3d,membrane_part*> functor_cell_filamentCreation::find_creationPosition(cell* iCell) {
     auto& membranes = iCell->get_membranes();
-    auto& filaments = iCell->get_filaments();
-    auto& volumes = iCell->get_volumes();
+    //auto& filaments = iCell->get_filaments();
+    //auto& volumes = iCell->get_volumes();
     auto& parts = (*membranes.begin())->get_parts();
 
     double length = (*membranes.begin())->get_length() * randomReal->draw<double>();
@@ -136,7 +146,7 @@ Eigen::Vector3d functor_cell_filamentCreation::find_tmVelocity(cell* iCell, memb
     double deg = PI * (randomReal->draw<double>() - 0.5);
     double speed = maxSpeed * randomReal->draw<double>();
     Eigen::AngleAxis<double> rot(deg,Eigen::Vector3d(0,0,1));
-    return Eigen::Vector3d(speed * (rot * iMembrane->get_normal()));
+    return Eigen::Vector3d(speed * (rot * (-1 * iMembrane->get_normal())));
 }
 double functor_cell_filamentCreation::find_maxLength(cell* iCell) {
     return maxLength * randomReal->draw<double>();
@@ -147,4 +157,3 @@ double functor_cell_filamentCreation::find_lifeTime(cell* iCell) {
 double functor_cell_filamentCreation::find_stallingForce(cell* iCell) {
     return maxStallingForce * randomReal->draw<double>();
 }
-

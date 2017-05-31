@@ -4,21 +4,26 @@ base::base() {
     associatedVisualObj = NULL;
     timeStamp = ofGetFrameNum();
 };
-base::base(std::vector<Eigen::Vector3d> iPositions) {
+base::base(
+    std::vector<Eigen::Vector3d> iPositions
+):
+    positions(iPositions)
+{
     associatedVisualObj = NULL;
     timeStamp = ofGetFrameNum();
-    positions = iPositions;
 };
-base::base(std::vector<Eigen::Vector3d> iPositions,std::vector<double> iParameters) {
+base::base(std::vector<Eigen::Vector3d> iPositions,std::vector<double> iParameters
+
+):
+    positions(iPositions),
+    parameters(iParameters)
+{
     associatedVisualObj = NULL;
     timeStamp = ofGetFrameNum();
-    positions = iPositions;
-    parameters = iParameters;
 };
 base::~base() {
-    if (associatedVisualObj) {
-        delete associatedVisualObj;
-    }
+    delete associatedVisualObj;
+    associatedVisualObj = NULL;
 };
 
 void base::set_gridCells(std::set<grid_cell*> iGridCells) { gridCells = iGridCells; }
@@ -115,6 +120,9 @@ void visual_base::set_fillColor(double iRed, double iGreen, double iBlue) {
     fillColor.b = iBlue;
     fillColor.a = 1.0;
 }
+void visual_base::draw(double iScale) {
+    /* do nothing */
+}
 
 /***************************
  * visual_line
@@ -122,6 +130,15 @@ void visual_base::set_fillColor(double iRed, double iGreen, double iBlue) {
 visual_line::visual_line(base* iComponent) : visual_base(1,iComponent) {
 }
 visual_line::~visual_line() {
+}
+void visual_line::draw(double iScale) {
+    ofSetColor(get_fillColor());
+    ofDrawLine(
+        iScale* get_positions()[0](0),
+        iScale* get_positions()[0](1),
+        iScale* get_positions()[1](0),
+        iScale* get_positions()[1](1)
+    );
 }
 
 /***************************
@@ -131,6 +148,15 @@ visual_ellipse::visual_ellipse(base* iComponent) : visual_base(2,iComponent) {
 }
 visual_ellipse::~visual_ellipse() {
 }
+void visual_ellipse::draw(double iScale) {
+    ofSetColor(get_fillColor());
+    ofDrawEllipse(
+        iScale* get_positions()[0](0),
+        iScale* get_positions()[0](1),
+        2* iScale* get_parameters()[0],
+        2* iScale* get_parameters()[1]
+    );
+}
 
 /***************************
  * visual_rectangle
@@ -139,6 +165,15 @@ visual_rectangle::visual_rectangle(base* iComponent) : visual_base(3,iComponent)
 }
 visual_rectangle::~visual_rectangle() {
 }
+void visual_rectangle::draw(double iScale) {
+    ofSetColor(get_fillColor());
+    ofDrawRectangle(
+        iScale* get_positions()[0](0),
+        iScale* get_positions()[0](1),
+        iScale* (get_positions()[2](0) - get_positions()[0](0)),
+        iScale* (get_positions()[2](1) - get_positions()[0](1))
+    );
+}
 
 /***************************
  * visual_triangle
@@ -146,4 +181,15 @@ visual_rectangle::~visual_rectangle() {
 visual_triangle::visual_triangle(base* iComponent) : visual_base(4,iComponent) {
 }
 visual_triangle::~visual_triangle() {
+}
+void visual_triangle::draw(double iScale) {
+    ofSetColor(get_fillColor());
+    ofDrawTriangle(
+        iScale* get_positions()[0](0),
+        iScale* get_positions()[0](1),
+        iScale* get_positions()[1](0),
+        iScale* get_positions()[1](1),
+        iScale* get_positions()[2](0),
+        iScale* get_positions()[2](1)
+    );
 }

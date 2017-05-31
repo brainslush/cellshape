@@ -70,32 +70,6 @@ random_dist::random_dist(
     }
 }
 
-template<typename T> T random_dist::draw() {
-    switch(type) {
-        case 10:
-            return (*boost::get<boost::random::uniform_smallint<>*>(dist))(*gen);
-        break;
-        case 20:
-            return (*boost::get<boost::random::uniform_real_distribution<>*>(dist))(*gen);
-        break;
-        case 21:
-            return (*boost::get<boost::random::normal_distribution<>*>(dist))(*gen);
-        break;
-        case 22:
-            return (*boost::get<boost::random::lognormal_distribution<>*>(dist))(*gen);
-        break;
-        case 30:
-            return (*boost::get<boost::random::bernoulli_distribution<>*>(dist))(*gen);
-        break;
-        case 31:
-            return (*boost::get<boost::random::exponential_distribution<>*>(dist))(*gen);
-        break;
-        case 32:
-            return (*boost::get<boost::random::uniform_01<>*>(dist))(*gen);
-        break;
-    }
-}
-
 /***************************
  * random_container
  ***************************/
@@ -118,19 +92,11 @@ void random_container::set_seed (unsigned long long iSeed) {
     seed = iSeed;
     gen.seed(seed);
 }
-template<typename... A> random_dist* random_container::register_random (
-    std::string iType,
-    A... args
-) {
-    random_dist* temp = new random_dist (&gen,iType,args...);
-    distributions.insert(temp);
-    return temp;
-}
 void random_container::unregister_random(random_dist* iDist) {
     delete iDist;
     distributions.erase(iDist);
+    iDist = NULL;
 }
-
 unsigned long long random_container::get_uptime() {
 #if defined(BOOST_WINDOWS)
     return GetTickCount64();

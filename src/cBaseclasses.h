@@ -96,12 +96,14 @@ public:
     filament_base(sGlobalVars& iGlobals, cell_base& iCell);
     virtual ~filament_base();
     virtual void set_positions(double iX1, double iY1, double iX2, double iY2);
+    virtual double& get_length();
     virtual void add_connectedCrosslinker(crosslinker_base* iCrosslinker);
     virtual void remove_connectedCrosslinker(crosslinker_base* iCrosslinker);
     virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
     virtual void make_timeStep(double& dT);
 protected:
-	std::set<crosslinker_base*> connectedCrosslinkers;
+    std::set<crosslinker_base*> connectedCrosslinkers;
+    double length;
 };
 
 /***************************

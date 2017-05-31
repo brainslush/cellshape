@@ -16,12 +16,12 @@ void ofApp::setup(){
     // use system uptime as seed
     Globals.rndC = new random_container();
     Globals.rndC->set_seed();
-    unsigned long long seed = Globals.rndC->get_seed();
+    //unsigned long long seed = Globals.rndC->get_seed();
     Globals.time = 0;
     Globals.frameNo = 0;
 
     // Create Components
-    FilamentF = new functor_cell_filamentCreation(Globals,100); // filament creation functor for cell
+    FilamentF = new functor_cell_filamentCreation(Globals,10,1,50,100,10); // filament creation functor for cell
     Cell = new cell(Globals,250,250,20,FilamentF);
     Surface = new simple_surface(Globals,sideLength);
     Surface->create_facs(0,30,5);
@@ -30,69 +30,29 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    /* update globals */
     Globals.frameNo = ofGetFrameNum();
     Globals.time = Globals.frameNo * Globals.settings.deltaT;
+    /* update grid */
+    Globals.grid->update_components();
+    /* make step*/
+    Cell->make_timeStep(Globals.settings.deltaT);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    /*update grid*/
-    Globals.grid->update_components();
-
-    /*obtain visual objects*/
+    /* obtain visual objects */
     std::vector<visual_base*>visualObjs;
     Globals.grid->obtain_visualObjs(visualObjs);
     Surface->obtain_visualObjs(visualObjs);
     Cell->obtain_visualObjs(visualObjs);
 
-    Cell->make_timeStep(Globals.settings.deltaT);
-
     // calculate scale factor when window is resized
     double scale = std::min(ofGetHeight() / (double)sideLength, ofGetWidth() / (double)sideLength);
     // draw elements
     for (auto& it : visualObjs) {
-        ofSetColor(it->get_fillColor());
-        switch (it->get_type()) {
-            case 1:
-                ofDrawLine(
-                    scale* it->get_positions()[0](0),
-                    scale* it->get_positions()[0](1),
-                    scale* it->get_positions()[1](0),
-                    scale* it->get_positions()[1](1)
-                );
-            break;
-            case 2:
-                ofDrawEllipse(
-                    scale* it->get_positions()[0](0),
-                    scale* it->get_positions()[0](1),
-                    2* scale* it->get_parameters()[0],
-                    2* scale* it->get_parameters()[1]
-                );
-            break;
-            case 3:
-                ofDrawRectangle(
-                    scale* it->get_positions()[0](0),
-                    scale* it->get_positions()[0](1),
-                    scale* (it->get_positions()[2](0) - it->get_positions()[0](0)),
-                    scale* (it->get_positions()[2](1) - it->get_positions()[0](1))
-                );
-            break;
-            case 4:
-                ofDrawTriangle(
-                    scale* it->get_positions()[0](0),
-                    scale* it->get_positions()[0](1),
-                    scale* it->get_positions()[1](0),
-                    scale* it->get_positions()[1](1),
-                    scale* it->get_positions()[2](0),
-                    scale* it->get_positions()[2](1)
-                );
-            break;
-            case 5:
-
-            break;
-        }
+        it->draw(scale);
     }
-
 }
 
 //--------------------------------------------------------------

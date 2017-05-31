@@ -28,9 +28,11 @@ membrane_part::membrane_part(
     this->add_ignoreIntersect(typeid(*this).hash_code());
     iGlobals.grid->register_component(this);
     length = (positions[1] - positions[0]).norm();
+    normal = Eigen::Vector3d(0,0,-1).cross(positions[1] - positions[0]);
 };
 membrane_part::~membrane_part(){
     delete associatedVisualObj;
+    associatedVisualObj = NULL;
 };
 double& membrane_part::get_length() {
     return length;
@@ -85,6 +87,7 @@ membrane_base::membrane_base(
 membrane_base::~membrane_base() {
     for (unsigned long long i = 0; i < parts.size(); i++) {
         delete parts[i];
+        parts[i] = NULL;
     }
 }
 
@@ -130,7 +133,7 @@ double& membrane_base::get_length() {
     update_length();
     return length;
 }
-virtual std::vector<membrane_part*>& membrane_base::get_parts() {
+std::vector<membrane_part*>& membrane_base::get_parts() {
     return parts;
 }
 /* update feature of the membrane */

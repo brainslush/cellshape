@@ -63,6 +63,8 @@ public:
     virtual void set_color(double iRed,double iGreen, double iBlue);
     virtual void set_fillColor(double iRed,double iGreen, double iBlue, double iAlpha);
     virtual void set_fillColor(double iRed,double iGreen, double iBlue);
+
+    virtual void draw(double iScale);
 protected:
     base* associatedComponent;
     ofFloatColor color;
@@ -74,24 +76,28 @@ class visual_line:public visual_base {
 public:
     visual_line(base* iComponent);
     virtual ~visual_line();
+    virtual void draw(double iScale);
 protected:
 };
 class visual_ellipse:public visual_base {
 public:
     visual_ellipse(base* iComponent);
     virtual ~visual_ellipse();
+    virtual void draw(double iScale);
 protected:
 };
 class visual_rectangle:public visual_base {
 public:
     visual_rectangle(base* iComponent);
     virtual ~visual_rectangle();
+    virtual void draw(double iScale);
 protected:
 };
 class visual_triangle:public visual_base {
 public:
     visual_triangle(base* iComponent);
     virtual ~visual_triangle();
+    virtual void draw(double iScale);
 protected:
 };
 
