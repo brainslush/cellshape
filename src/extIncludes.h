@@ -31,8 +31,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "ofColor.h"
-#include "ofxGeo.h"
+#include "ofxGui.h"
 #include "ofMain.h"
 
 #ifdef Success

@@ -21,7 +21,7 @@ void ofApp::setup(){
     Globals.frameNo = 0;
 
     // Create Components
-    FilamentF = new functor_cell_filamentCreation(Globals,10,1,50,100,10); // filament creation functor for cell
+    FilamentF = new functor_cell_filamentCreation(Globals,200,0.01,100,500,10); // filament creation functor for cell
     Cell = new cell(Globals,250,250,20,FilamentF);
     Surface = new simple_surface(Globals,sideLength);
     Surface->create_facs(0,30,5);

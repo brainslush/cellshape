@@ -195,9 +195,14 @@ void grid_cell::update_intersecting() {
             }
         }
     }
-    if (settings.showGridOccupation && intersection) {
-        associatedVisualObj->set_color(1, 0, 1, 1);
-        associatedVisualObj->set_fillColor(1, 0, 1, 1);
+    if (settings.showGridOccupation) {
+        if (intersection) {
+            associatedVisualObj->set_color(1, 0, 1, 1);
+            associatedVisualObj->set_fillColor(1, 0, 1, 1);
+        } else {
+            associatedVisualObj->set_color(0, 0, 1, 1);
+            associatedVisualObj->set_fillColor(0, 0, 1, 1);
+        }
     }
 }
 void grid_cell::remove_component(base* iComponent) {
