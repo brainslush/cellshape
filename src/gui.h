@@ -13,17 +13,17 @@
 #define SRC_GUI_H_
 
 using ofxControlTypes = boost::variant<
-    ofxButton*,
     ofxToggle*,
     ofxFloatSlider*,
     ofxIntSlider*
 >;
 
+class ofxGui_return : public boost::static_visitor {
+    ofxButton* operator()(ofxButton* t,) const {t->setup()}
+};
+
 template<typename T> class gui_setting {
 public:
-    gui_setting(std::string iName) : name(iName) {
-        control = new ofxButton;
-    }
     gui_setting (
         std::string iName,
         T iValue
@@ -71,7 +71,7 @@ public:
         return value;
     }
     virtual ofxBaseGui* setup() {
-        control.ge
+        return boost::apply_visitor(ofxGui_return{}, control);
     };
 private:
     std::string name;

@@ -31,8 +31,9 @@
 #include <string>
 #include <typeinfo>
 
-#include "ofxGui.h"
 #include "ofMain.h"
+//#include "ofxGui.h"
+
 
 #ifdef Success
     #undef Success
