@@ -7,25 +7,33 @@
 
 #include "gui.h"
 
-gui_group::gui_group() {
+using namespace mygui;
+
+group::group() {
     name = "";
 }
-gui_group::gui_group(std::string iName) : name(iName) {
+group::group(std::string iName) : name(iName) {
 
 }
-gui_group::~gui_group() {
+group::~group() {
     for(auto& it : settings) {
         delete it;
     }
 }
-void gui_group::setup() {
+void group::setup() {
     for(auto& it : settings) {
         panel.add(it->setup());
     }
 }
-void gui_group::draw() {
-
+void group::draw() {
+    panel.draw();
 }
+void group::update() {
+    for(auto& it : settings) {
+        it->update();
+    }
+}
+
 
 
 gui::gui() {
@@ -46,13 +54,22 @@ void gui::draw() {
         it->draw();
     }
 }
-gui_group* gui::register_group() {
-    gui_group* newGroup = new gui_group();
+void gui::update() {
+    for(auto& it : groups) {
+        it->update();
+    }
+}
+group* gui::register_group() {
+    group* newGroup = new group();
     groups.insert(newGroup);
     return newGroup;
 };
-gui_group* gui::register_group(std::string iName) {
-    gui_group* newGroup = new gui_group(iName);
+group* gui::register_group(std::string iName) {
+    group* newGroup = new group(iName);
     groups.insert(newGroup);
     return newGroup;
 };
+void gui::unregister_group(group* iGroup) {
+    delete iGroup;
+    groups.erase(iGroup);
+}

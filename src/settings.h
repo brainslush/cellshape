@@ -9,8 +9,6 @@
 #define SRC_SETTINGS_H_
 
 struct sSettings {
-    bool showGrid;
-    bool showGridOccupation;
     double deltaT;
     double rotationEpsilon;
 };

@@ -4,6 +4,7 @@
 #include "cSurface.h"
 #include "ofMain.h"
 #include "ofxGui.h"
+#include "gui.h"
 
 #ifndef SRC_OFAPP_H_
 #define SRC_OFAPP_H_
@@ -26,8 +27,8 @@ class ofApp : public ofBaseApp{
         void dragEvent(ofDragInfo dragInfo);
         void gotMessage(ofMessage msg);
     protected:
-        functor_cell_filamentCreation* FilamentF;
         sGlobalVars Globals;
+        functor_cell_filamentCreation* FilamentF;
         cell* Cell;
         simple_surface* Surface;
         unsigned long long sideLength = 500;

@@ -6,13 +6,15 @@
  */
 
 #include "settings.h"
+#include "gui.h"
 #include "random.h"
+#include "grid.h"
 
 #ifndef SRC_GLOBALVARS_H_
 #define SRC_GLOBALVARS_H_
 
-class grid_base;
 struct sGlobalVars {
+    mygui::gui* guiBase;
     grid_base* grid;
     random_container* rndC;
     double time;

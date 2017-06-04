@@ -5,12 +5,11 @@
 ***************************/
 
 grid_border::grid_border(
-    sSettings& iSettings,
     double iX1,
     double iY1,
     double iX2,
     double iY2
-): base(), settings(iSettings) {
+): base() {
     positions.clear();
     positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
     positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
@@ -32,17 +31,22 @@ void grid_border::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 ***************************/
 
 grid_cell::grid_cell(
-    sSettings& iSettings,
+    bool*& iShowGrid,
+    bool*& iShowGridOccupation,
     double iX1,
     double iY1,
     double iX2,
     double iY2
-): base(), settings(iSettings) {
+):
+    base(),
+    showGrid(iShowGrid),
+    showGridOccupation(iShowGridOccupation)
+{
     borders.clear();
-    borders.push_back(new grid_border(settings, iX1, iY1, iX1, iY2));
-    borders.push_back(new grid_border(settings, iX1, iY2, iX2, iY2));
-    borders.push_back(new grid_border(settings, iX2, iY2, iX2, iY1));
-    borders.push_back(new grid_border(settings, iX2, iY1, iX1, iY1));
+    borders.push_back(new grid_border(iX1, iY1, iX1, iY2));
+    borders.push_back(new grid_border(iX1, iY2, iX2, iY2));
+    borders.push_back(new grid_border(iX2, iY2, iX2, iY1));
+    borders.push_back(new grid_border(iX2, iY1, iX1, iY1));
     positions.clear();
     positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
     positions.push_back(Eigen::Vector3d(iX1, iY2, 0));
@@ -113,10 +117,10 @@ std::pair<base*, std::pair<Eigen::Vector3d, Eigen::Vector3d>> grid_cell::obtain_
 }
 
 void grid_cell::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
-    if (settings.showGridOccupation && components.size() > 0) {
+    if (*showGridOccupation && components.size() > 0) {
         iVisualObjs.push_back(associatedVisualObj);
     }
-    if (settings.showGrid) {
+    if (*showGrid) {
         for (auto& it : borders) {
             it->obtain_visualObjs(iVisualObjs);
         }
@@ -195,7 +199,7 @@ void grid_cell::update_intersecting() {
             }
         }
     }
-    if (settings.showGridOccupation) {
+    if (showGridOccupation) {
         if (intersection) {
             associatedVisualObj->set_color(1, 0, 1, 1);
             associatedVisualObj->set_fillColor(1, 0, 1, 1);
@@ -216,11 +220,15 @@ void grid_cell::add_component(base* iComponent) {
 * grid_base
 ***************************/
 
-grid_base::grid_base(sSettings& iSettings, unsigned long long iResolution, double iSideLength):
-    settings(iSettings),
+grid_base::grid_base(mygui::gui*& iGuiBase, unsigned long long iResolution, double iSideLength):
+    //settings(iSettings),
+    guiBase(iGuiBase),
     resolution(iResolution),
     sideLength(iSideLength)
 {
+    guiGroup = guiBase->register_group("Grid");
+    showGrid = guiGroup->register_setting<bool>("Show grid",true,false);
+    showGridOccupation = guiGroup->register_setting<bool>("show Occ",true,false);
     double stepLength = iSideLength / (double)iResolution;
     for (unsigned long long i = 0; i < resolution; i++) {
         for (unsigned long long j = 0; j < resolution; j++) {
@@ -228,7 +236,7 @@ grid_base::grid_base(sSettings& iSettings, unsigned long long iResolution, doubl
             double iY1 = stepLength * j;
             double iX2 = stepLength * (i + 1);
             double iY2 = stepLength * (j + 1);
-            cells.push_back(new grid_cell(settings, iX1, iY1, iX2, iY2));
+            cells.push_back(new grid_cell(showGrid, showGridOccupation, iX1, iY1, iX2, iY2));
         }
     }
 }
@@ -237,9 +245,10 @@ grid_base::~grid_base() {
         delete it;
         it = NULL;
     }
+
 }
 void grid_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
-    if (settings.showGrid || settings.showGridOccupation) {
+    if (*showGrid || *showGridOccupation) {
         for (auto& it : cells) {
             it->obtain_visualObjs(iVisualObjs);
         }

@@ -2,25 +2,22 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    // of Settings
+    // openframeworks settings
     ofSetFrameRate(10);
-    // set settings
-    Globals.settings.showGrid = true;
-    Globals.settings.showGridOccupation = true;
-    Globals.settings.deltaT = 1;
-
     ofBackground(200,200,200);
-    // create mayors
-    Globals.grid = new grid_base(Globals.settings,100,sideLength);
-
-    // use system uptime as seed
+    // create GUI Container
+    Globals.guiBase = new mygui::gui();
+    // set settings
+    Globals.settings.deltaT = 1;
+    // create grid
+    Globals.grid = new grid_base(Globals.guiBase,100,sideLength);
+    // initialize random
     Globals.rndC = new random_container();
     Globals.rndC->set_seed();
-    //unsigned long long seed = Globals.rndC->get_seed();
+    // initialize some global variables
     Globals.time = 0;
     Globals.frameNo = 0;
-
-    // Create Components
+    // create cell components
     FilamentF = new functor_cell_filamentCreation(Globals,200,0.01,100,500,10); // filament creation functor for cell
     Cell = new cell(Globals,250,250,20,FilamentF);
     Surface = new simple_surface(Globals,sideLength);
@@ -31,7 +28,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     /* update globals */
-    Globals.frameNo = ofGetFrameNum();
+    Globals.frameNo ++;
     Globals.time = Globals.frameNo * Globals.settings.deltaT;
     /* update grid */
     Globals.grid->update_components();
