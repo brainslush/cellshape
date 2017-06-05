@@ -22,7 +22,8 @@ void ofApp::setup(){
     Cell = new cell(Globals,250,250,20,FilamentF);
     Surface = new simple_surface(Globals,sideLength);
     Surface->create_facs(0,30,5);
-    Globals.grid->update_components();
+    // setup gui
+    Globals.guiBase->setup();
 }
 
 //--------------------------------------------------------------
@@ -50,6 +51,8 @@ void ofApp::draw(){
     for (auto& it : visualObjs) {
         it->draw(scale);
     }
+    // draw gui
+    Globals.guiBase->draw();
 }
 
 //--------------------------------------------------------------

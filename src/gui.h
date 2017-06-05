@@ -20,8 +20,8 @@ namespace mygui {
       ofxToggle*,
       ofxFloatSlider*,
       ofxDoubleSlider*,
-      ofxULLongSlider*,
-      ofxLongLongSlider*,
+      //ofxULLongSlider*,
+      //ofxLongLongSlider*,
       ofxIntSlider*
   >;
 
@@ -69,35 +69,22 @@ namespace mygui {
           width(iWidth),
           height(iHeight)
       {
-          switch(typeid(T)) {
-              case (typeid(bool)) : {
-                  control = new ofxToggle;
-              }
-              break;
-              case (typeid(double)) : {
-                  control = new ofxDoubleSlider;
-              }
-              break;
-              case (typeid(float)) : {
-                  control = new ofxFloatSlider;
-              }
-              break;
-              case (typeid(unsigned long long)) : {
-                  control = new ofxULLongSlider;
-              }
-              break;
-              case (typeid(long long)) : {
-                  control = new ofxLongLongSlider;
-              }
-              break;
-              case (typeid(int)) : {
-                  control = new ofxIntSlider;
-              }
-              break;
-              default : {
-                  label = "ERROR 1";
-                  control = new ofxLabel;
-              }
+          std::type_info& type = typeid(T);
+          if(type == typeid(bool)) {
+              control = new ofxToggle;
+          } else if(type == typeid(double)) {
+              control = new ofxDoubleSlider;
+          } else if(type == typeid(float)) {
+              control = new ofxFloatSlider;
+          /*} else if(type == typeid(unsigned long long)) {
+              control = new ofxULLongSlider;
+          } else if(type == typeid(long long)) {
+              control = new ofxLongLongSlider;*/
+          } else if(type == typeid(int)) {
+              control = new ofxIntSlider;
+          } else {
+              label = "ERROR 1";
+              control = new ofxLabel;
           }
       }
       virtual ~setting() {
@@ -122,12 +109,12 @@ namespace mygui {
           } else if(control.type() == typeid(ofxFloatSlider*)) {
               ofxFloatSlider* t = boost::get<ofxFloatSlider*>(control);
               return t->setup(label,value,minValue,maxValue,width,height);
-          } else if(control.type() == typeid(ofxLongLongSlider*)) {
+          /*} else if(control.type() == typeid(ofxLongLongSlider*)) {
               ofxLongLongSlider* t = boost::get<ofxLongLongSlider*>(control);
               return t->setup(label,value,minValue,maxValue,width,height);
           } else if(control.type() == typeid(ofxULLongSlider*)) {
               ofxULLongSlider* t = boost::get<ofxULLongSlider*>(control);
-              return t->setup(label,value,minValue,maxValue,width,height);
+              return t->setup(label,value,minValue,maxValue,width,height);*/
           } else if(control.type() == typeid(ofxIntSlider*)) {
               ofxIntSlider* t = boost::get<ofxIntSlider*>(control);
               return t->setup(label,value,minValue,maxValue,width,height);
@@ -149,12 +136,12 @@ namespace mygui {
               } else if (control.type() == typeid(ofxFloatSlider*)) {
                   ofxFloatSlider* t = boost::get<ofxFloatSlider*>(control);
                   value = *t;
-              } else if (control.type() == typeid(ofxLongLongSlider*)) {
+              /*} else if (control.type() == typeid(ofxLongLongSlider*)) {
                   ofxLongLongSlider* t = boost::get<ofxLongLongSlider*>(control);
                   value = *t;
               } else if (control.type() == typeid(ofxULLongSlider*)) {
                   ofxULLongSlider* t = boost::get<ofxULLongSlider*>(control);
-                  value = *t;
+                  value = *t;*/
               } else if (control.type() == typeid(ofxIntSlider*)) {
                   ofxIntSlider* t = boost::get<ofxIntSlider*>(control);
                   value = *t;
@@ -233,11 +220,11 @@ namespace mygui {
       virtual void unregister_group(group* iGroup);
   protected:
       std::set<group*> groups;
-      ofxPanel mainPanel;
-      ofxLabel mainLabel;
-      ofxLabel FPS;
-      ofxButton playPause;
-      ofxButton stopReset;
+      //ofxPanel mainPanel;
+      //ofxLabel mainLabel;
+      //ofxLabel FPS;
+      //ofxButton playPause;
+      //ofxButton stopReset;
   };
 }
 
