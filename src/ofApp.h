@@ -3,7 +3,6 @@
 #include "cCell.h"
 #include "cSurface.h"
 #include "ofMain.h"
-#include "ofxGui.h"
 #include "gui.h"
 
 #ifndef SRC_OFAPP_H_

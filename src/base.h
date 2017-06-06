@@ -1,4 +1,6 @@
-#include "extIncludes.h"
+#include <set>
+#include <vector>
+#include <eigen3/Eigen/Eigen>
 
 #ifndef SRC_BASE_H_
 #define SRC_BASE_H_

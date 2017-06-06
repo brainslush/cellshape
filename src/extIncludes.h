@@ -11,14 +11,7 @@
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/algorithm/clamp.hpp>
 #include <boost/variant.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_smallint.hpp>
-#include <boost/random/uniform_01.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/random/bernoulli_distribution.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/lognormal_distribution.hpp>
-#include <boost/random/exponential_distribution.hpp>
+
 //#include <boost/geometry.hpp>
 //#include <boost/geometry/geometries/linestring.hpp>
 //#include <boost/geometry/geometries/point_xy.hpp>
@@ -32,8 +25,6 @@
 #include <typeinfo>
 
 #include "ofMain.h"
-//#include "ofxGui.h"
-
 
 #ifdef Success
     #undef Success

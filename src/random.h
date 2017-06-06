@@ -1,4 +1,15 @@
-#include "extIncludes.h"
+//#include "extIncludes.h"
+#include <set>
+#include <string>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_smallint.hpp>
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/bernoulli_distribution.hpp>
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/lognormal_distribution.hpp>
+#include <boost/random/exponential_distribution.hpp>
+
 
 #ifndef SRC_RANDOM_H_
 #define SRC_RANDOM_H_

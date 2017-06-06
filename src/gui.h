@@ -5,228 +5,238 @@
  *      Author: siegbahn
  */
 
-#include "extIncludes.h"
-#include "ofxGui.h"
+#include "ofxDatGui.h"
+#include <set>
+#include <typeinfo>
+#include <functional>
 
 #ifndef SRC_GUI_H_
 #define SRC_GUI_H_
 
-namespace mygui {
-  typedef ofxSlider<unsigned long long> ofxULLongSlider;
-  typedef ofxSlider<double> ofxDoubleSlider;
-  typedef ofxSlider<long long> ofxLongLongSlider;
-  using ofxControlTypes = boost::variant<
-      ofxLabel*,
-      ofxToggle*,
-      ofxFloatSlider*,
-      ofxDoubleSlider*,
-      //ofxULLongSlider*,
-      //ofxLongLongSlider*,
-      ofxIntSlider*
-  >;
+namespace mygui
+{
+using ofxControlTypes = boost::variant<
+    ofxDatGuiLabel *,
+    ofxDatGuiButton *,
+    ofxDatGuiToggle *,
+    ofxDatGuiSlider *,
+    ofxDatGuiColorPicker *>;
 
-  class setting_base {
+class setting_base
+{
   public:
-      setting_base(){};
-      virtual ~setting_base(){};
-      virtual ofxBaseGui* setup(){return nullptr;};
-      virtual void update(){};
+    setting_base(){};
+    virtual ~setting_base(){};
+    virtual ofxDatGuiComponent *setup() { return nullptr; };
+    virtual void update(){};
+
   protected:
-  };
-  template<typename T> class setting: public setting_base {
+};
+template <typename T>
+class setting : public setting_base
+{
   public:
-      setting (
-          std::string& iLabel,
-          bool& iUpdatePerFrame,
-          float iWidth,
-          float iHeight,
-          T iValue
-      ) :
-          label(iLabel),
-          updatePerFrame(iUpdatePerFrame),
-          value(iValue),
-          width(iWidth),
-          height(iHeight)
-      {
-          control = new ofxToggle;
-          minValue = false;
-          maxValue = false;
-      }
-      setting(
-          std::string& iLabel,
-          bool& iUpdatePerFrame,
-          float iWidth,
-          float iHeight,
-          T iValue,
-          T iMinValue,
-          T iMaxValue
-      ) :
-          label(iLabel),
-          updatePerFrame(iUpdatePerFrame),
-          value(iValue),
-          minValue(iMinValue),
-          maxValue(iMaxValue),
-          width(iWidth),
-          height(iHeight)
-      {
-          std::type_info& type = typeid(T);
-          if(type == typeid(bool)) {
-              control = new ofxToggle;
-          } else if(type == typeid(double)) {
-              control = new ofxDoubleSlider;
-          } else if(type == typeid(float)) {
-              control = new ofxFloatSlider;
-          /*} else if(type == typeid(unsigned long long)) {
-              control = new ofxULLongSlider;
-          } else if(type == typeid(long long)) {
-              control = new ofxLongLongSlider;*/
-          } else if(type == typeid(int)) {
-              control = new ofxIntSlider;
-          } else {
-              label = "ERROR 1";
-              control = new ofxLabel;
-          }
-      }
-      virtual ~setting() {
-
-      }
-      virtual std::string& get_name() {
-          return label;
-      }
-      virtual T* get_pointer() {
-          return &value;
-      }
-      virtual T& get_value() {
-          return value;
-      }
-      virtual ofxBaseGui* setup() {
-          if(control.type() == typeid(ofxToggle*)) {
-              ofxToggle* t = boost::get<ofxToggle*>(control);
-              return t->setup(label,value,width,height);
-          } else if(control.type() == typeid(ofxDoubleSlider*)) {
-              ofxDoubleSlider* t = boost::get<ofxDoubleSlider*>(control);
-              return t->setup(label,value,minValue,maxValue,width,height);
-          } else if(control.type() == typeid(ofxFloatSlider*)) {
-              ofxFloatSlider* t = boost::get<ofxFloatSlider*>(control);
-              return t->setup(label,value,minValue,maxValue,width,height);
-          /*} else if(control.type() == typeid(ofxLongLongSlider*)) {
-              ofxLongLongSlider* t = boost::get<ofxLongLongSlider*>(control);
-              return t->setup(label,value,minValue,maxValue,width,height);
-          } else if(control.type() == typeid(ofxULLongSlider*)) {
-              ofxULLongSlider* t = boost::get<ofxULLongSlider*>(control);
-              return t->setup(label,value,minValue,maxValue,width,height);*/
-          } else if(control.type() == typeid(ofxIntSlider*)) {
-              ofxIntSlider* t = boost::get<ofxIntSlider*>(control);
-              return t->setup(label,value,minValue,maxValue,width,height);
-          } else {
-              label = "ERROR 2";
-              control = new ofxLabel;
-              ofxLabel* t = boost::get<ofxLabel*>(control);
-              return t->setup(label,width,height);
-          }
-      }
-      virtual void update() {
-          if(updatePerFrame) {
-              if(control.type() == typeid(ofxToggle*)) {
-                  ofxToggle* t = boost::get<ofxToggle*>(control);
-                  value = *t;
-              } else if (control.type() == typeid(ofxDoubleSlider*)) {
-                  ofxDoubleSlider* t = boost::get<ofxDoubleSlider*>(control);
-                  value = *t;
-              } else if (control.type() == typeid(ofxFloatSlider*)) {
-                  ofxFloatSlider* t = boost::get<ofxFloatSlider*>(control);
-                  value = *t;
-              /*} else if (control.type() == typeid(ofxLongLongSlider*)) {
+    setting(
+        std::string &iLabel,
+        T iValue
+    ) : label(iLabel),
+        value(iValue)
+    {
+        control = new ofxDatGuiButton;
+    }
+    setting(
+        std::string &iLabel,
+        bool &iUpdatePerFrame,
+        T iValue) : label(iLabel),
+                    updatePerFrame(iUpdatePerFrame),
+                    value(iValue)
+    {
+        control = new ofxDatGuiToggle;
+        minValue = false;
+        maxValue = false;
+    }
+    setting(
+        std::string &iLabel,
+        bool &iUpdatePerFrame,
+        T iValue,
+        T iMinValue,
+        T iMaxValue) : label(iLabel),
+                       updatePerFrame(iUpdatePerFrame),
+                       value(iValue),
+                       minValue(iMinValue),
+                       maxValue(iMaxValue)
+    {
+        std::type_info &type = typeid(T);
+        if (type == type_info(bool))
+        {
+            control = new ofxDatGuiToggle;
+        }
+        else if (std::is_floating_point<T> || std::is_integral<T>)
+        {
+            control = new ofxDatGuiSlider;
+        }
+        else if (std::is_function<T>)
+        {
+            control = new ofxDatGuiButton;
+        }
+        else
+        {
+            label = "ERROR 1";
+            control = new ofxDatGuiLabel;
+        }
+    }
+    virtual ~setting()
+    {
+    }
+    virtual std::string &get_name()
+    {
+        return label;
+    }
+    virtual T *get_pointer()
+    {
+        return &value;
+    }
+    virtual T &get_value()
+    {
+        return value;
+    }
+    virtual ofxDatGuiComponent *setup()
+    {
+        if (control.type() == typeid(ofxToggle *))
+        {
+            ofxToggle *t = boost::get<ofxToggle *>(control);
+            return t->setup(label, value, width, height);
+        }
+        else if (control.type() == typeid(ofxDoubleSlider *))
+        {
+            ofxDoubleSlider *t = boost::get<ofxDoubleSlider *>(control);
+            return t->setup(label, value, minValue, maxValue, width, height);
+        }
+        else if (control.type() == typeid(ofxFloatSlider *))
+        {
+            ofxFloatSlider *t = boost::get<ofxFloatSlider *>(control);
+            return t->setup(label, value, minValue, maxValue, width, height);
+        }
+        else if (control.type() == typeid(ofxIntSlider *))
+        {
+            ofxIntSlider *t = boost::get<ofxIntSlider *>(control);
+            return t->setup(label, value, minValue, maxValue, width, height);
+        }
+        else
+        {
+            label = "ERROR 2";
+            control = new ofxLabel;
+            ofxLabel *t = boost::get<ofxLabel *>(control);
+            return t->setup(label, width, height);
+        }
+    }
+    virtual void update()
+    {
+        if (updatePerFrame)
+        {
+            if (control.type() == typeid(ofxToggle *))
+            {
+                ofxToggle *t = boost::get<ofxToggle *>(control);
+                value = *t;
+            }
+            else if (control.type() == typeid(ofxDoubleSlider *))
+            {
+                ofxDoubleSlider *t = boost::get<ofxDoubleSlider *>(control);
+                value = *t;
+            }
+            else if (control.type() == typeid(ofxFloatSlider *))
+            {
+                ofxFloatSlider *t = boost::get<ofxFloatSlider *>(control);
+                value = *t;
+                /*} else if (control.type() == typeid(ofxLongLongSlider*)) {
                   ofxLongLongSlider* t = boost::get<ofxLongLongSlider*>(control);
                   value = *t;
               } else if (control.type() == typeid(ofxULLongSlider*)) {
                   ofxULLongSlider* t = boost::get<ofxULLongSlider*>(control);
                   value = *t;*/
-              } else if (control.type() == typeid(ofxIntSlider*)) {
-                  ofxIntSlider* t = boost::get<ofxIntSlider*>(control);
-                  value = *t;
-              }
-          }
-      }
-  protected:
-      std::string label;
-      bool updatePerFrame;
-      T value;
-      T minValue;
-      T maxValue;
-      float width;
-      float height;
-      ofxControlTypes control;
-  };
+            }
+            else if (control.type() == typeid(ofxIntSlider *))
+            {
+                ofxIntSlider *t = boost::get<ofxIntSlider *>(control);
+                value = *t;
+            }
+        }
+    }
 
-  class group {
+  protected:
+    std::string label;
+    bool updatePerFrame;
+    T value;
+    T minValue;
+    T maxValue;
+    float width;
+    float height;
+    ofxControlTypes control;
+};
+
+class group
+{
   public:
-      group();
-      group(std::string iName);
-      virtual ~group();
-      virtual void setup();
-      virtual void draw();
-      virtual void update();
-      template <typename T,typename... A>
-      T& register_setting(
-          std::string iLabel,
-          bool iUpdatePerFrame,
-          float iWidth,
-          float iHeight,
-          A... iArgs
-      ) {
-          setting<T>* newSetting = new setting<T>(
-              iLabel,
-              iUpdatePerFrame,
-              iWidth,
-              iHeight,
-              iArgs...
-          );
-          settings.insert(newSetting);
-          return newSetting->get_value();
-      }
-      template <typename T,typename... A>
-      T* register_setting(
-          std::string iLabel,
-          bool iUpdatePerFrame,
-          A... iArgs
-      ) {
-          setting<T>* newSetting = new setting<T>(
-              iLabel,
-              iUpdatePerFrame,
-              200,
-              18,
-              iArgs...
-          );
-          settings.insert(newSetting);
-          return newSetting->get_pointer();
-      }
+    group();
+    group(std::string iName);
+    virtual ~group();
+    virtual void setup();
+    virtual void draw();
+    virtual void update();
+    template <typename T, typename... A>
+    T &register_setting(
+        std::string iLabel,
+        bool iUpdatePerFrame,
+        float iWidth,
+        float iHeight,
+        A... iArgs)
+    {
+        setting<T> *newSetting = new setting<T>(
+            iLabel,
+            iUpdatePerFrame,
+            iWidth,
+            iHeight,
+            iArgs...);
+        settings.insert(newSetting);
+        return newSetting->get_value();
+    }
+    template <typename T, typename... A>
+    T *register_setting(
+        std::string iLabel,
+        bool iUpdatePerFrame,
+        A... iArgs)
+    {
+        setting<T> *newSetting = new setting<T>(
+            iLabel,
+            iUpdatePerFrame,
+            200,
+            18,
+            iArgs...);
+        settings.insert(newSetting);
+        return newSetting->get_pointer();
+    }
+
   protected:
-      std::string name;
-      std::set<setting_base*> settings;
-      ofxPanel panel;
-  };
+    std::string name;
+    std::set<setting_base *> settings;
+    ofxPanel panel;
+};
 
-
-  class gui {
+class gui
+{
   public:
-      gui();
-      virtual ~gui();
-      virtual void setup();
-      virtual void draw();
-      virtual void update();
-      group* register_group();
-      group* register_group(std::string iName);
-      virtual void unregister_group(group* iGroup);
+    gui();
+    virtual ~gui();
+    virtual void setup();
+    virtual void draw();
+    virtual void update();
+    group *register_group();
+    group *register_group(std::string iName);
+    virtual void unregister_group(group *iGroup);
+
   protected:
-      std::set<group*> groups;
-      //ofxPanel mainPanel;
-      //ofxLabel mainLabel;
-      //ofxLabel FPS;
-      //ofxButton playPause;
-      //ofxButton stopReset;
-  };
+    std::set<group *> groups;
+};
 }
-
 
 #endif /* SRC_GUI_H_ */
