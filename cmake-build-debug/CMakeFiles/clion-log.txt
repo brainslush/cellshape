@@ -1,0 +1,26 @@
+/home/siegbahn/clion-2017.1.2/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/siegbahn/gitprojects/MA/Cellformation
+-- Boost version: 1.58.0
+-- Found the following Boost libraries:
+--   filesystem
+--   system
+-- libudev stable: 1
+-- Found UDev: /usr/lib/x86_64-linux-gnu/libudev.so
+--    include: /usr/include
+-- Found components for GLIB
+-- Checking for module 'gstreamer-gl-1.0>=1.5.0'
+--   
+-- Checking for module 'gstreamer-mpegts-1.0>=1.4.0'
+--   
+-- cotire 1.7.2 loaded.
+-- TARGET_ARCH: x86_64 64bit
+-- OF_COTIRE: ON
+-- OF_STATIC: OFF
+-- OF_AUDIO: ON
+-- OF_VIDEO: ON
+-- OF_GTK: ON
+-- CMAKE_BUILD_TYPE: Debug
+-- CMAKE_C_COMPILER_ID: GNU
+-- CMAKE_CXX_COMPILER_ID: GNU
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug

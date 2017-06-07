@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Cellformation"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\of\;CMake Files\..\of\dev\;CMake Files\..\of\dev\cmake\;CMake Files\cmake-build-debug\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Cellformation">
+				<Option output="/home/siegbahn/gitprojects/MA/Cellformation/bin/Cellformation" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DOF_USING_MPG123"/>
+					<Add option="-DOF_SOUND_PLAYER_OPENAL"/>
+					<Add option="-DOF_SOUNDSTREAM_RTAUDIO"/>
+					<Add option="-DOF_VIDEO_PLAYER_GSTREAMER"/>
+					<Add option="-DOF_VIDEO_CAPTURE_GSTREAMER"/>
+					<Add option="-DOF_USING_GTK"/>
+					<Add option="-DFREEIMAGE_LIB"/>
+					<Add option="-DPOCO_STATIC"/>
+					<Add option="-DNO_LCMS"/>
+					<Add option="-DOPJ_STATIC"/>
+					<Add option="-DLIBRAW_NODLL"/>
+					<Add option="-DDISABLE_PERF_MEASUREMENT"/>
+					<Add option="-D__ANSI__"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/3d"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/app"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/communication"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/events"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/gl"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/graphics"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/math"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/sound"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/types"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/utils"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/video"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/DeprecationManager"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibJPEG"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibOpenJPEG"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibPNG"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibRawLite"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibTIFF4"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibWebP"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/Half"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/Iex"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/IexMath"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/IlmImf"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/IlmThread"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/Imath"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glew"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glew/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glfw"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glfw/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glfw/include/GLFW"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/kissfft"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/kissfft/tools"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/libtess2"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/libtess2/Include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/libtess2/Source"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Crypto/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Foundation/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Net/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/NetSSL_OpenSSL/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Util/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/XML/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Zip/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/rtaudio"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/rtaudio/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/utf8cpp"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/utf8cpp/include"/>
+					<Add directory="/usr/include/cairo"/>
+					<Add directory="/usr/include/glib-2.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+					<Add directory="/usr/include/pixman-1"/>
+					<Add directory="/usr/include/freetype2"/>
+					<Add directory="/usr/include/libpng12"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/freetype2"/>
+					<Add directory="/usr/include/AL"/>
+					<Add directory="/usr/include/gstreamer-1.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gstreamer-1.0/include"/>
+					<Add directory="/usr/include/gtk-3.0"/>
+					<Add directory="/usr/include/at-spi2-atk/2.0"/>
+					<Add directory="/usr/include/at-spi-2.0"/>
+					<Add directory="/usr/include/dbus-1.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/dbus-1.0/include"/>
+					<Add directory="/usr/include/gio-unix-2.0"/>
+					<Add directory="/usr/include/mirclient"/>
+					<Add directory="/usr/include/mircommon"/>
+					<Add directory="/usr/include/mircookie"/>
+					<Add directory="/usr/include/pango-1.0"/>
+					<Add directory="/usr/include/harfbuzz"/>
+					<Add directory="/usr/include/atk-1.0"/>
+					<Add directory="/usr/include/gdk-pixbuf-2.0"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/components"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/core"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/libs/ofxSmartFont"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/themes"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 Cellformation"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Cellformation/fast">
+				<Option output="/home/siegbahn/gitprojects/MA/Cellformation/bin/Cellformation" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DOF_USING_MPG123"/>
+					<Add option="-DOF_SOUND_PLAYER_OPENAL"/>
+					<Add option="-DOF_SOUNDSTREAM_RTAUDIO"/>
+					<Add option="-DOF_VIDEO_PLAYER_GSTREAMER"/>
+					<Add option="-DOF_VIDEO_CAPTURE_GSTREAMER"/>
+					<Add option="-DOF_USING_GTK"/>
+					<Add option="-DFREEIMAGE_LIB"/>
+					<Add option="-DPOCO_STATIC"/>
+					<Add option="-DNO_LCMS"/>
+					<Add option="-DOPJ_STATIC"/>
+					<Add option="-DLIBRAW_NODLL"/>
+					<Add option="-DDISABLE_PERF_MEASUREMENT"/>
+					<Add option="-D__ANSI__"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/3d"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/app"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/communication"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/events"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/gl"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/graphics"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/math"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/sound"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/types"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/utils"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/openframeworks/video"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/DeprecationManager"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibJPEG"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibOpenJPEG"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibPNG"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibRawLite"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibTIFF4"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/LibWebP"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/Half"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/Iex"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/IexMath"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/IlmImf"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/IlmThread"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/freeimage/Source/OpenEXR/Imath"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glew"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glew/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glfw"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glfw/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/glfw/include/GLFW"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/kissfft"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/kissfft/tools"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/libtess2"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/libtess2/Include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/libtess2/Source"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Crypto/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Foundation/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Net/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/NetSSL_OpenSSL/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Util/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/XML/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/poco/Zip/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/rtaudio"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/rtaudio/include"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/utf8cpp"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/src/utf8cpp/include"/>
+					<Add directory="/usr/include/cairo"/>
+					<Add directory="/usr/include/glib-2.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+					<Add directory="/usr/include/pixman-1"/>
+					<Add directory="/usr/include/freetype2"/>
+					<Add directory="/usr/include/libpng12"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/freetype2"/>
+					<Add directory="/usr/include/AL"/>
+					<Add directory="/usr/include/gstreamer-1.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gstreamer-1.0/include"/>
+					<Add directory="/usr/include/gtk-3.0"/>
+					<Add directory="/usr/include/at-spi2-atk/2.0"/>
+					<Add directory="/usr/include/at-spi-2.0"/>
+					<Add directory="/usr/include/dbus-1.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/dbus-1.0/include"/>
+					<Add directory="/usr/include/gio-unix-2.0"/>
+					<Add directory="/usr/include/mirclient"/>
+					<Add directory="/usr/include/mircommon"/>
+					<Add directory="/usr/include/mircookie"/>
+					<Add directory="/usr/include/pango-1.0"/>
+					<Add directory="/usr/include/harfbuzz"/>
+					<Add directory="/usr/include/atk-1.0"/>
+					<Add directory="/usr/include/gdk-pixbuf-2.0"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/components"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/core"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/libs/ofxSmartFont"/>
+					<Add directory="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/themes"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 Cellformation/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/RigidBody.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/RigidBody.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/base.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/base.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cActin.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cActin.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cBaseclasses.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cBaseclasses.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cCell.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cCell.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cFac.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cFac.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cMembrane.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cMembrane.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cSurface.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/cSurface.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/extIncludes.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/globalVars.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/grid.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/grid.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/gui.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/gui.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/main.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/ofApp.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/ofApp.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/random.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/random.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/settings.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/src/variable_type.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/core/ofxDatGuiComponent.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/core/ofxDatGuiComponent.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/libs/ofxSmartFont/ofxSmartFont.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/libs/ofxSmartFont/ofxSmartFont.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/ofxDatGui.cpp">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/of/addons/ofxDatGui/src/ofxDatGui.h">
+			<Option target="Cellformation"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/openFrameworks.cmake">
+			<Option virtualFolder="CMake Files\..\of\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/TargetArch.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/FindMPG123.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/FindSndfile.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/FindUDev.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/FindGlib.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/FindGStreamer.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/../of/dev/cmake/cotire.cmake">
+			<Option virtualFolder="CMake Files\..\of\dev\cmake\"/>
+		</Unit>
+		<Unit filename="/home/siegbahn/gitprojects/MA/Cellformation/cmake-build-debug/arch.c">
+			<Option virtualFolder="CMake Files\cmake-build-debug\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
