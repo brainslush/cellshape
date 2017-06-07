@@ -5,25 +5,31 @@
  *      Author: siegbahn
  */
 
+#pragma once
+
 #include "cBaseclasses.h"
 #include "globalVars.h"
-#include "extIncludes.h"
 
 #ifndef SRC_CFAC_H_
 #define SRC_CFAC_H_
 
-class fac:public matrix_base {
+class fac : public matrix_base {
 public:
     fac(
-        sGlobalVars& iGlobals,
-        double iRadius,
-        double iX,
-        double iY
+            sGlobalVars &iGlobals,
+            double iRadius,
+            double iX,
+            double iY
     );
+
     virtual ~fac();
-    virtual void obtain_visualObjs(std::vector<visual_base*>& iVisualObjs);
+
+    virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+
     virtual void set_radius(double iRadius);
+
     virtual void set_position(double iX, double iY);
+
 protected:
 };
 

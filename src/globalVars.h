@@ -5,6 +5,8 @@
  *      Author: siegbahn
  */
 
+#pragma once
+
 #include "settings.h"
 #include "gui.h"
 #include "random.h"
@@ -14,9 +16,9 @@
 #define SRC_GLOBALVARS_H_
 
 struct sGlobalVars {
-    mygui::gui* guiBase;
-    grid_base* grid;
-    random_container* rndC;
+    mygui::gui *guiBase;
+    grid_base *grid;
+    random_container *rndC;
     double time;
     uint64_t frameNo;
     sSettings settings;

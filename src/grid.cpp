@@ -5,11 +5,11 @@
 ***************************/
 
 grid_border::grid_border(
-    double iX1,
-    double iY1,
-    double iX2,
-    double iY2
-): base() {
+        double iX1,
+        double iY1,
+        double iX2,
+        double iY2
+) : base() {
     positions.clear();
     positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
     positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
@@ -17,11 +17,13 @@ grid_border::grid_border(
     associatedVisualObj->set_color(0, 0, 0, 1);
     associatedVisualObj->set_fillColor(0, 0, 0, 1);
 }
+
 grid_border::~grid_border() {
     delete associatedVisualObj;
     associatedVisualObj = NULL;
 }
-void grid_border::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
+
+void grid_border::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
 
@@ -31,17 +33,16 @@ void grid_border::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
 ***************************/
 
 grid_cell::grid_cell(
-    bool*& iShowGrid,
-    bool*& iShowGridOccupation,
-    double iX1,
-    double iY1,
-    double iX2,
-    double iY2
-):
-    base(),
-    showGrid(iShowGrid),
-    showGridOccupation(iShowGridOccupation)
-{
+        bool *&iShowGrid,
+        bool *&iShowGridOccupation,
+        double iX1,
+        double iY1,
+        double iX2,
+        double iY2
+) :
+        base(),
+        showGrid(iShowGrid),
+        showGridOccupation(iShowGridOccupation) {
     borders.clear();
     borders.push_back(new grid_border(iX1, iY1, iX1, iY2));
     borders.push_back(new grid_border(iX1, iY2, iX2, iY2));
@@ -56,87 +57,92 @@ grid_cell::grid_cell(
     associatedVisualObj->set_color(0, 0, 1, 1);
     associatedVisualObj->set_fillColor(0, 0, 1, 1);
 }
+
 grid_cell::~grid_cell() {
-    for (auto& it : borders) {
+    for (auto &it : borders) {
         delete it;
         it = NULL;
     }
 }
-std::set<base*>& grid_cell::get_components() {
+
+std::set<base *> &grid_cell::get_components() {
     return components;
 }
 
-std::pair<base*, Eigen::Vector3d> grid_cell::obtain_intersectingCircleLine(base* iRef, base* iCom) {
+std::pair<base *, Eigen::Vector3d> grid_cell::obtain_intersectingCircleLine(base *iRef, base *iCom) {
     // get data
-    std::vector<Eigen::Vector3d>& posRef = iRef->get_positions();
-    std::vector<Eigen::Vector3d>& posCom = iCom->get_positions();
-    std::vector<double>& parCom = iCom->get_parameters();
+    std::vector<Eigen::Vector3d> &posRef = iRef->get_positions();
+    std::vector<Eigen::Vector3d> &posCom = iCom->get_positions();
+    std::vector<double> &parCom = iCom->get_parameters();
     // get vector direction
-    Eigen::Vector3d diff(posRef[1]-posRef[0]);
+    Eigen::Vector3d diff(posRef[1] - posRef[0]);
     // get length
     double length = diff.norm();
     // create parameterized line and project sphere center onto it
-    Eigen::ParametrizedLine<double, 3> line(posRef[0],diff.normalized());
+    Eigen::ParametrizedLine<double, 3> line(posRef[0], diff.normalized());
     Eigen::Vector3d proj = line.projection(posCom[0]);
     Eigen::Vector3d projDiff(proj - posCom[0]);
 
     // check if projection lies on line and inside the sphere
     if (
-        (proj - posRef[0]).norm() < length &&
-        projDiff.norm() < parCom[0]
-    ) {
+            (proj - posRef[0]).norm() < length &&
+            projDiff.norm() < parCom[0]
+            ) {
         return std::make_pair(iCom, projDiff);
     }
     return std::make_pair(iRef, posRef[0]);
 }
-std::pair<base*, std::pair<Eigen::Vector3d, Eigen::Vector3d>> grid_cell::obtain_intersectingLineLine(base* iRef, base* iCom) {
-    std::vector<Eigen::Vector3d>& posRef = iRef->get_positions();
-    std::vector<Eigen::Vector3d>& posCom = iCom->get_positions();
 
-    Eigen::Vector3d& l1S = posRef[0];
-    Eigen::Vector3d& l1E = posRef[1];
-    Eigen::Vector3d& l2S = posCom[0];
-    Eigen::Vector3d& l2E = posCom[1];
+std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>>
+grid_cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
+    std::vector<Eigen::Vector3d> &posRef = iRef->get_positions();
+    std::vector<Eigen::Vector3d> &posCom = iCom->get_positions();
+
+    Eigen::Vector3d &l1S = posRef[0];
+    Eigen::Vector3d &l1E = posRef[1];
+    Eigen::Vector3d &l2S = posCom[0];
+    Eigen::Vector3d &l2E = posCom[1];
 
     double compareA, compareB;
     Eigen::Vector3d diffLA = l1E - l1S;
     Eigen::Vector3d diffLB = l2E - l2S;
-    compareA = diffLA(0)*l1S(1) - diffLA(1)*l1S(0);
-    compareB = diffLB(0)*l2S(1) - diffLB(1)*l2S(0);
+    compareA = diffLA(0) * l1S(1) - diffLA(1) * l1S(0);
+    compareB = diffLB(0) * l2S(1) - diffLB(1) * l2S(0);
     if ((
-        ((diffLA(0)*l2S(1) - diffLA(1)*l2S(0)) < compareA) ^
-        ((diffLA(0)*l2E(1) - diffLA(1)*l2E(0)) < compareA)
+                ((diffLA(0) * l2S(1) - diffLA(1) * l2S(0)) < compareA) ^
+                ((diffLA(0) * l2E(1) - diffLA(1) * l2E(0)) < compareA)
         ) && (
-        ((diffLB(0)*l1S(1) - diffLB(1)*l1S(0)) < compareB) ^
-            ((diffLB(0)*l1E(1) - diffLB(1)*l1E(0)) < compareB)
-            )) {
+                ((diffLB(0) * l1S(1) - diffLB(1) * l1S(0)) < compareB) ^
+                ((diffLB(0) * l1E(1) - diffLB(1) * l1E(0)) < compareB)
+        )) {
         diffLB.normalize();
         return std::make_pair(iCom, std::make_pair(diffLA, diffLB));
     }
     return std::make_pair(iRef, std::make_pair(l1S, l2S));
 }
 
-void grid_cell::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
+void grid_cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     if (*showGridOccupation && components.size() > 0) {
         iVisualObjs.push_back(associatedVisualObj);
     }
     if (*showGrid) {
-        for (auto& it : borders) {
+        for (auto &it : borders) {
             it->obtain_visualObjs(iVisualObjs);
         }
     }
 }
-bool grid_cell::obtain_intersecting(base* iComponentA, base* iComponentB) {
+
+bool grid_cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
     bool ret = false;
-    std::pair<base*, Eigen::Vector3d> temp;
+    std::pair<base *, Eigen::Vector3d> temp;
 
     // get data of reference and neighbor object object
-    unsigned& typeA = iComponentA->get_visualObj()->get_type();
-    unsigned& typeB = iComponentB->get_visualObj()->get_type();
-    std::vector<Eigen::Vector3d>& posA = iComponentA->get_positions();
-    std::vector<double>& parA = iComponentA->get_parameters();
-    std::vector<Eigen::Vector3d>& posB = iComponentB->get_positions();
-    std::vector<double>& parB = iComponentB->get_parameters();
+    unsigned &typeA = iComponentA->get_visualObj()->get_type();
+    unsigned &typeB = iComponentB->get_visualObj()->get_type();
+    std::vector<Eigen::Vector3d> &posA = iComponentA->get_positions();
+    std::vector<double> &parA = iComponentA->get_parameters();
+    std::vector<Eigen::Vector3d> &posB = iComponentB->get_positions();
+    std::vector<double> &parB = iComponentB->get_parameters();
 
     if (iComponentA != iComponentB) {
         // handle two circles
@@ -150,7 +156,7 @@ bool grid_cell::obtain_intersecting(base* iComponentA, base* iComponentB) {
                 ret = true;
             }
         }
-        // handle circle and line like
+            // handle circle and line like
         else if ((typeA == 1 || typeA == 3 || typeA == 4) && typeB == 2) {
             temp = obtain_intersectingCircleLine(iComponentA, iComponentB);
             if (temp.first != iComponentA) {
@@ -158,8 +164,7 @@ bool grid_cell::obtain_intersecting(base* iComponentA, base* iComponentB) {
                 iComponentB->add_intersector(iComponentA, -temp.second);
                 ret = true;
             }
-        }
-        else if ((typeB == 1 || typeB == 3 || typeB == 4) && typeA == 2) {
+        } else if ((typeB == 1 || typeB == 3 || typeB == 4) && typeA == 2) {
             temp = obtain_intersectingCircleLine(iComponentB, iComponentA);
             if (temp.first == iComponentA) {
                 iComponentA->add_intersector(iComponentB, temp.second);
@@ -167,12 +172,13 @@ bool grid_cell::obtain_intersecting(base* iComponentA, base* iComponentB) {
                 ret = true;
             }
         }
-        // handle multi-line objects
+            // handle multi-line objects
         else if (
-            (typeA == 1 || typeA == 3 || typeA == 4)
-            && (typeB == 1 || typeB == 3 || typeB == 4)
-        ) {
-            std::pair<base*, std::pair<Eigen::Vector3d, Eigen::Vector3d>> temp2 = obtain_intersectingLineLine(iComponentA, iComponentB);
+                (typeA == 1 || typeA == 3 || typeA == 4)
+                && (typeB == 1 || typeB == 3 || typeB == 4)
+                ) {
+            std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>> temp2 = obtain_intersectingLineLine(
+                    iComponentA, iComponentB);
             if (temp2.first == iComponentA) {
                 iComponentA->add_intersector(iComponentB, temp2.second.first);
                 iComponentB->add_intersector(iComponentA, temp2.second.second);
@@ -182,19 +188,20 @@ bool grid_cell::obtain_intersecting(base* iComponentA, base* iComponentB) {
     }
     return ret;
 }
+
 void grid_cell::update_intersecting() {
     std::set<unsigned>::iterator itType;
-    for (auto& it : components) {
+    for (auto &it : components) {
         it->clear_intersectors();
     }
     bool intersection = false;
-    for (auto& itA : components) {
-        for (auto& itB : components) {
+    for (auto &itA : components) {
+        for (auto &itB : components) {
             if (
-                itA != itB &&
-                itA->get_ignoreIntersect().find(typeid(*itB).hash_code()) == itA->get_ignoreIntersect().end() &&
-                itB->get_ignoreIntersect().find(typeid(*itA).hash_code()) == itB->get_ignoreIntersect().end()
-            ) {
+                    itA != itB &&
+                    itA->get_ignoreIntersect().find(typeid(*itB).hash_code()) == itA->get_ignoreIntersect().end() &&
+                    itB->get_ignoreIntersect().find(typeid(*itA).hash_code()) == itB->get_ignoreIntersect().end()
+                    ) {
                 intersection = intersection || obtain_intersecting(itA, itB);
             }
         }
@@ -209,27 +216,28 @@ void grid_cell::update_intersecting() {
         }
     }
 }
-void grid_cell::remove_component(base* iComponent) {
-	components.erase(iComponent);
+
+void grid_cell::remove_component(base *iComponent) {
+    components.erase(iComponent);
 }
-void grid_cell::add_component(base* iComponent) {
-	components.insert(iComponent);
+
+void grid_cell::add_component(base *iComponent) {
+    components.insert(iComponent);
 }
 
 /***************************
 * grid_base
 ***************************/
 
-grid_base::grid_base(mygui::gui*& iGuiBase, unsigned long long iResolution, double iSideLength):
-    //settings(iSettings),
-    guiBase(iGuiBase),
-    resolution(iResolution),
-    sideLength(iSideLength)
-{
+grid_base::grid_base(mygui::gui *&iGuiBase, unsigned long long iResolution, double iSideLength) :
+//settings(iSettings),
+        guiBase(iGuiBase),
+        resolution(iResolution),
+        sideLength(iSideLength) {
     guiGroup = guiBase->register_group("Grid");
-    showGrid = guiGroup->register_setting<bool>("Show grid",true,false);
-    showGridOccupation = guiGroup->register_setting<bool>("show Occ",true,false);
-    double stepLength = iSideLength / (double)iResolution;
+    showGrid = guiGroup->register_setting<bool>("Show grid", true, false);
+    showGridOccupation = guiGroup->register_setting<bool>("show Occ", true, false);
+    double stepLength = iSideLength / (double) iResolution;
     for (unsigned long long i = 0; i < resolution; i++) {
         for (unsigned long long j = 0; j < resolution; j++) {
             double iX1 = stepLength * i;
@@ -240,46 +248,52 @@ grid_base::grid_base(mygui::gui*& iGuiBase, unsigned long long iResolution, doub
         }
     }
 }
+
 grid_base::~grid_base() {
-    for (auto& it : cells) {
+    for (auto &it : cells) {
         delete it;
         it = NULL;
     }
 
 }
-void grid_base::obtain_visualObjs(std::vector<visual_base*>& iVisualObjs) {
+
+void grid_base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     if (*showGrid || *showGridOccupation) {
-        for (auto& it : cells) {
+        for (auto &it : cells) {
             it->obtain_visualObjs(iVisualObjs);
         }
     }
 }
-void grid_base::register_component(base* iComponent) {
+
+void grid_base::register_component(base *iComponent) {
     if (iComponent->get_visualObj()) {
         components.insert(iComponent);
         //update_component(iComponent);
     } else {
-        std::cout << "Could not register object with ID: " << typeid(*iComponent).name() << "\n Visual object is missing";
+        std::cout << "Could not register object with ID: " << typeid(*iComponent).name()
+                  << "\n Visual object is missing";
     }
 }
-void grid_base::unregister_component(base* iComponent) {
-    for (auto& it : iComponent->get_gridCells()) {
+
+void grid_base::unregister_component(base *iComponent) {
+    for (auto &it : iComponent->get_gridCells()) {
         it->remove_component(iComponent);
     }
     components.erase(iComponent);
 }
-void grid_base::update_component(base* iComponent) {
-    double cellLength = sideLength / (double)resolution;
+
+void grid_base::update_component(base *iComponent) {
+    double cellLength = sideLength / (double) resolution;
     // remove entries from old cells first
-    for (auto& it : iComponent->get_gridCells()) {
-            it->remove_component(iComponent);
+    for (auto &it : iComponent->get_gridCells()) {
+        it->remove_component(iComponent);
     }
     //assign new cells
-    std::set<grid_cell*> assignedCells;
+    std::set<grid_cell *> assignedCells;
     switch (iComponent->get_visualObj()->get_type()) {
-	case 1: {
-            const Eigen::Vector3d& posA = iComponent->get_positions()[0];
-            const Eigen::Vector3d& posB = iComponent->get_positions()[1];
+        case 1: {
+            const Eigen::Vector3d &posA = iComponent->get_positions()[0];
+            const Eigen::Vector3d &posB = iComponent->get_positions()[1];
 
             // get slope
             double m = std::numeric_limits<double>::infinity();
@@ -303,9 +317,12 @@ void grid_base::update_component(base* iComponent) {
                 while (indexXMin <= indexXMax) {
                     // calculate y value
                     unsigned long long indexTestT = floor(f0Red + m * indexXMin);
-                    unsigned long long indexTestB = boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)), indexYMin, indexYMax);
-                    unsigned long long indexT = std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestT);
-                    unsigned long long indexB = std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestB);
+                    unsigned long long indexTestB = boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
+                                                                            indexYMin, indexYMax);
+                    unsigned long long indexT =
+                            std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestT);
+                    unsigned long long indexB =
+                            std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestB);
                     assignedCells.insert(cells[indexT]);
                     cells[indexT]->add_component(iComponent);
                     if (indexT != indexB) {
@@ -319,19 +336,22 @@ void grid_base::update_component(base* iComponent) {
                     if (abs(m) < std::numeric_limits<double>::max()) {
                         // calculate x value
                         unsigned long long indexTestL = floor((indexYMin - f0Red) / m);
-                        unsigned long long indexTestR = boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m), indexXMin, indexXMax);
-                        unsigned long long indexL = std::min(resolution - 1, indexTestL) * resolution + std::min(resolution - 1, indexYMin);
-                        unsigned long long indexR = std::min(resolution - 1, indexTestR) * resolution + std::min(resolution - 1, indexYMin);
+                        unsigned long long indexTestR = boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
+                                                                                indexXMin, indexXMax);
+                        unsigned long long indexL =
+                                std::min(resolution - 1, indexTestL) * resolution + std::min(resolution - 1, indexYMin);
+                        unsigned long long indexR =
+                                std::min(resolution - 1, indexTestR) * resolution + std::min(resolution - 1, indexYMin);
                         assignedCells.insert(cells[indexL]);
                         cells[indexL]->add_component(iComponent);
                         if (indexL != indexR) {
                             assignedCells.insert(cells[indexR]);
                             cells[indexR]->add_component(iComponent);
                         }
-                    }
-                    else {
+                    } else {
                         // take care of vertical lines
-                        unsigned long long index = std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
+                        unsigned long long index =
+                                std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
                         assignedCells.insert(cells[index]);
                         cells[index]->add_component(iComponent);
                     }
@@ -339,12 +359,12 @@ void grid_base::update_component(base* iComponent) {
                 }
             }
         }
-        break;
+            break;
         case 2: {
             // get position and parameters
-            const Eigen::Vector3d& pos = iComponent->get_positions()[0];
-            const double& a = iComponent->get_parameters()[0];
-            const double& b = iComponent->get_parameters()[1];
+            const Eigen::Vector3d &pos = iComponent->get_positions()[0];
+            const double &a = iComponent->get_parameters()[0];
+            const double &b = iComponent->get_parameters()[1];
             // get lowest and highest x and y
             double xMin = pos(0) - a;
             double xMax = pos(0) + a;
@@ -357,14 +377,15 @@ void grid_base::update_component(base* iComponent) {
             // get grid cells
             if (indexXMin != indexXMax) {
                 while (indexXMin <= indexXMax) {
-                    double xL = boost::algorithm::clamp(cellLength*indexXMin, xMin, xMax);
-                    double xR = boost::algorithm::clamp(cellLength*(indexXMin + 1), xMin, xMax);
-                    double yL = sqrt(b*b * (1 - pow((xL - pos(0)) / a, 2)));
-                    double yR = sqrt(b*b * (1 - pow((xR - pos(0)) / a, 2)));
+                    double xL = boost::algorithm::clamp(cellLength * indexXMin, xMin, xMax);
+                    double xR = boost::algorithm::clamp(cellLength * (indexXMin + 1), xMin, xMax);
+                    double yL = sqrt(b * b * (1 - pow((xL - pos(0)) / a, 2)));
+                    double yR = sqrt(b * b * (1 - pow((xR - pos(0)) / a, 2)));
                     indexYMin = std::min(floor((pos(1) - yL) / cellLength), floor((pos(1) - yR) / cellLength));
                     indexYMax = std::max(floor((pos(1) + yL) / cellLength), floor((pos(1) + yR) / cellLength));
                     while (indexYMin <= indexYMax) {
-                        unsigned long long index = std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
+                        unsigned long long index =
+                                std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
                         assignedCells.insert(cells[index]);
                         cells[index]->add_component(iComponent);
                         ++indexYMin;
@@ -372,27 +393,27 @@ void grid_base::update_component(base* iComponent) {
                     ++indexXMin;
                 }
                 // in case the ellipse does only occupy one x-cell but multiple y-cells
-            }
-            else if (indexYMin != indexYMax) {
+            } else if (indexYMin != indexYMax) {
                 while (indexYMin <= indexYMax) {
-                    unsigned long long index = std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
+                    unsigned long long index =
+                            std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
                     assignedCells.insert(cells[index]);
                     cells[index]->add_component(iComponent);
                     ++indexYMin;
                 }
                 // in case the ellipse is inside a single grid
-            }
-            else {
-                unsigned long long index = std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
+            } else {
+                unsigned long long index =
+                        std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
                 assignedCells.insert(cells[index]);
                 cells[index]->add_component(iComponent);
             }
         }
-        break;
+            break;
         case 3: {
             // get position and parameters
-            Eigen::Vector3d& posA = iComponent->get_positions()[0];
-            Eigen::Vector3d& posB = iComponent->get_positions()[1];
+            Eigen::Vector3d &posA = iComponent->get_positions()[0];
+            Eigen::Vector3d &posB = iComponent->get_positions()[1];
             // get lowest and largest x and y
             double xMin = std::min(posA(0), posB(0));
             double xMax = std::max(posA(0), posB(0));
@@ -422,15 +443,16 @@ void grid_base::update_component(base* iComponent) {
                 yMin += cellLength;
             }
         }
-        break;
+            break;
     }
     iComponent->set_gridCells(assignedCells);
 }
+
 void grid_base::update_components() {
-    for (auto& it : components) {
+    for (auto &it : components) {
         update_component(it);
     }
-    for (auto& it : cells) {
+    for (auto &it : cells) {
         it->update_intersecting();
     }
 }
