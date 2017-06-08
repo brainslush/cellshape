@@ -7,8 +7,6 @@
 
 #include "cSurface.h"
 
-boost::random::mt19937 RandomGen;
-
 /***************************
  * surface_borders
  ***************************/
@@ -18,15 +16,15 @@ surface_border::surface_border(
         simple_surface *iSurface,
         Eigen::Vector3d iStart,
         Eigen::Vector3d iEnd
-) : matrix_base(iGlobals) {
-    surface = iSurface;
+) : matrix_base(iGlobals),
+    surface(iSurface),
+    associatedVisualObj(new visual_line(this)) {
     positions.clear();
     positions.push_back(iStart);
     positions.push_back(iEnd);
-    associatedVisualObj = new visual_line(this);
     associatedVisualObj->set_fillColor(1.0, 1.0, 1.0);
     associatedVisualObj->set_color(1.0, 1.0, 1.0);
-    iGlobals.grid->register_component(this);
+    globals.grid->register_component(this);
 }
 
 surface_border::~surface_border() {
@@ -45,17 +43,23 @@ void surface_border::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
 simple_surface::simple_surface(
         sGlobalVars &iGlobals,
         double iSideLength
-) : matrix_base(iGlobals) {
-    sideLength = iSideLength;
+) : matrix_base(iGlobals),
+    randomReal(globals.rndC->register_random("uniform_01")),
+    guiGroup(globals.guiBase->register_group("Surface")),
+    facCount(guiGroup->register_setting<unsigned>("FAC Count",false,0,100,20)),
+    facRadius(guiGroup->register_setting<double>("FAC Radius",false,0,20,10)),
+    sideLength(iSideLength)
+{
     positions.clear();
     positions.push_back(Eigen::Vector3d(0, 0, 0));
-    positions.push_back(Eigen::Vector3d(0, iSideLength, 0));
-    positions.push_back(Eigen::Vector3d(iSideLength, iSideLength, 0));
-    positions.push_back(Eigen::Vector3d(iSideLength, 0, 0));
-    borders.push_back(new surface_border(iGlobals, this, positions[0], positions[1]));
-    borders.push_back(new surface_border(iGlobals, this, positions[1], positions[2]));
-    borders.push_back(new surface_border(iGlobals, this, positions[2], positions[3]));
-    borders.push_back(new surface_border(iGlobals, this, positions[3], positions[0]));
+    positions.push_back(Eigen::Vector3d(0, sideLength, 0));
+    positions.push_back(Eigen::Vector3d(sideLength, sideLength, 0));
+    positions.push_back(Eigen::Vector3d(sideLength, 0, 0));
+    borders.push_back(new surface_border(globals, this, positions[0], positions[1]));
+    borders.push_back(new surface_border(globals, this, positions[1], positions[2]));
+    borders.push_back(new surface_border(globals, this, positions[2], positions[3]));
+    borders.push_back(new surface_border(globals, this, positions[3], positions[0]));
+    create_facs();
 }
 
 simple_surface::~simple_surface() {
@@ -78,15 +82,11 @@ void simple_surface::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
     }
 }
 
-void simple_surface::create_facs(unsigned iType, unsigned long long iCount, double iRadius) {
-    boost::random::uniform_real_distribution<double> rndPosX(positions[0](0) + iRadius, positions[2](0) - iRadius);
-    boost::random::uniform_real_distribution<double> rndPosY(positions[0](1) + iRadius, positions[2](1) - iRadius);
-    switch (iType) {
-        case 0: {
-            for (unsigned long long i = 0; i < iCount; i++) {
-                facs.push_back(new fac(globals, iRadius, rndPosX(RandomGen), rndPosY(RandomGen)));
-            }
-        }
-            break;
+void simple_surface::create_facs() {
+    double redSideLength = sideLength - 2*facRadius;
+    double rndPosX = positions[0](0) + facRadius + randomReal->draw() * redSideLength;
+    double rndPosY = positions[0](1) + facRadius + randomReal->draw() * redSideLength;
+    for (unsigned long long i = 0; i < facCount; i++) {
+        facs.push_back(new fac(globals, facRadius, rndPosX, rndPosY));
     }
 }

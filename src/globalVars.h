@@ -22,6 +22,10 @@ struct sGlobalVars {
     double time;
     uint64_t frameNo;
     sSettings settings;
+
+    sGlobalVars(
+            mygui::gui *iGuiBase
+    ) : guiBase(iGuiBase) {};
 };
 
 #endif /* SRC_GLOBALVARS_H_ */

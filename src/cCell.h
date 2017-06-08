@@ -21,11 +21,9 @@ class functor_cell_filamentCreation;
 
 class cell : public cell_base {
 public:
+
     cell(
             sGlobalVars &iGlobals,
-            double iX,
-            double iY,
-            unsigned long long iResolution,
             functor_cell_filamentCreation *iFunctor
     );
 
@@ -49,9 +47,16 @@ public:
 
     virtual void destory_filament(filament_base *iFilament);
 
+    virtual void reset();
+
     virtual void make_timeStep(double &dT);
 
 protected:
+    mygui::group *guiGroup;
+    double &x;
+    double &y;
+    double &radius;
+    unsigned &resolution;
     std::set<membrane_base *> membranes;
     std::set<filament_base *> filaments;
     std::set<volume_base *> volumes;
@@ -61,12 +66,7 @@ protected:
 class functor_cell_filamentCreation {
 public:
     functor_cell_filamentCreation(
-            sGlobalVars &iGlobals,
-            unsigned long long iMaxCount,
-            double iMaxSpeed,
-            double iMaxLength,
-            double iMaxLifeTime,
-            double iMaxStallingForce
+            sGlobalVars &iGlobals
     );
 
     virtual ~functor_cell_filamentCreation();
@@ -90,11 +90,13 @@ protected:
 
     sGlobalVars &globals;
     random_dist *randomReal;
-    unsigned long long maxCount;
-    double maxSpeed;
-    double maxLength;
-    double maxLifeTime;
-    double maxStallingForce;
+    mygui::group *guiGroup;
+    unsigned &maxCount;
+    double &maxSpeed;
+    double &maxLength;
+    double &maxLifeTime;
+    double &maxStallingForce;
+
 };
 
 #endif /* SRC_CCELL_H_ */

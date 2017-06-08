@@ -1,12 +1,34 @@
 #include "ofApp.h"
 
-//--------------------------------------------------------------
+ofApp::ofApp() :
+        Globals(sGlobalVars(new mygui::gui())),
+        guiGroup(Globals.guiBase->register_group("General")),
+        maxFPS(guiGroup->register_setting<unsigned>("Max FPS", true, 0, 60, 10)) {
+    guiGroup->register_setting<std::function<void()>>("Start", start);
+    guiGroup->register_setting<std::function<void()>>("Stop", stop);
+    guiGroup->register_setting<std::function<void()>>("Reset", reset);
+    halt = true;
+}
+
+void ofApp::start() {
+    halt = false;
+}
+
+void ofApp::stop() {
+    halt = true;
+}
+
+void ofApp::reset() {
+    halt = true;
+    Cell->reset();
+    Surface->reset();
+    Globals.grid->update_components();
+}
+
 void ofApp::setup() {
     // openframeworks settings
     ofSetFrameRate(10);
     ofBackground(200, 200, 200);
-    // create GUI Container
-    Globals.guiBase = new mygui::gui();
     // set settings
     Globals.settings.deltaT = 1;
     // create grid
@@ -18,26 +40,27 @@ void ofApp::setup() {
     Globals.time = 0;
     Globals.frameNo = 0;
     // create cell components
-    FilamentF = new functor_cell_filamentCreation(Globals, 200, 0.01, 100, 500,
-                                                  10); // filament creation functor for cell
-    Cell = new cell(Globals, 250, 250, 20, FilamentF);
+    FilamentF = new functor_cell_filamentCreation(Globals); // filament creation functor for cell
+    Cell = new cell(Globals, FilamentF);
     Surface = new simple_surface(Globals, sideLength);
-    Surface->create_facs(0, 30, 5);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-    /* calculate scale factor when window is resized */
+    // calculate scale factor when window is resized
     scale = std::min(ofGetHeight() / (double) sideLength, ofGetWidth() / (double) sideLength);
-    /* update gui variables */
+    // update gui variables
     Globals.guiBase->update();
-    /* update globals */
-    Globals.frameNo++;
-    Globals.time = Globals.frameNo * Globals.settings.deltaT;
-    /* update grid */
-    Globals.grid->update_components();
-    /* make step*/
-    Cell->make_timeStep(Globals.settings.deltaT);
+    // only execute if simulation is not paused
+    if (!halt) {
+        // update global variables
+        Globals.frameNo++;
+        Globals.time = Globals.frameNo * Globals.settings.deltaT;
+        // update grid
+        Globals.grid->update_components();
+        // make timestep
+        Cell->make_timeStep(Globals.settings.deltaT);
+    }
 }
 
 //--------------------------------------------------------------

@@ -32,6 +32,7 @@ membrane_part::membrane_part(
 };
 
 membrane_part::~membrane_part() {
+    globals.grid->unregister_component(this);
     delete associatedVisualObj;
     associatedVisualObj = NULL;
 };

@@ -43,7 +43,8 @@ protected:
 class membrane_base : public cellcomponents_base {
 public:
     membrane_base(
-            sGlobalVars &iGlobals, cell_base &iCell,
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
             double iX, double iY,
             double iRadius,
             unsigned long long iResolution

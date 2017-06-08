@@ -33,8 +33,8 @@ void grid_border::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 ***************************/
 
 grid_cell::grid_cell(
-        bool *&iShowGrid,
-        bool *&iShowGridOccupation,
+        bool &iShowGrid,
+        bool &iShowGridOccupation,
         double iX1,
         double iY1,
         double iX2,
@@ -122,10 +122,10 @@ grid_cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
 }
 
 void grid_cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
-    if (*showGridOccupation && components.size() > 0) {
+    if (showGridOccupation && components.size() > 0) {
         iVisualObjs.push_back(associatedVisualObj);
     }
-    if (*showGrid) {
+    if (showGrid) {
         for (auto &it : borders) {
             it->obtain_visualObjs(iVisualObjs);
         }
@@ -233,10 +233,11 @@ grid_base::grid_base(mygui::gui *&iGuiBase, unsigned long long iResolution, doub
 //settings(iSettings),
         guiBase(iGuiBase),
         resolution(iResolution),
-        sideLength(iSideLength) {
-    guiGroup = guiBase->register_group("Grid");
-    showGrid = guiGroup->register_setting<bool>("Show grid", true, false);
-    showGridOccupation = guiGroup->register_setting<bool>("show Occ", true, false);
+        sideLength(iSideLength),
+        guiGroup(guiBase->register_group("Grid")),
+        showGrid(guiGroup->register_setting<bool>("Show grid", true, false)),
+        showGridOccupation(guiGroup->register_setting<bool>("show Occ", true, false))
+    {
     double stepLength = iSideLength / (double) iResolution;
     for (unsigned long long i = 0; i < resolution; i++) {
         for (unsigned long long j = 0; j < resolution; j++) {
@@ -258,7 +259,7 @@ grid_base::~grid_base() {
 }
 
 void grid_base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
-    if (*showGrid || *showGridOccupation) {
+    if (showGrid || showGridOccupation) {
         for (auto &it : cells) {
             it->obtain_visualObjs(iVisualObjs);
         }

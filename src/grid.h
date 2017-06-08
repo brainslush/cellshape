@@ -24,7 +24,7 @@ protected:
 
 class grid_cell : public base {
 public:
-    grid_cell(bool *&iShowGrid, bool *&iShowGridOccupation, double iX1, double iY1, double iX2, double iY2);
+    grid_cell(bool &iShowGrid, bool &iShowGridOccupation, double iX1, double iY1, double iX2, double iY2);
 
     ~grid_cell();
 
@@ -41,8 +41,8 @@ public:
     void add_component(base *iComponent);
 
 protected:
-    bool *&showGrid;
-    bool *&showGridOccupation;
+    bool &showGrid;
+    bool &showGridOccupation;
     visual_base *associatedVisualObj;
     std::vector<grid_border *> borders;
 
@@ -81,8 +81,8 @@ protected:
     std::vector<grid_cell *> cells;
     std::set<base *> components;
     mygui::group *guiGroup;
-    bool *showGrid;
-    bool *showGridOccupation;
+    bool &showGrid;
+    bool &showGridOccupation;
 };
 
 #endif

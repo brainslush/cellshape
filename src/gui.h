@@ -46,6 +46,7 @@ namespace mygui {
                 T iValue
         ) : label(iLabel),
             value(iValue) {
+            valuePointer = &value;
             if (std::is_function<T>::value) {
                 control = iFolder->addButton(label);
             } else {
@@ -62,10 +63,9 @@ namespace mygui {
                 T iValue) : label(iLabel),
                             updatePerFrame(iUpdatePerFrame),
                             value(iValue) {
+            valuePointer = &value;
             if (typeid(bool) == typeid(T)) {
                 control = iFolder->addToggle(label, value);
-                minValue = false;
-                maxValue = false;
             } else {
                 std::stringstream s;
                 s << "ERROR wrong type (" << label << ")";
@@ -77,15 +77,14 @@ namespace mygui {
                 ofxDatGuiFolder *iFolder,
                 std::string &iLabel,
                 bool &iUpdatePerFrame,
-                T iValue,
                 T iMinValue,
-                T iMaxValue) : label(iLabel),
-                               updatePerFrame(iUpdatePerFrame),
-                               value(iValue),
-                               minValue(iMinValue),
-                               maxValue(iMaxValue) {
+                T iMaxValue,
+                T iValue) : label(iLabel),
+                            updatePerFrame(iUpdatePerFrame),
+                            value(iValue) {
+            valuePointer = &value;
             if (std::is_floating_point<T>::value || std::is_integral<T>::value) {
-                control = iFolder->addSlider(label, (float) minValue, (float) maxValue, (double) value);
+                control = iFolder->addSlider(label, (float) iMinValue, (float) iMaxValue, (double) value);
             } else {
                 std::stringstream s;
                 s << "ERROR wrong type (" << label << ")";
@@ -96,8 +95,8 @@ namespace mygui {
         virtual ~setting() {
         }
 
-        virtual T *get_pointer() {
-            return &value;
+        virtual T *&get_pointer() {
+            return valuePointer;
         }
 
         virtual T &get_value() {
@@ -125,8 +124,7 @@ namespace mygui {
         std::string label;
         bool updatePerFrame;
         T value;
-        T minValue;
-        T maxValue;
+        T *valuePointer;
         ofxControlTypes control;
     };
 
@@ -143,7 +141,7 @@ namespace mygui {
         virtual void update();
 
         template<typename T, typename... A>
-        T *register_setting(
+        T &register_setting(
                 std::string iLabel,
                 A... iArgs
         ) {
@@ -152,11 +150,11 @@ namespace mygui {
                     iLabel,
                     iArgs...);
             settings.insert(newSetting);
-            return newSetting->get_pointer();
+            return newSetting->get_value();
         }
 
         template<typename T, typename... A>
-        T *register_setting(
+        T &register_setting(
                 std::string iLabel,
                 bool iUpdatePerFrame,
                 A... iArgs
@@ -167,7 +165,7 @@ namespace mygui {
                     iUpdatePerFrame,
                     iArgs...);
             settings.insert(newSetting);
-            return newSetting->get_pointer();
+            return newSetting->get_value();
         }
 
     protected:
@@ -183,7 +181,7 @@ namespace mygui {
 
         virtual void update();
 
-        group *register_group(std::string iName);
+        virtual group *register_group(std::string iName);
 
         virtual void unregister_group(group *iGroup);
 

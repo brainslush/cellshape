@@ -68,7 +68,7 @@ crosslinker_base::crosslinker_base(
 };
 
 crosslinker_base::~crosslinker_base() {
-
+    globals.grid->unregister_component(this);
 };
 
 std::set<filament_base *> &crosslinker_base::get_connectedFilaments() {
@@ -108,6 +108,7 @@ filament_base::filament_base(
 }
 
 filament_base::~filament_base() {
+    globals.grid->unregister_component(this);
     delete associatedVisualObj;
     associatedVisualObj = NULL;
 }
