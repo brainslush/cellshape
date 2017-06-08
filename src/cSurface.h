@@ -45,9 +45,15 @@ public:
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void create_facs(unsigned iType, unsigned long long iCount, double iRadius);
+    virtual void reset();
 
 protected:
+    virtual void create_facs();
+
+    random_dist *randomReal;
+    mygui::group *guiGroup;
+    unsigned &facCount;
+    double &facRadius;
     double sideLength;
     std::vector<surface_border *> borders;
     std::vector<fac *> facs;

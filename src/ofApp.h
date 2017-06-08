@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include "cCell.h"
 #include "cSurface.h"
 #include "gui.h"
@@ -10,6 +11,16 @@
 
 class ofApp : public ofBaseApp {
 public:
+    ofApp();
+
+    ~ofApp();
+
+    void start();
+
+    void stop();
+
+    void reset();
+
     void setup();
 
     void update();
@@ -39,12 +50,15 @@ public:
     void gotMessage(ofMessage msg);
 
 protected:
+    mygui::group *guiGroup;
     sGlobalVars Globals;
     functor_cell_filamentCreation *FilamentF;
     cell *Cell;
     simple_surface *Surface;
+    bool halt;
     unsigned long long sideLength = 500;
     double scale;
+    unsigned &maxFPS;
 };
 
 #endif

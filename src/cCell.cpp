@@ -9,14 +9,16 @@
 
 cell::cell(
         sGlobalVars &iGlobals,
-        double iX,
-        double iY,
-        unsigned long long iResolution,
         functor_cell_filamentCreation *iFunctor
 ) :
         cell_base(iGlobals),
-        filamentF(iFunctor) {
-    membranes.insert(new membrane_base(iGlobals, *this, iX, iY, 200, iResolution));
+        filamentF(iFunctor),
+        guiGroup(globals.guiBase->register_group("Cell")),
+        x(guiGroup->register_setting<double>("X", false, 0, 500, 250)),
+        y(guiGroup->register_setting<double>("Y", false, 0, 500, 250)),
+        radius(guiGroup->register_setting<double>("Radius", false, 0, 200, 150)),
+        resolution(guiGroup->register_setting<unsigned>("Resolution", false, 20, 200, 20)) {
+    membranes.insert(new membrane_base(globals, *this, x, y, radius, resolution));
     filamentF->setup(this);
 }
 
@@ -69,8 +71,6 @@ void cell::add_filament(filament_base *iFilament) {
 }
 
 void cell::create_filament() {
-    /* Needs to be enhanced */
-    //filaments.insert(new actin(globals,*this,Eigen::Vector3d(90,90,0),Eigen::Vector3d(0.1,0.1,0),100,2000,10));
     filamentF->setup(this);
 }
 
@@ -79,34 +79,51 @@ void cell::destory_filament(filament_base *iFilament) {
     delete iFilament;
 }
 
-void cell::make_timeStep(double &dT) {
+void cell::reset() {
     for (auto it: filaments) {
-        it->make_timeStep(dT);
+        delete it;
+        it = NULL;
     }
+    filaments.clear();
     for (auto it: membranes) {
+        delete it;
+        it = NULL;
+    }
+    membranes.clear();
+    for (auto it: volumes) {
+        delete it;
+        it = NULL;
+    }
+    volumes.clear();
+    membranes.insert(new membrane_base(globals, *this, x, y, radius, resolution));
+    filamentF->setup(this);
+}
+
+void cell::make_timeStep(double &dT) {
+    filamentF->make_timeStep(dT, this);
+    for (auto &it: filaments) {
         it->make_timeStep(dT);
     }
-    for (auto it: volumes) {
+    for (auto &it: membranes) {
+        it->make_timeStep(dT);
+    }
+    for (auto &it: volumes) {
         it->make_timeStep(dT);
     }
 }
 
 /* Filament creation functors*/
 functor_cell_filamentCreation::functor_cell_filamentCreation(
-        sGlobalVars &iGlobals,
-        unsigned long long iMaxCount,
-        double iMaxSpeed,
-        double iMaxLength,
-        double iMaxLifeTime,
-        double iMaxStallingForce
+        sGlobalVars &iGlobals
 ) :
         globals(iGlobals),
-        maxCount(iMaxCount),
-        maxSpeed(iMaxSpeed),
-        maxLength(iMaxLength),
-        maxLifeTime(iMaxLifeTime),
-        maxStallingForce(iMaxStallingForce) {
-    randomReal = globals.rndC->register_random("uniform_01");
+        randomReal(globals.rndC->register_random("uniform_01")),
+        guiGroup(globals.guiBase->register_group("Filaments")),
+        maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
+        maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
+        maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
+        maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
+        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)) {
 }
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
@@ -115,34 +132,39 @@ functor_cell_filamentCreation::~functor_cell_filamentCreation() {
 
 void functor_cell_filamentCreation::setup(cell *iCell) {
     for (unsigned long long i = 0; i < maxCount; i++) {
-        pair<Eigen::Vector3d, membrane_part *> pos = find_creationPosition(iCell);
-        actin *newActin = new actin(
-                globals,
-                *iCell,
-                pos.first,
-                find_tmVelocity(iCell, pos.second),
-                find_maxLength(iCell),
-                find_lifeTime(iCell),
-                find_stallingForce(iCell)
-        );
-        iCell->add_filament(newActin);
+        create_filament(iCell);
     }
 }
 
 void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
-
+    long diff = maxCount - iCell->get_filaments().size();
+    if (diff > 0) {
+        for (unsigned i = 0; i < diff; i++) {
+            create_filament(iCell);
+        }
+    }
 }
 
 filament_base *functor_cell_filamentCreation::create_filament(cell *iCell) {
-    return NULL;
+    pair<Eigen::Vector3d, membrane_part *> pos = find_creationPosition(iCell);
+    actin *newActin = new actin(
+            globals,
+            *iCell,
+            pos.first,
+            find_tmVelocity(iCell, pos.second),
+            find_maxLength(iCell),
+            find_lifeTime(iCell),
+            find_stallingForce(iCell)
+    );
+    iCell->add_filament(newActin);
+    return newActin;
 }
 
 pair<Eigen::Vector3d, membrane_part *> functor_cell_filamentCreation::find_creationPosition(cell *iCell) {
+    // get membrane and membrane parts
     auto &membranes = iCell->get_membranes();
-    //auto& filaments = iCell->get_filaments();
-    //auto& volumes = iCell->get_volumes();
     auto &parts = (*membranes.begin())->get_parts();
-
+    // determine new position along membrane
     double length = (*membranes.begin())->get_length() * randomReal->draw<double>();
     auto it = parts.begin();
     double currLength = (*it)->get_length();
@@ -152,9 +174,8 @@ pair<Eigen::Vector3d, membrane_part *> functor_cell_filamentCreation::find_creat
     }
     length -= currLength;
     auto &pos = (*it)->get_positions();
-    Eigen::Vector3d returnVec = pos[0] + length * (pos[1] - pos[0]).normalized();
 
-    return std::make_pair(returnVec, *it);
+    return std::make_pair(Eigen::Vector3d(pos[0] + length * (pos[0] - pos[1]).normalized()), *it);
 }
 
 Eigen::Vector3d functor_cell_filamentCreation::find_tmVelocity(cell *iCell, membrane_part *iMembrane) {

@@ -22,7 +22,7 @@ group::~group() {
         delete it;
         it = NULL;
     }
-    delete fserialolder;
+    delete folder;
     folder = NULL;
 }
 
