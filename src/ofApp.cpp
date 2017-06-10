@@ -4,9 +4,16 @@ ofApp::ofApp() :
         Globals(sGlobalVars(new mygui::gui())),
         guiGroup(Globals.guiBase->register_group("General")),
         maxFPS(guiGroup->register_setting<unsigned>("Max FPS", true, 0, 60, 10)) {
-    guiGroup->register_setting<std::function<void()>>("Start", start);
-    guiGroup->register_setting<std::function<void()>>("Stop", stop);
-    guiGroup->register_setting<std::function<void()>>("Reset", reset);
+
+    guiGroup->register_action<void()>("Start", [this]() { halt = false; });
+    guiGroup->register_action<void()>("Stop", [this]() { halt = true; });
+    guiGroup->register_action<void()>("Reset", [this]() {
+                                                          halt = true;
+                                                          Cell->reset();
+                                                          Surface->reset();
+                                                          Globals.grid->update_components();
+                                                      }
+    );
     halt = true;
 }
 

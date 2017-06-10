@@ -59,6 +59,8 @@ protected:
     unsigned long long sideLength = 500;
     double scale;
     unsigned &maxFPS;
+    //std::function<void()> start;
+
 };
 
 #endif

@@ -17,8 +17,8 @@ surface_border::surface_border(
         Eigen::Vector3d iStart,
         Eigen::Vector3d iEnd
 ) : matrix_base(iGlobals),
-    surface(iSurface),
-    associatedVisualObj(new visual_line(this)) {
+    surface(iSurface) {
+    associatedVisualObj = new visual_line(this);
     positions.clear();
     positions.push_back(iStart);
     positions.push_back(iEnd);
@@ -46,10 +46,9 @@ simple_surface::simple_surface(
 ) : matrix_base(iGlobals),
     randomReal(globals.rndC->register_random("uniform_01")),
     guiGroup(globals.guiBase->register_group("Surface")),
-    facCount(guiGroup->register_setting<unsigned>("FAC Count",false,0,100,20)),
-    facRadius(guiGroup->register_setting<double>("FAC Radius",false,0,20,10)),
-    sideLength(iSideLength)
-{
+    facCount(guiGroup->register_setting<unsigned>("FAC Count", false, 0, 100, 20)),
+    facRadius(guiGroup->register_setting<double>("FAC Radius", false, 0, 20, 10)),
+    sideLength(iSideLength) {
     positions.clear();
     positions.push_back(Eigen::Vector3d(0, 0, 0));
     positions.push_back(Eigen::Vector3d(0, sideLength, 0));
@@ -83,9 +82,9 @@ void simple_surface::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
 }
 
 void simple_surface::create_facs() {
-    double redSideLength = sideLength - 2*facRadius;
-    double rndPosX = positions[0](0) + facRadius + randomReal->draw() * redSideLength;
-    double rndPosY = positions[0](1) + facRadius + randomReal->draw() * redSideLength;
+    double redSideLength = sideLength - 2 * facRadius;
+    double rndPosX = positions[0](0) + facRadius + randomReal->draw<double>() * redSideLength;
+    double rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * redSideLength;
     for (unsigned long long i = 0; i < facCount; i++) {
         facs.push_back(new fac(globals, facRadius, rndPosX, rndPosY));
     }

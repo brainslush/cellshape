@@ -21,7 +21,6 @@
 namespace mygui {
     using ofxControlTypes = boost::variant<
             ofxDatGuiLabel *,
-            ofxDatGuiButton *,
             ofxDatGuiToggle *,
             ofxDatGuiSlider *,
             ofxDatGuiColorPicker *>;
@@ -43,32 +42,15 @@ namespace mygui {
         setting(
                 ofxDatGuiFolder *iFolder,
                 std::string &iLabel,
-                T iValue
-        ) : label(iLabel),
-            value(iValue) {
-            valuePointer = &value;
-            if (std::is_function<T>::value) {
-                control = iFolder->addButton(label);
-            } else {
-                std::stringstream s;
-                s << "ERROR wrong type (" << label << ")";
-                control = iFolder->addLabel(s.str());
-            }
-        }
-
-        setting(
-                ofxDatGuiFolder *iFolder,
-                std::string &iLabel,
                 bool &iUpdatePerFrame,
-                T iValue) : label(iLabel),
-                            updatePerFrame(iUpdatePerFrame),
+                T iValue) : updatePerFrame(iUpdatePerFrame),
                             value(iValue) {
             valuePointer = &value;
             if (typeid(bool) == typeid(T)) {
-                control = iFolder->addToggle(label, value);
+                control = iFolder->addToggle(iLabel, value);
             } else {
                 std::stringstream s;
-                s << "ERROR wrong type (" << label << ")";
+                s << "ERROR wrong type (" << iLabel << ")";
                 control = iFolder->addLabel(s.str());
             }
         }
@@ -79,15 +61,14 @@ namespace mygui {
                 bool &iUpdatePerFrame,
                 T iMinValue,
                 T iMaxValue,
-                T iValue) : label(iLabel),
-                            updatePerFrame(iUpdatePerFrame),
+                T iValue) : updatePerFrame(iUpdatePerFrame),
                             value(iValue) {
             valuePointer = &value;
             if (std::is_floating_point<T>::value || std::is_integral<T>::value) {
-                control = iFolder->addSlider(label, (float) iMinValue, (float) iMaxValue, (double) value);
+                control = iFolder->addSlider(iLabel, (float) iMinValue, (float) iMaxValue, (double) value);
             } else {
                 std::stringstream s;
-                s << "ERROR wrong type (" << label << ")";
+                s << "ERROR wrong type (" << iLabel << ")";
                 control = iFolder->addLabel(s.str());
             }
         }
@@ -121,11 +102,36 @@ namespace mygui {
         };
 
     protected:
-        std::string label;
         bool updatePerFrame;
         T value;
         T *valuePointer;
         ofxControlTypes control;
+    };
+
+    class action_base {
+        action_base() {};
+
+        ~action_base() {};
+    };
+
+    template<typename T>
+    class action {
+    public:
+        action(
+                ofxDatGuiFolder *iFolder,
+                std::string &iLabel,
+                std::function<T> iFunction
+        ) :
+                control(iFolder->addButton(iLabel)),
+                function(iFunction) {
+            control->onButtonEvent(this,function);
+        };
+
+        virtual ~action();
+
+    protected:
+        std::function<T> function;
+        ofxDatGuiButton *control;
     };
 
     class group {
@@ -139,6 +145,18 @@ namespace mygui {
         virtual ofxDatGuiFolder *&get_folder();
 
         virtual void update();
+
+        template<typename T>
+        void register_action(
+                std::string iLabel,
+                std::function<T> iFunction
+        ) {
+            action<T> *newAction = new action<T>(
+                    folder,
+                    iLabel,
+                    iFunction
+            );
+        };
 
         template<typename T, typename... A>
         T &register_setting(
@@ -170,6 +188,7 @@ namespace mygui {
 
     protected:
         std::set<setting_base *> settings;
+        std::set<action_base *> actions;
         ofxDatGuiFolder *folder;
     };
 
