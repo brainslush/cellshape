@@ -15,18 +15,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8cdf4f1-df52-4765-a4a9-70b1d9f9df8e" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/Cellformation" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/data/ofxbraitsch/fonts/Verdana.ttf" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/data/ofxbraitsch/ofxdatgui/icon-group-closed.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/data/ofxbraitsch/ofxdatgui/icon-group-open.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/data/ofxbraitsch/ofxdatgui/icon-radio-off.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/data/ofxbraitsch/ofxdatgui/icon-radio-on.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bin/data/ofxbraitsch/ofxdatgui/picker-rainbow.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cBaseclasses.cpp" afterPath="$PROJECT_DIR$/src/cBaseclasses.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cCell.cpp" afterPath="$PROJECT_DIR$/src/cCell.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cCell.h" afterPath="$PROJECT_DIR$/src/cCell.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cMembrane.cpp" afterPath="$PROJECT_DIR$/src/cMembrane.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cMembrane.h" afterPath="$PROJECT_DIR$/src/cMembrane.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cSurface.cpp" afterPath="$PROJECT_DIR$/src/cSurface.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cSurface.h" afterPath="$PROJECT_DIR$/src/cSurface.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/globalVars.h" afterPath="$PROJECT_DIR$/src/globalVars.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/grid.cpp" afterPath="$PROJECT_DIR$/src/grid.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/grid.h" afterPath="$PROJECT_DIR$/src/grid.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/gui.cpp" afterPath="$PROJECT_DIR$/src/gui.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/gui.h" afterPath="$PROJECT_DIR$/src/gui.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ofApp.cpp" afterPath="$PROJECT_DIR$/src/ofApp.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ofApp.h" afterPath="$PROJECT_DIR$/src/ofApp.h" />
@@ -41,24 +38,34 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.457862">
+    <splitter split-orientation="horizontal" split-proportion="0.43728018">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="ofApp.cpp" pinned="false" current-in-tab="false">
+          <file leaf-file-name="ofApp.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/ofApp.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="386">
-                  <caret line="44" column="54" lean-forward="false" selection-start-line="44" selection-start-column="54" selection-end-line="44" selection-end-column="54" />
+                <state relative-caret-position="-580">
+                  <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="cSurface.cpp" pinned="false" current-in-tab="true">
+          <file leaf-file-name="gui.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/gui.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="340">
+                  <caret line="29" column="18" lean-forward="true" selection-start-line="29" selection-start-column="18" selection-end-line="29" selection-end-column="18" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="cSurface.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/cSurface.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="320">
-                  <caret line="61" column="18" lean-forward="false" selection-start-line="61" selection-start-column="18" selection-end-line="61" selection-end-column="18" />
+                <state relative-caret-position="1300">
+                  <caret line="86" column="74" lean-forward="false" selection-start-line="86" selection-start-column="74" selection-end-line="86" selection-end-column="74" />
                   <folding />
                 </state>
               </provider>
@@ -67,7 +74,7 @@
           <file leaf-file-name="cCell.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/cCell.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="100">
+                <state relative-caret-position="2380">
                   <caret line="119" column="64" lean-forward="false" selection-start-line="119" selection-start-column="64" selection-end-line="119" selection-end-column="64" />
                   <folding />
                 </state>
@@ -77,7 +84,7 @@
           <file leaf-file-name="grid.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/grid.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="296">
+                <state relative-caret-position="5380">
                   <caret line="269" column="38" lean-forward="false" selection-start-line="269" selection-start-column="38" selection-end-line="269" selection-end-column="38" />
                   <folding />
                 </state>
@@ -87,7 +94,7 @@
           <file leaf-file-name="grid.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/grid.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="676">
+                <state relative-caret-position="880">
                   <caret line="44" column="9" lean-forward="false" selection-start-line="44" selection-start-column="9" selection-end-line="44" selection-end-column="9" />
                   <folding />
                 </state>
@@ -97,8 +104,8 @@
           <file leaf-file-name="cBaseclasses.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/cBaseclasses.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="335">
-                  <caret line="155" column="0" lean-forward="true" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
+                <state relative-caret-position="3100">
+                  <caret line="155" column="0" lean-forward="false" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -107,7 +114,7 @@
           <file leaf-file-name="cActin.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/cActin.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="840">
+                <state relative-caret-position="900">
                   <caret line="45" column="17" lean-forward="false" selection-start-line="45" selection-start-column="17" selection-end-line="45" selection-end-column="17" />
                   <folding />
                 </state>
@@ -117,7 +124,7 @@
           <file leaf-file-name="random.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/random.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2440">
+                <state relative-caret-position="2660">
                   <caret line="133" column="40" lean-forward="false" selection-start-line="133" selection-start-column="40" selection-end-line="133" selection-end-column="40" />
                   <folding />
                 </state>
@@ -127,8 +134,8 @@
           <file leaf-file-name="random.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/random.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-14">
-                  <caret line="87" column="50" lean-forward="true" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
+                <state relative-caret-position="1740">
+                  <caret line="87" column="50" lean-forward="false" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
                   <folding />
                 </state>
               </provider>
@@ -141,8 +148,8 @@
           <file leaf-file-name="ofApp.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/ofApp.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="286">
-                  <caret line="19" column="16" lean-forward="true" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
+                <state relative-caret-position="320">
+                  <caret line="61" column="6" lean-forward="false" selection-start-line="61" selection-start-column="6" selection-end-line="61" selection-end-column="6" />
                   <folding>
                     <element signature="e#14#35#0" expanded="true" />
                   </folding>
@@ -160,13 +167,16 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="gui.h" pinned="false" current-in-tab="false">
+          <file leaf-file-name="gui.h" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/gui.h">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="220">
-                  <caret line="17" column="18" lean-forward="false" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
+                  <caret line="120" column="41" lean-forward="true" selection-start-line="120" selection-start-column="41" selection-end-line="120" selection-end-column="41" />
                   <folding>
-                    <element signature="e#3810#3837#0" expanded="true" />
+                    <element signature="e#660#672#0" expanded="true" />
+                    <element signature="e#3055#3067#0" expanded="true" />
+                    <element signature="e#3730#3742#0" expanded="true" />
+                    <element signature="e#4043#4070#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -175,8 +185,8 @@
           <file leaf-file-name="cCell.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/cCell.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="160">
-                  <caret line="91" column="4" lean-forward="true" selection-start-line="91" selection-start-column="4" selection-end-line="91" selection-end-column="28" />
+                <state relative-caret-position="1180">
+                  <caret line="91" column="4" lean-forward="false" selection-start-line="91" selection-start-column="4" selection-end-line="91" selection-end-column="28" />
                   <folding>
                     <element signature="e#90#104#0" expanded="true" />
                   </folding>
@@ -184,12 +194,14 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="cSurface.h" pinned="false" current-in-tab="true">
+          <file leaf-file-name="cSurface.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/cSurface.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="220">
-                  <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-                  <folding />
+                <state relative-caret-position="240">
+                  <caret line="12" column="17" lean-forward="true" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+                  <folding>
+                    <element signature="e#93#118#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -198,7 +210,7 @@
             <entry file="file://$PROJECT_DIR$/src/cActin.h">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="280">
-                  <caret line="42" column="35" lean-forward="true" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
+                  <caret line="42" column="35" lean-forward="false" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
                   <folding />
                 </state>
               </provider>
@@ -230,6 +242,14 @@
       <find>point_t</find>
       <find>unreg</find>
       <find>register</find>
+      <find>r</find>
+      <find>rand</find>
+      <find>random</find>
+      <find>randomR</find>
+      <find>randomRe</find>
+      <find>randomRea</find>
+      <find>randomReal</find>
+      <find>addBu</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/src</dir>
@@ -257,21 +277,21 @@
         <option value="$PROJECT_DIR$/src/RigidBody.cpp" />
         <option value="$PROJECT_DIR$/src/variable_type.h" />
         <option value="$PROJECT_DIR$/src/random.h" />
-        <option value="$PROJECT_DIR$/src/gui.cpp" />
-        <option value="$PROJECT_DIR$/src/gui.h" />
         <option value="$PROJECT_DIR$/src/grid.h" />
         <option value="$PROJECT_DIR$/src/grid.cpp" />
         <option value="$PROJECT_DIR$/src/globalVars.h" />
         <option value="$PROJECT_DIR$/src/cCell.h" />
-        <option value="$PROJECT_DIR$/src/ofApp.h" />
         <option value="$PROJECT_DIR$/src/cActin.cpp" />
         <option value="$PROJECT_DIR$/src/cBaseclasses.cpp" />
         <option value="$PROJECT_DIR$/src/cMembrane.cpp" />
         <option value="$PROJECT_DIR$/src/cMembrane.h" />
         <option value="$PROJECT_DIR$/src/cCell.cpp" />
         <option value="$PROJECT_DIR$/src/cSurface.h" />
-        <option value="$PROJECT_DIR$/src/ofApp.cpp" />
         <option value="$PROJECT_DIR$/src/cSurface.cpp" />
+        <option value="$PROJECT_DIR$/src/ofApp.h" />
+        <option value="$PROJECT_DIR$/src/gui.cpp" />
+        <option value="$PROJECT_DIR$/src/ofApp.cpp" />
+        <option value="$PROJECT_DIR$/src/gui.h" />
       </list>
     </option>
   </component>
@@ -539,33 +559,35 @@
       <workItem from="1496841372587" duration="19432000" />
       <workItem from="1496917569096" duration="7510000" />
       <workItem from="1496927283359" duration="12367000" />
+      <workItem from="1497020475154" duration="12282000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39309000" />
+    <option name="totallyTimeSpent" value="51591000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="3775" height="1056" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.06278146" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44700944" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.096158944" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32843652" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39959225" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -579,6 +601,89 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/random.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1740">
+          <caret line="87" column="50" lean-forward="true" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cSurface.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1220">
+          <caret line="61" column="18" lean-forward="false" selection-start-line="61" selection-start-column="18" selection-end-line="61" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ofApp.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="19" column="16" lean-forward="true" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
+          <folding>
+            <element signature="e#14#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/globalVars.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="520">
+          <caret line="26" column="32" lean-forward="false" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gui.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="17" column="18" lean-forward="false" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
+          <folding>
+            <element signature="e#660#672#0" expanded="true" />
+            <element signature="e#3055#3067#0" expanded="true" />
+            <element signature="e#3730#3742#0" expanded="true" />
+            <element signature="e#4043#4070#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cCell.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1820">
+          <caret line="91" column="4" lean-forward="true" selection-start-line="91" selection-start-column="4" selection-end-line="91" selection-end-column="28" />
+          <folding>
+            <element signature="e#90#104#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cActin.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="840">
+          <caret line="42" column="35" lean-forward="true" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cMembrane.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="920">
+          <caret line="46" column="12" lean-forward="false" selection-start-line="46" selection-start-column="12" selection-end-line="46" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cSurface.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1020">
+          <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+          <folding>
+            <element signature="e#93#118#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ofApp.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="920">
@@ -626,7 +731,10 @@
         <state relative-caret-position="3120">
           <caret line="156" column="28" lean-forward="true" selection-start-line="156" selection-start-column="28" selection-end-line="156" selection-end-column="28" />
           <folding>
-            <element signature="e#3810#3837#0" expanded="true" />
+            <element signature="e#660#672#0" expanded="true" />
+            <element signature="e#3055#3067#0" expanded="true" />
+            <element signature="e#3730#3742#0" expanded="true" />
+            <element signature="e#4043#4070#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -766,39 +874,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
           <caret line="6" column="6" lean-forward="false" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gui.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="58" column="7" lean-forward="false" selection-start-line="58" selection-start-column="7" selection-end-line="58" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ofApp.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="19" column="16" lean-forward="true" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
-          <folding>
-            <element signature="e#14#35#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/random.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-14">
-          <caret line="87" column="50" lean-forward="true" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
+        <state relative-caret-position="1740">
+          <caret line="87" column="50" lean-forward="false" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/random.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2440">
+        <state relative-caret-position="2660">
           <caret line="133" column="40" lean-forward="false" selection-start-line="133" selection-start-column="40" selection-end-line="133" selection-end-column="40" />
           <folding />
         </state>
@@ -806,7 +895,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cActin.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="840">
+        <state relative-caret-position="900">
           <caret line="45" column="17" lean-forward="false" selection-start-line="45" selection-start-column="17" selection-end-line="45" selection-end-column="17" />
           <folding />
         </state>
@@ -814,8 +903,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cBaseclasses.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="155" column="0" lean-forward="true" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
+        <state relative-caret-position="3100">
+          <caret line="155" column="0" lean-forward="false" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -830,7 +919,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/grid.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="676">
+        <state relative-caret-position="880">
           <caret line="44" column="9" lean-forward="false" selection-start-line="44" selection-start-column="9" selection-end-line="44" selection-end-column="9" />
           <folding />
         </state>
@@ -838,8 +927,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/grid.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="296">
+        <state relative-caret-position="5380">
           <caret line="269" column="38" lean-forward="false" selection-start-line="269" selection-start-column="38" selection-end-line="269" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cCell.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2380">
+          <caret line="119" column="64" lean-forward="false" selection-start-line="119" selection-start-column="64" selection-end-line="119" selection-end-column="64" />
           <folding />
         </state>
       </provider>
@@ -852,20 +949,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/gui.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="17" column="18" lean-forward="false" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
-          <folding>
-            <element signature="e#3810#3837#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cActin.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
-          <caret line="42" column="35" lean-forward="true" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
+          <caret line="42" column="35" lean-forward="false" selection-start-line="42" selection-start-column="35" selection-end-line="42" selection-end-column="35" />
           <folding />
         </state>
       </provider>
@@ -880,43 +967,68 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cCell.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="91" column="4" lean-forward="true" selection-start-line="91" selection-start-column="4" selection-end-line="91" selection-end-column="28" />
+        <state relative-caret-position="1180">
+          <caret line="91" column="4" lean-forward="false" selection-start-line="91" selection-start-column="4" selection-end-line="91" selection-end-column="28" />
           <folding>
             <element signature="e#90#104#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cCell.cpp">
+    <entry file="file://$PROJECT_DIR$/src/cSurface.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="119" column="64" lean-forward="false" selection-start-line="119" selection-start-column="64" selection-end-line="119" selection-end-column="64" />
+        <state relative-caret-position="240">
+          <caret line="12" column="17" lean-forward="true" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+          <folding>
+            <element signature="e#93#118#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cSurface.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1300">
+          <caret line="86" column="74" lean-forward="false" selection-start-line="86" selection-start-column="74" selection-end-line="86" selection-end-column="74" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cSurface.h">
+    <entry file="file://$PROJECT_DIR$/src/ofApp.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+        <state relative-caret-position="320">
+          <caret line="61" column="6" lean-forward="false" selection-start-line="61" selection-start-column="6" selection-end-line="61" selection-end-column="6" />
+          <folding>
+            <element signature="e#14#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gui.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="29" column="18" lean-forward="true" selection-start-line="29" selection-start-column="18" selection-end-line="29" selection-end-column="18" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ofApp.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="44" column="54" lean-forward="false" selection-start-line="44" selection-start-column="54" selection-end-line="44" selection-end-column="54" />
+        <state relative-caret-position="-580">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cSurface.cpp">
+    <entry file="file://$PROJECT_DIR$/src/gui.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="61" column="18" lean-forward="false" selection-start-line="61" selection-start-column="18" selection-end-line="61" selection-end-column="18" />
-          <folding />
+        <state relative-caret-position="220">
+          <caret line="120" column="41" lean-forward="true" selection-start-line="120" selection-start-column="41" selection-end-line="120" selection-end-column="41" />
+          <folding>
+            <element signature="e#660#672#0" expanded="true" />
+            <element signature="e#3055#3067#0" expanded="true" />
+            <element signature="e#3730#3742#0" expanded="true" />
+            <element signature="e#4043#4070#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
