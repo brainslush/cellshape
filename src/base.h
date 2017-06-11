@@ -57,7 +57,7 @@ protected:
     std::set<grid_cell *> gridCells; // gridcells in which object lies
     std::set<unsigned> ignoreIntersect; // ignore class types for collision
     visual_base *associatedVisualObj; // assignes a visual object
-    unsigned long long timeStamp; // timestamp is relevant for update features
+    unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
 };
 
 /*

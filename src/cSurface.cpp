@@ -81,11 +81,21 @@ void simple_surface::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
     }
 }
 
+void simple_surface::reset() {
+    for (auto &it: facs) {
+        delete it;
+        it = NULL;
+    }
+    facs.clear();
+    guiGroup->forceVariableUpdate();
+    create_facs();
+}
+
 void simple_surface::create_facs() {
     double redSideLength = sideLength - 2 * facRadius;
-    double rndPosX = positions[0](0) + facRadius + randomReal->draw<double>() * redSideLength;
-    double rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * redSideLength;
     for (unsigned long long i = 0; i < facCount; i++) {
+        double rndPosX = positions[0](0) + facRadius + randomReal->draw<double>() * redSideLength;
+        double rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * redSideLength;
         facs.push_back(new fac(globals, facRadius, rndPosX, rndPosY));
     }
 }

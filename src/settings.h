@@ -13,6 +13,7 @@
 struct sSettings {
     double deltaT;
     double rotationEpsilon;
+    unsigned long sideLength;
 };
 
 #endif /* SRC_SETTINGS_H_ */

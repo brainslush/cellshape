@@ -19,6 +19,8 @@
 #define SRC_GUI_H_
 
 namespace mygui {
+
+    using onButtonEvent = std::function<void(ofxDatGuiButtonEvent)>;
     using ofxControlTypes = boost::variant<
             ofxDatGuiLabel *,
             ofxDatGuiToggle *,
@@ -32,6 +34,8 @@ namespace mygui {
         virtual ~setting_base() {};
 
         virtual void update() {};
+
+        virtual void update(bool iGet) {};
 
     protected:
     };
@@ -109,13 +113,16 @@ namespace mygui {
     };
 
     class action_base {
+    public:
         action_base() {};
 
         ~action_base() {};
+    protected:
+
     };
 
     template<typename T>
-    class action {
+    class action : public action_base {
     public:
         action(
                 ofxDatGuiFolder *iFolder,
@@ -124,15 +131,40 @@ namespace mygui {
         ) :
                 control(iFolder->addButton(iLabel)),
                 function(iFunction) {
-            control->onButtonEvent(this,function);
+            eh = [this](ofxDatGuiButtonEvent e) {
+                function();
+            };
+            control->onButtonEvent(eh);
         };
 
-        virtual ~action();
+        virtual ~action() {
+
+        };
 
     protected:
+        onButtonEvent eh;
         std::function<T> function;
         ofxDatGuiButton *control;
     };
+
+    /*
+    template<typename T, typename A, class L>
+    class action : public action_base {
+    public:
+        action(
+                ofxDatGuiFolder *iFolder,
+                std::string &iLabel,
+                T *&iOwner,
+                void (L::*listenerMethod)(A)
+        ) :
+                control(iFolder->addButton(iLabel)) {
+            control->onButtonEvent(iOwner, listenerMethod);
+        }
+
+    protected:
+        ofxDatGuiButton *control;
+    };
+    */
 
     class group {
     public:
@@ -144,13 +176,16 @@ namespace mygui {
 
         virtual ofxDatGuiFolder *&get_folder();
 
-        virtual void update();
+        virtual void variableUpdate();
+
+        virtual void forceVariableUpdate();
 
         template<typename T>
         void register_action(
                 std::string iLabel,
                 std::function<T> iFunction
         ) {
+            iLabel.insert(0,"> ");
             action<T> *newAction = new action<T>(
                     folder,
                     iLabel,
@@ -163,6 +198,7 @@ namespace mygui {
                 std::string iLabel,
                 A... iArgs
         ) {
+            iLabel.insert(0,"> ");
             setting<T> *newSetting = new setting<T>(
                     folder,
                     iLabel,
@@ -177,6 +213,7 @@ namespace mygui {
                 bool iUpdatePerFrame,
                 A... iArgs
         ) {
+            iLabel.insert(0,"> ");
             setting<T> *newSetting = new setting<T>(
                     folder,
                     iLabel,
