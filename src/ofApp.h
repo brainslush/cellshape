@@ -11,15 +11,10 @@
 
 class ofApp : public ofBaseApp {
 public:
+
     ofApp();
 
     ~ofApp();
-
-    void start();
-
-    void stop();
-
-    void reset();
 
     void setup();
 
@@ -53,14 +48,12 @@ protected:
     mygui::group *guiGroup;
     sGlobalVars Globals;
     functor_cell_filamentCreation *FilamentF;
-    cell *Cell;
     simple_surface *Surface;
-    bool halt;
-    unsigned long long sideLength = 500;
-    double scale;
-    unsigned &maxFPS;
-    //std::function<void()> start;
+    cell *Cell;
 
+    bool halt;
+    double scale;
+    //unsigned &maxFPS;
 };
 
 #endif

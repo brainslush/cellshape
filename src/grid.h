@@ -56,7 +56,7 @@ protected:
 class grid_base {
 public:
     //grid_base();
-    grid_base(mygui::gui *&iGuiBase, unsigned long long iResolution, double iSideLength);
+    grid_base(mygui::gui *&iGuiBase, double iSideLength);
 
     ~grid_base();
 
@@ -70,19 +70,19 @@ public:
 
     void update_components();
 
+    void reset();
+
 protected:
+    void create_cells();
+
     mygui::gui *&guiBase;
-    //sSettings& settings;
-    unsigned long long resolution;
     double sideLength;
-
-    bool lineSegmentIntersection();
-
     std::vector<grid_cell *> cells;
     std::set<base *> components;
     mygui::group *guiGroup;
     bool &showGrid;
     bool &showGridOccupation;
+    unsigned &resolution;
 };
 
 #endif

@@ -17,11 +17,13 @@
 
 struct sGlobalVars {
     mygui::gui *guiBase;
-    grid_base *grid;
     random_container *rndC;
+    grid_base *grid;
     double time;
     uint64_t frameNo;
     sSettings settings;
+
+    sGlobalVars() {};
 
     sGlobalVars(
             mygui::gui *iGuiBase

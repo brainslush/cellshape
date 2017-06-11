@@ -85,7 +85,7 @@ void RigidBody3d::add_force(Eigen::Vector3d &iX, Eigen::Vector3d &iF) {
 }
 
 void RigidBody3d::do_timeStep(double &dT) {
-    // update force and torque
+    // variableUpdate force and torque
     F = forceFunctor->calc(X, v, q, L);
     T = torqueFunctor->calc(X, v, q, L);
     // do simulation via verlet

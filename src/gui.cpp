@@ -30,15 +30,20 @@ ofxDatGuiFolder *&group::get_folder() {
     return folder;
 }
 
-void group::update() {
+void group::variableUpdate() {
     for (auto &it : settings) {
         it->update();
     }
 }
 
+void group::forceVariableUpdate() {
+    for (auto &it : settings) {
+        it->update(true);
+    }
+}
 
 gui::gui() {
-    datGui = new ofxDatGui(ofxDatGuiAnchor::TOP_LEFT);
+    datGui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 }
 
 gui::~gui() {
@@ -52,7 +57,7 @@ gui::~gui() {
 
 void gui::update() {
     for (auto &it : groups) {
-        it->update();
+        it->variableUpdate();
     }
 }
 

@@ -150,7 +150,7 @@ std::vector<membrane_part *> &membrane_base::get_parts() {
     return parts;
 }
 
-/* update feature of the membrane */
+/* variableUpdate feature of the membrane */
 void membrane_base::make_timeStep(double &dT) {
 
 }

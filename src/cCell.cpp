@@ -95,6 +95,9 @@ void cell::reset() {
         it = NULL;
     }
     volumes.clear();
+    guiGroup->forceVariableUpdate();
+    x = std::min(max(x, radius), (double) globals.settings.sideLength);
+    y = std::min(max(y, radius), (double) globals.settings.sideLength);
     membranes.insert(new membrane_base(globals, *this, x, y, radius, resolution));
     filamentF->setup(this);
 }

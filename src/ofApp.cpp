@@ -1,45 +1,42 @@
 #include "ofApp.h"
 
-ofApp::ofApp() :
-        Globals(sGlobalVars(new mygui::gui())),
-        guiGroup(Globals.guiBase->register_group("General")),
-        maxFPS(guiGroup->register_setting<unsigned>("Max FPS", true, 0, 60, 10)) {
-
+ofApp::ofApp() {
+    Globals.guiBase = new mygui::gui();
+    guiGroup = Globals.guiBase->register_group("General");
+    //maxFPS =guiGroup->register_setting<unsigned>("Max FPS", true, 0, 60, 10));
     guiGroup->register_action<void()>("Start", [this]() { halt = false; });
     guiGroup->register_action<void()>("Stop", [this]() { halt = true; });
     guiGroup->register_action<void()>("Reset", [this]() {
-                                                          halt = true;
-                                                          Cell->reset();
-                                                          Surface->reset();
-                                                          Globals.grid->update_components();
-                                                      }
+                                          halt = true;
+                                          Globals.grid->reset();
+                                          Cell->reset();
+                                          Surface->reset();
+                                          Globals.grid->update_components();
+                                      }
     );
     halt = true;
 }
 
-void ofApp::start() {
-    halt = false;
-}
-
-void ofApp::stop() {
-    halt = true;
-}
-
-void ofApp::reset() {
-    halt = true;
-    Cell->reset();
-    Surface->reset();
-    Globals.grid->update_components();
+ofApp::~ofApp() {
+    delete guiGroup;
+    guiGroup = NULL;
+    delete FilamentF;
+    FilamentF = NULL;
+    delete Cell;
+    Cell = NULL;
+    delete Surface;
+    Surface = NULL;
 }
 
 void ofApp::setup() {
     // openframeworks settings
     ofSetFrameRate(10);
-    ofBackground(200, 200, 200);
+    ofBackground(50, 50, 50);
     // set settings
     Globals.settings.deltaT = 1;
+    Globals.settings.sideLength = 500;
     // create grid
-    Globals.grid = new grid_base(Globals.guiBase, 100, sideLength);
+    Globals.grid = new grid_base(Globals.guiBase, Globals.settings.sideLength);
     // initialize random
     Globals.rndC = new random_container();
     Globals.rndC->set_seed();
@@ -47,23 +44,24 @@ void ofApp::setup() {
     Globals.time = 0;
     Globals.frameNo = 0;
     // create cell components
+    Surface = new simple_surface(Globals, Globals.settings.sideLength);
     FilamentF = new functor_cell_filamentCreation(Globals); // filament creation functor for cell
     Cell = new cell(Globals, FilamentF);
-    Surface = new simple_surface(Globals, sideLength);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
     // calculate scale factor when window is resized
-    scale = std::min(ofGetHeight() / (double) sideLength, ofGetWidth() / (double) sideLength);
-    // update gui variables
+    scale = std::min(ofGetHeight() / (double) Globals.settings.sideLength,
+                     ofGetWidth() / (double) Globals.settings.sideLength);
+    // variableUpdate gui variables
     Globals.guiBase->update();
     // only execute if simulation is not paused
     if (!halt) {
-        // update global variables
+        // variableUpdate global variables
         Globals.frameNo++;
         Globals.time = Globals.frameNo * Globals.settings.deltaT;
-        // update grid
+        // variableUpdate grid
         Globals.grid->update_components();
         // make timestep
         Cell->make_timeStep(Globals.settings.deltaT);
