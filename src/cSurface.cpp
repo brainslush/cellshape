@@ -28,6 +28,7 @@ surface_border::surface_border(
 }
 
 surface_border::~surface_border() {
+    globals.grid->unregister_component(this);
     delete associatedVisualObj;
     associatedVisualObj = NULL;
 }
@@ -49,15 +50,7 @@ simple_surface::simple_surface(
     facCount(guiGroup->register_setting<unsigned>("FAC Count", false, 0, 100, 20)),
     facRadius(guiGroup->register_setting<double>("FAC Radius", false, 0, 20, 10)),
     sideLength(iSideLength) {
-    positions.clear();
-    positions.push_back(Eigen::Vector3d(0, 0, 0));
-    positions.push_back(Eigen::Vector3d(0, sideLength, 0));
-    positions.push_back(Eigen::Vector3d(sideLength, sideLength, 0));
-    positions.push_back(Eigen::Vector3d(sideLength, 0, 0));
-    borders.push_back(new surface_border(globals, this, positions[0], positions[1]));
-    borders.push_back(new surface_border(globals, this, positions[1], positions[2]));
-    borders.push_back(new surface_border(globals, this, positions[2], positions[3]));
-    borders.push_back(new surface_border(globals, this, positions[3], positions[0]));
+    create_borders();
     create_facs();
 }
 
@@ -82,12 +75,18 @@ void simple_surface::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
 }
 
 void simple_surface::reset() {
+    for (auto &it: borders) {
+        delete it;
+        it = NULL;
+    }
+    borders.clear();
     for (auto &it: facs) {
         delete it;
         it = NULL;
     }
     facs.clear();
     guiGroup->forceVariableUpdate();
+    create_borders();
     create_facs();
 }
 
@@ -98,4 +97,16 @@ void simple_surface::create_facs() {
         double rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * redSideLength;
         facs.push_back(new fac(globals, facRadius, rndPosX, rndPosY));
     }
+}
+
+void simple_surface::create_borders() {
+    positions.clear();
+    positions.push_back(Eigen::Vector3d(0, 0, 0));
+    positions.push_back(Eigen::Vector3d(0, sideLength, 0));
+    positions.push_back(Eigen::Vector3d(sideLength, sideLength, 0));
+    positions.push_back(Eigen::Vector3d(sideLength, 0, 0));
+    borders.push_back(new surface_border(globals, this, positions[0], positions[1]));
+    borders.push_back(new surface_border(globals, this, positions[1], positions[2]));
+    borders.push_back(new surface_border(globals, this, positions[2], positions[3]));
+    borders.push_back(new surface_border(globals, this, positions[3], positions[0]));
 }

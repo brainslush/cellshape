@@ -10,79 +10,83 @@
 *  The Grid is supposed to ease up workload for finding near neighbors and to increase overall performance
 *  The grid contains cells and each grid cell stores pointers to all components which are located in the gird cell
 */
-class grid_border : public base {
-public:
-    grid_border(double iX1, double iY1, double iX2, double iY2);
 
-    ~grid_border();
+namespace grid {
 
-    void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+    class border : public base {
+    public:
+        border(double iX1, double iY1, double iX2, double iY2);
 
-protected:
-    visual_base *associatedVisualObj;
-};
+        ~border();
 
-class grid_cell : public base {
-public:
-    grid_cell(bool &iShowGrid, bool &iShowGridOccupation, double iX1, double iY1, double iX2, double iY2);
+        void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    ~grid_cell();
+    protected:
+        visual_base *associatedVisualObj;
+    };
 
-    std::set<base *> &get_components();
+    class cell : public base {
+    public:
+        cell(bool &iShowGrid, bool &iShowGridOccupation, double iX1, double iY1, double iX2, double iY2);
 
-    void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+        ~cell();
 
-    bool obtain_intersecting(base *iComponentA, base *iComponentB);
+        std::set<base *> &get_components();
 
-    void update_intersecting();
+        void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    void remove_component(base *iComponent);
+        bool obtain_intersecting(base *iComponentA, base *iComponentB);
 
-    void add_component(base *iComponent);
+        void update_intersecting();
 
-protected:
-    bool &showGrid;
-    bool &showGridOccupation;
-    visual_base *associatedVisualObj;
-    std::vector<grid_border *> borders;
+        void remove_component(base *iComponent);
 
-    std::pair<base *, Eigen::Vector3d> obtain_intersectingCircleLine(base *iRef, base *iCom);
+        void add_component(base *iComponent);
 
-    std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>> obtain_intersectingLineLine(base *iRef, base *iCom);
+    protected:
+        bool &showGrid;
+        bool &showGridOccupation;
+        visual_base *associatedVisualObj;
+        std::vector<border *> borders;
 
-    std::set<base *> components;
-};
+        std::pair<base *, Eigen::Vector3d> obtain_intersectingCircleLine(base *iRef, base *iCom);
 
-class grid_base {
-public:
-    //grid_base();
-    grid_base(mygui::gui *&iGuiBase, double iSideLength);
+        std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>>
+        obtain_intersectingLineLine(base *iRef, base *iCom);
 
-    ~grid_base();
+        std::set<base *> components;
+    };
 
-    void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+    class container {
+    public:
+        container(mygui::gui *&iGuiBase, double iSideLength);
 
-    void register_component(base *iComponent);
+        ~container();
 
-    void unregister_component(base *iComponent);
+        void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    void update_component(base *iComponent);
+        void register_component(base *iComponent);
 
-    void update_components();
+        void unregister_component(base *iComponent);
 
-    void reset();
+        void update_component(base *iComponent);
 
-protected:
-    void create_cells();
+        void update_components();
 
-    mygui::gui *&guiBase;
-    double sideLength;
-    std::vector<grid_cell *> cells;
-    std::set<base *> components;
-    mygui::group *guiGroup;
-    bool &showGrid;
-    bool &showGridOccupation;
-    unsigned &resolution;
-};
+        void reset();
+
+    protected:
+        void create_cells();
+
+        mygui::gui *&guiBase;
+        double sideLength;
+        std::vector<cell *> cells;
+        std::set<base *> components;
+        mygui::group *guiGroup;
+        bool &showGrid;
+        bool &showGridOccupation;
+        unsigned &resolution;
+    };
+}
 
 #endif

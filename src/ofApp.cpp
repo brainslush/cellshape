@@ -8,9 +8,9 @@ ofApp::ofApp() {
     guiGroup->register_action<void()>("Stop", [this]() { halt = true; });
     guiGroup->register_action<void()>("Reset", [this]() {
                                           halt = true;
-                                          Globals.grid->reset();
                                           Cell->reset();
                                           Surface->reset();
+                                          Globals.grid->reset();
                                           Globals.grid->update_components();
                                       }
     );
@@ -36,7 +36,7 @@ void ofApp::setup() {
     Globals.settings.deltaT = 1;
     Globals.settings.sideLength = 500;
     // create grid
-    Globals.grid = new grid_base(Globals.guiBase, Globals.settings.sideLength);
+    Globals.grid = new grid::container(Globals.guiBase, Globals.settings.sideLength);
     // initialize random
     Globals.rndC = new random_container();
     Globals.rndC->set_seed();

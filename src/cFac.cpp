@@ -26,10 +26,13 @@ fac::fac(
     associatedVisualObj->set_color(1.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(1.0, 0.0, 0.0);
     this->add_ignoreIntersect(typeid(*this).hash_code());
-    iGlobals.grid->register_component(this);
+    globals.grid->register_component(this);
 }
 
 fac::~fac() {
+    globals.grid->unregister_component(this);
+    delete associatedVisualObj;
+    associatedVisualObj = NULL;
 }
 
 void fac::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {

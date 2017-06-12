@@ -49,6 +49,7 @@ public:
 
 protected:
     virtual void create_facs();
+    virtual void create_borders();
 
     random_dist *randomReal;
     mygui::group *guiGroup;
