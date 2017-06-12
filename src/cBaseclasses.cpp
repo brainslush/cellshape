@@ -9,7 +9,7 @@ components_base::components_base(sGlobalVars &iGlobals) : base(), globals(iGloba
     canColide = true;
 }
 
-components_base::~components_base() { globals.grid->unregister_component(this); }
+components_base::~components_base() {}
 
 bool &components_base::get_canMove() { return canMove; }
 
@@ -64,7 +64,7 @@ crosslinker_base::crosslinker_base(
     canColide = false;
     canMove = true;
     force = Eigen::Vector3d(0, 0, 0);
-    iGlobals.grid->register_component(this);
+    globals.grid->register_component(this);
 };
 
 crosslinker_base::~crosslinker_base() {
@@ -103,7 +103,7 @@ filament_base::filament_base(
     canColide = true;
     canMove = true;
     associatedVisualObj = new visual_line(this);
-    iGlobals.grid->register_component(this);
+    globals.grid->register_component(this);
     length = 0;
 }
 

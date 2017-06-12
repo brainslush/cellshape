@@ -27,7 +27,7 @@ base::~base() {
     associatedVisualObj = NULL;
 }
 
-void base::set_gridCells(std::set<grid_cell *> iGridCells) { gridCells = iGridCells; }
+void base::set_gridCells(std::set<grid::cell *> iGridCells) { gridCells = iGridCells; }
 
 std::vector<Eigen::Vector3d> &base::get_positions() { return positions; }
 
@@ -37,7 +37,7 @@ std::set<unsigned> &base::get_ignoreIntersect() { return ignoreIntersect; }
 
 std::set<base *> &base::get_intersectorsChecked() { return intersectorsChecked; }
 
-std::set<grid_cell *> &base::get_gridCells() { return gridCells; }
+std::set<grid::cell *> &base::get_gridCells() { return gridCells; }
 
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 

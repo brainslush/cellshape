@@ -26,7 +26,7 @@ membrane_part::membrane_part(
     associatedVisualObj->set_color(0.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
     this->add_ignoreIntersect(typeid(*this).hash_code());
-    iGlobals.grid->register_component(this);
+    globals.grid->register_component(this);
     length = (positions[1] - positions[0]).norm();
     normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
 };

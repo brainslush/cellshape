@@ -18,7 +18,7 @@
 struct sGlobalVars {
     mygui::gui *guiBase;
     random_container *rndC;
-    grid_base *grid;
+    grid::container *grid;
     double time;
     uint64_t frameNo;
     sSettings settings;

@@ -8,7 +8,9 @@
 #ifndef SRC_BASE_H_
 #define SRC_BASE_H_
 
-class grid_cell;
+namespace grid {
+    class cell;
+}
 
 class visual_base;
 
@@ -22,7 +24,7 @@ public:
 
     virtual ~base();
 
-    virtual void set_gridCells(std::set<grid_cell *> iGridCells);
+    virtual void set_gridCells(std::set<grid::cell *> iGridCells);
 
     virtual std::vector<Eigen::Vector3d> &get_positions();
 
@@ -32,7 +34,7 @@ public:
 
     virtual std::set<base *> &get_intersectorsChecked();
 
-    virtual std::set<grid_cell *> &get_gridCells();
+    virtual std::set<grid::cell *> &get_gridCells();
 
     virtual visual_base *get_visualObj();
 
@@ -54,7 +56,7 @@ protected:
     std::vector<base *> intersectors; // list of objects which intersect with
     std::vector<Eigen::Vector3d> intersectorsVectors; // list of collision vectors of intersectors
     std::set<base *> intersectorsChecked; // list of intersectors which are already checked
-    std::set<grid_cell *> gridCells; // gridcells in which object lies
+    std::set<grid::cell *> gridCells; // gridcells in which object lies
     std::set<unsigned> ignoreIntersect; // ignore class types for collision
     visual_base *associatedVisualObj; // assignes a visual object
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
