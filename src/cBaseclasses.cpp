@@ -37,8 +37,6 @@ cell_base::cell_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
 
 cell_base::~cell_base() {}
 
-void cell_base::destory_filament(filament_base *iFilament) {}
-
 /***************************
  * Matrix Base
  ***************************/
@@ -110,7 +108,7 @@ filament_base::filament_base(
 filament_base::~filament_base() {
     globals.grid->unregister_component(this);
     delete associatedVisualObj;
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
 }
 
 void filament_base::set_positions(double iX1, double iY1, double iX2, double iY2) {

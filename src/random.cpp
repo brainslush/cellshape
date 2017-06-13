@@ -80,8 +80,9 @@ random_container::random_container() {
 }
 
 random_container::~random_container() {
-    for (auto &it : distributions) {
+    for (auto it : distributions) {
         delete it;
+        it = nullptr;
     }
 }
 
@@ -101,7 +102,7 @@ void random_container::set_seed(unsigned long long iSeed) {
 void random_container::unregister_random(random_dist *iDist) {
     delete iDist;
     distributions.erase(iDist);
-    iDist = NULL;
+    iDist = nullptr;
 }
 
 unsigned long long random_container::get_uptime() {

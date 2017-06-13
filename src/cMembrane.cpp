@@ -34,7 +34,7 @@ membrane_part::membrane_part(
 membrane_part::~membrane_part() {
     globals.grid->unregister_component(this);
     delete associatedVisualObj;
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
 };
 
 double &membrane_part::get_length() {
@@ -93,9 +93,9 @@ membrane_base::membrane_base(
 };
 
 membrane_base::~membrane_base() {
-    for (unsigned long long i = 0; i < parts.size(); i++) {
-        delete parts[i];
-        parts[i] = NULL;
+    for (auto &it : parts) {
+        delete it;
+        it = nullptr;
     }
 }
 

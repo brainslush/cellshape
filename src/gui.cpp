@@ -20,10 +20,10 @@ group::group(std::string iName) {
 group::~group() {
     for (auto it : settings) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     delete folder;
-    folder = NULL;
+    folder = nullptr;
 }
 
 ofxDatGuiFolder *&group::get_folder() {
@@ -49,10 +49,10 @@ gui::gui() {
 gui::~gui() {
     for (auto it : groups) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     delete datGui;
-    datGui = NULL;
+    datGui = nullptr;
 }
 
 void gui::update() {
@@ -69,6 +69,7 @@ group *gui::register_group(std::string iName) {
 };
 
 void gui::unregister_group(group *iGroup) {
-    delete iGroup;
     groups.erase(iGroup);
+    delete iGroup;
+    iGroup = nullptr;
 }

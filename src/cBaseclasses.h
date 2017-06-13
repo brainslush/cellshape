@@ -48,7 +48,9 @@ public:
 
     virtual ~cell_base();
 
-    virtual void destory_filament(filament_base *iFilament);
+    virtual void register_filament(filament_base *iFilament) {};
+
+    virtual void unregister_filament(filament_base *iFilament) {};
 
 protected:
 };

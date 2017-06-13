@@ -23,14 +23,17 @@ cell::cell(
 }
 
 cell::~cell() {
-    for (auto &it : membranes) {
+    for (auto it : membranes) {
         delete it;
+        it = nullptr;
     }
-    for (auto &it : filaments) {
+    for (auto it : filaments) {
         delete it;
+        it = nullptr;
     }
-    for (auto &it : volumes) {
+    for (auto it : volumes) {
         delete it;
+        it = nullptr;
     }
 }
 
@@ -66,33 +69,29 @@ void cell::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {
     }
 }
 
-void cell::add_filament(filament_base *iFilament) {
+void cell::register_filament(filament_base *iFilament) {
     filaments.insert(iFilament);
 }
 
-void cell::create_filament() {
-    filamentF->setup(this);
-}
-
-void cell::destory_filament(filament_base *iFilament) {
+void cell::unregister_filament(filament_base *iFilament) {
     filaments.erase(iFilament);
-    delete iFilament;
+    iFilament = nullptr;
 }
 
 void cell::reset() {
     for (auto it: filaments) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     filaments.clear();
     for (auto it: membranes) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     membranes.clear();
     for (auto it: volumes) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     volumes.clear();
     guiGroup->forceVariableUpdate();
@@ -104,9 +103,18 @@ void cell::reset() {
 
 void cell::make_timeStep(double &dT) {
     filamentF->make_timeStep(dT, this);
-    for (auto &it: filaments) {
-        it->make_timeStep(dT);
+
+    for (
+            std::set<filament_base*>::iterator it= filaments.begin();
+            it != filaments.end();
+            it++
+            ) {
+        (*it)->make_timeStep(dT);
     }
+
+    /*for (auto &it: filaments) {
+        it->make_timeStep(dT);
+    }*/
     for (auto &it: membranes) {
         it->make_timeStep(dT);
     }
@@ -159,7 +167,7 @@ filament_base *functor_cell_filamentCreation::create_filament(cell *iCell) {
             find_lifeTime(iCell),
             find_stallingForce(iCell)
     );
-    iCell->add_filament(newActin);
+    iCell->register_filament(newActin);
     return newActin;
 }
 
