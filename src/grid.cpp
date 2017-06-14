@@ -22,7 +22,7 @@ border::border(
 
 border::~border() {
     delete associatedVisualObj;
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
 }
 
 void border::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
@@ -63,7 +63,7 @@ cell::cell(
 cell::~cell() {
     for (auto &it : borders) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
 }
 
@@ -105,22 +105,64 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
     Eigen::Vector3d &l2S = posCom[0];
     Eigen::Vector3d &l2E = posCom[1];
 
-    double compareA, compareB;
-    Eigen::Vector3d diffLA = l1E - l1S;
-    Eigen::Vector3d diffLB = l2E - l2S;
-    compareA = diffLA(0) * l1S(1) - diffLA(1) * l1S(0);
-    compareB = diffLB(0) * l2S(1) - diffLB(1) * l2S(0);
-    if ((
-                ((diffLA(0) * l2S(1) - diffLA(1) * l2S(0)) < compareA) ^
-                ((diffLA(0) * l2E(1) - diffLA(1) * l2E(0)) < compareA)
-        ) && (
-                ((diffLB(0) * l1S(1) - diffLB(1) * l1S(0)) < compareB) ^
-                ((diffLB(0) * l1E(1) - diffLB(1) * l1E(0)) < compareB)
-        )) {
-        diffLB.normalize();
-        return std::make_pair(iCom, std::make_pair(diffLA, diffLB));
+    double compareA1, compareA2, compareB1, compareB2, compareD;
+    Eigen::Vector3d diffL1 = l1E - l1S;
+    Eigen::Vector3d diffL2 = l2E - l2S;
+
+    compareA1 = diffL1(0) * l1S(1) - diffL1(1) * l1S(0);
+    compareA2 = diffL1(0) * l2S(1) - diffL1(1) * l2S(0);
+    if (compareA1 >= compareA2) {
+        compareD = diffL1(0) * diffL2(1) - diffL2(0) * diffL1 (1);
+        if (compareA1 - compareA2 <= compareD) {
+            compareB1 = diffL2(0) * l2S(1) - diffL2(1) * l2S(0);
+            compareB2 = diffL2(0) * l1S(1) - diffL2(1) * l1S(0);
+            if (compareB1 <= compareB2) {
+                if (compareB2 - compareB1 <= compareD) {
+                    diffL1.normalize();
+                    diffL2.normalize();
+                    return std::make_pair(iCom, std::make_pair(diffL1, diffL2));
+                }
+            }
+        }
     }
     return std::make_pair(iRef, std::make_pair(l1S, l2S));
+
+    /*
+    if ((
+                (
+                        compareC = diffL1(0) * l2S(1) - diffL1(1) * l2S(0);
+                        compareA2 <= compareA1
+                ) ^
+                ((diffL1(0) * l2E(1) - diffL1(1) * l2E(0)) < compareA)
+        ) && (
+                ((diffL2(0) * l1S(1) - diffL2(1) * l1S(0)) >= compareB) ^
+                ((diffL2(0) * l1E(1) - diffL2(1) * l1E(0)) < compareB)
+        )) {
+        diffL1.normalize();
+        diffL2.normalize();
+        return std::make_pair(iCom, std::make_pair(diffL1, diffL2));
+    }
+
+    float s, t;
+    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y) >= 0;
+    s = s1_x * p0_y - s1_y * p0_x >= s1_x * p2_y - s1_y * p2_x;
+
+    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y) <= 1;
+    s = -s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y) <= -s2_x * s1_y + s1_x * s2_y;
+
+
+    t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y) >= 0;
+    t = s2_x * p0_y - s2_y * p0_x >= s2_x * p2_y - s2_y * p2_x;
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+        // Collision detected
+        if (i_x)
+            *i_x = p0_x + (t * s1_x);
+        if (i_y)
+            *i_y = p0_y + (t * s1_y);
+        return 1;
+    }
+     */
 }
 
 void cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
@@ -148,6 +190,7 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
 
     if (iComponentA != iComponentB) {
         // handle two circles
+        /*
         if (typeA == typeB && typeA == 2) {
             // check whether the two circles overlap
             if ((posA[0] - posB[0]).norm() < parA[0] + parB[0]) {
@@ -174,8 +217,9 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
                 ret = true;
             }
         }
-            // handle multi-line objects
-        else if (
+
+            // handle line objects
+        else */if (
                 (typeA == 1 || typeA == 3 || typeA == 4)
                 && (typeB == 1 || typeB == 3 || typeB == 4)
                 ) {
@@ -246,7 +290,7 @@ container::container(mygui::gui *&iGuiBase, double iSideLength) :
 container::~container() {
     for (auto &it : cells) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
 }
 
@@ -353,7 +397,7 @@ void container::update_component(base *iComponent) {
             }
         }
             break;
-        // ellipse
+            // ellipse
         case 2: {
             // get position and parameters
             const Eigen::Vector3d &pos = iComponent->get_positions()[0];
@@ -454,7 +498,7 @@ void container::update_components() {
 void container::reset() {
     for (auto &it : cells) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     cells.clear();
     guiGroup->forceVariableUpdate();

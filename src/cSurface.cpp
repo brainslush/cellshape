@@ -30,7 +30,7 @@ surface_border::surface_border(
 surface_border::~surface_border() {
     globals.grid->unregister_component(this);
     delete associatedVisualObj;
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
 }
 
 void surface_border::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {
@@ -57,11 +57,11 @@ simple_surface::simple_surface(
 simple_surface::~simple_surface() {
     for (auto &it : borders) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     for (auto &it : facs) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
 }
 
@@ -77,12 +77,12 @@ void simple_surface::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
 void simple_surface::reset() {
     for (auto &it: borders) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     borders.clear();
     for (auto &it: facs) {
         delete it;
-        it = NULL;
+        it = nullptr;
     }
     facs.clear();
     guiGroup->forceVariableUpdate();

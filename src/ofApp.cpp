@@ -19,13 +19,13 @@ ofApp::ofApp() {
 
 ofApp::~ofApp() {
     delete guiGroup;
-    guiGroup = NULL;
+    guiGroup = nullptr;
     delete FilamentF;
-    FilamentF = NULL;
+    FilamentF = nullptr;
     delete Cell;
-    Cell = NULL;
+    Cell = nullptr;
     delete Surface;
-    Surface = NULL;
+    Surface = nullptr;
 }
 
 void ofApp::setup() {

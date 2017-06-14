@@ -22,12 +22,13 @@ actin::actin(
         maxLength(iMaxLength),
         lifeTime(iLifeTime),
         stallingForce(iStallingForce) {
+    cell.register_filament(this);
     associatedVisualObj->set_color(0, 0, 1, 1);
     associatedVisualObj->set_fillColor(0, 1, 0, 1);
     positions.clear();
     positions.push_back(iStart);
     positions.push_back(iStart);
-    tail = NULL;
+    tail = nullptr;
     forceF = new functor_actin_force(this);
     torqueF = new functor_actin_torque(this);
     // test variables, remove them later
@@ -44,19 +45,20 @@ actin::actin(
 }
 
 actin::~actin() {
+    cell.unregister_filament(this);
     delete tail;
-    tail = NULL;
+    tail = nullptr;
     delete forceF;
-    forceF = NULL;
+    forceF = nullptr;
     delete torqueF;
-    torqueF = NULL;
+    torqueF = nullptr;
     delete rigidBody;
-    rigidBody = NULL;
+    rigidBody = nullptr;
 }
 
 void actin::update_force() {
     /*if (!force.isUpdated()) {
-        if (tail != NULL) {
+        if (tail) {
             force += tail->get_force();
         }
         for (auto& it : connectedCrosslinkers) {
@@ -76,7 +78,7 @@ Eigen::Vector3d actin::get_force() {
 void actin::make_timeStep(double &dT) {
     // destroy if it exceeds life time
     if (birthTime + lifeTime < globals.time) {
-        cell.destory_filament(this);
+        delete this;
     } else {
         if (get_length() < maxLength) {
             positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;

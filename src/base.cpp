@@ -1,7 +1,7 @@
 #include "base.h"
 
 base::base() {
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
     timeStamp = ofGetFrameNum();
 }
 
@@ -9,7 +9,7 @@ base::base(
         std::vector<Eigen::Vector3d> iPositions
 ) :
         positions(iPositions) {
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
     timeStamp = ofGetFrameNum();
 }
 
@@ -18,13 +18,13 @@ base::base(std::vector<Eigen::Vector3d> iPositions, std::vector<double> iParamet
 ) :
         positions(iPositions),
         parameters(iParameters) {
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
     timeStamp = ofGetFrameNum();
 }
 
 base::~base() {
     delete associatedVisualObj;
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
 }
 
 void base::set_gridCells(std::set<grid::cell *> iGridCells) { gridCells = iGridCells; }

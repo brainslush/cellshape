@@ -32,7 +32,7 @@ fac::fac(
 fac::~fac() {
     globals.grid->unregister_component(this);
     delete associatedVisualObj;
-    associatedVisualObj = NULL;
+    associatedVisualObj = nullptr;
 }
 
 void fac::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {

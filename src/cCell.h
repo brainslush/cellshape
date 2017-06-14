@@ -41,11 +41,9 @@ public:
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void add_filament(filament_base *iFilament);
+    virtual void register_filament(filament_base *iFilament);
 
-    virtual void create_filament();
-
-    virtual void destory_filament(filament_base *iFilament);
+    virtual void unregister_filament(filament_base *iFilament);
 
     virtual void reset();
 
@@ -57,6 +55,7 @@ protected:
     double &y;
     double &radius;
     unsigned &resolution;
+
     std::set<membrane_base *> membranes;
     std::set<filament_base *> filaments;
     std::set<volume_base *> volumes;
