@@ -1,3 +1,5 @@
+#pragma once
+
 #include <boost/variant.hpp>
 #include "base.h"
 #include "random.h"
@@ -31,7 +33,7 @@ public:
 
     virtual void set_componentModel(std::string, std::string);
 
-    virtual void make_timeStep(double &dT);
+    //virtual void make_timeStep(double &dT);
 
 protected:
     bool canMove; // is it a fixed object
@@ -41,7 +43,9 @@ protected:
 };
 
 class filament_base;
-
+/*****************************
+ *  Cell Base
+ */
 class cell_base : public components_base {
 public:
     cell_base(sGlobalVars &iGlobals);
@@ -51,6 +55,8 @@ public:
     virtual void register_filament(filament_base *iFilament) {};
 
     virtual void unregister_filament(filament_base *iFilament) {};
+
+    virtual void unregister_filament(std::set<filament_base*>::iterator iIt) {};
 
 protected:
 };
@@ -122,19 +128,16 @@ public:
 
     virtual void set_positions(double iX1, double iY1, double iX2, double iY2);
 
-    virtual double &get_length();
-
     virtual void add_connectedCrosslinker(crosslinker_base *iCrosslinker);
 
     virtual void remove_connectedCrosslinker(crosslinker_base *iCrosslinker);
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void make_timeStep(double &dT);
+    virtual bool make_timeStep(double &dT);
 
 protected:
     std::set<crosslinker_base *> connectedCrosslinkers;
-    double length;
 };
 
 /***************************
@@ -145,6 +148,8 @@ public:
     volume_base(sGlobalVars &iGlobals, cell_base &iCell);
 
     virtual ~volume_base();
+
+    virtual void make_timeStep(double &dT);
 
 protected:
 };

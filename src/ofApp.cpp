@@ -46,6 +46,7 @@ void ofApp::setup() {
     // create cell components
     Surface = new simple_surface(Globals, Globals.settings.sideLength);
     FilamentF = new functor_cell_filamentCreation(Globals); // filament creation functor for cell
+
     Cell = new cell(Globals, FilamentF);
 }
 
