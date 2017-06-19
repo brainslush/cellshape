@@ -39,7 +39,7 @@ set(SOURCE_FILES
         src/RigidBody.cpp
         src/RigidBody.h
         src/settings.h
-        src/variable_type.h)
+        src/variable_type.h src/cFunctors.cpp src/cFunctors.h)
 
 add_executable(
         ${APP}
