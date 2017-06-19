@@ -75,7 +75,10 @@ void cell::register_filament(filament_base *iFilament) {
 
 void cell::unregister_filament(filament_base *iFilament) {
     filaments.erase(iFilament);
-    iFilament = nullptr;
+}
+
+void cell::unregister_filament(std::set<filament_base *>::iterator iIt) {
+    filaments.erase(iIt);
 }
 
 void cell::reset() {
@@ -102,19 +105,20 @@ void cell::reset() {
 }
 
 void cell::make_timeStep(double &dT) {
+    // filament creator makes time step
     filamentF->make_timeStep(dT, this);
-
-    for (
-            std::set<filament_base*>::iterator it= filaments.begin();
-            it != filaments.end();
-            it++
-            ) {
-        (*it)->make_timeStep(dT);
+    // filaments make time step
+    for (std::set<filament_base *>::iterator it = filaments.begin(); it != filaments.end();) {
+        if ((*it)->make_timeStep(dT)) {
+            delete *it;
+            filament_base *del = *it;
+            del = NULL;
+            it = filaments.erase(it);
+        } else {
+            it++;
+        }
     }
 
-    /*for (auto &it: filaments) {
-        it->make_timeStep(dT);
-    }*/
     for (auto &it: membranes) {
         it->make_timeStep(dT);
     }
@@ -134,17 +138,35 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
         maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
         maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
-        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)) {
+        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
+        guiForceGroup(guiGroup->register_group("Forces")),
+        guiTorqueGroup(guiGroup->register_group("Torques")) {
 }
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
     globals.rndC->unregister_random(randomReal);
 }
 
+mygui::group *&functor_cell_filamentCreation::get_guiForceGroup() {
+    return guiForceGroup;
+}
+
+mygui::group *&functor_cell_filamentCreation::get_guiTorqueGroup() {
+    return guiTorqueGroup;
+}
+
 void functor_cell_filamentCreation::setup(cell *iCell) {
     for (unsigned long long i = 0; i < maxCount; i++) {
         create_filament(iCell);
     }
+}
+
+void functor_cell_filamentCreation::register_force(physic::functor *iFunctor) {
+    forceFunctors.insert(iFunctor);
+}
+
+void functor_cell_filamentCreation::register_torque(physic::functor *iFunctor) {
+    forceFunctors.insert(iFunctor);
 }
 
 void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {

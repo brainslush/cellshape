@@ -45,6 +45,8 @@ public:
 
     virtual void unregister_filament(filament_base *iFilament);
 
+    virtual void unregister_filament(std::set<filament_base *>::iterator iIt);
+
     virtual void reset();
 
     virtual void make_timeStep(double &dT);
@@ -70,7 +72,15 @@ public:
 
     virtual ~functor_cell_filamentCreation();
 
+    virtual mygui::group *&get_guiForceGroup();
+
+    virtual mygui::group *&get_guiTorqueGroup();
+
     virtual void setup(cell *iCell);
+
+    virtual void register_force(physic::functor *iFunctor);
+
+    virtual void register_torque(physic::functor *iFunctor);
 
     virtual void make_timeStep(double &dT, cell *iCell);
 
@@ -90,12 +100,15 @@ protected:
     sGlobalVars &globals;
     random_dist *randomReal;
     mygui::group *guiGroup;
+    mygui::group *guiForceGroup;
+    mygui::group *guiTorqueGroup;
     unsigned &maxCount;
     double &maxSpeed;
     double &maxLength;
     double &maxLifeTime;
     double &maxStallingForce;
-
+    std::set<physic::functor *> forceFunctors;
+    std::set<physic::functor *> torqueFunctors;
 };
 
 #endif /* SRC_CCELL_H_ */

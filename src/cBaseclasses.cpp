@@ -23,9 +23,11 @@ void components_base::set_componentModel(std::string, std::string) {
     /* TODO */
 }
 
+/*
 void components_base::make_timeStep(double &dT) {
-    /* do nothing */
+    // do nothing
 }
+*/
 
 /***************************
  * Cell Base
@@ -102,7 +104,6 @@ filament_base::filament_base(
     canMove = true;
     associatedVisualObj = new visual_line(this);
     globals.grid->register_component(this);
-    length = 0;
 }
 
 filament_base::~filament_base() {
@@ -118,11 +119,6 @@ void filament_base::set_positions(double iX1, double iY1, double iX2, double iY2
     positions[1](1) = iY2;
 }
 
-double &filament_base::get_length() {
-    length = (positions[1] - positions[0]).norm();
-    return length;
-}
-
 void filament_base::add_connectedCrosslinker(crosslinker_base *iCrosslinker) {
     connectedCrosslinkers.insert(iCrosslinker);
 }
@@ -135,8 +131,8 @@ void filament_base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
 
-void filament_base::make_timeStep(double &iTime) {
-
+bool filament_base::make_timeStep(double &iTime) {
+    return false;
 };
 
 /***************************
@@ -154,6 +150,7 @@ volume_base::~volume_base() {
 
 }
 
+void volume_base::make_timeStep(double &dT) {}
 
 cellcomponents_base::cellcomponents_base(
         sGlobalVars &iGlobals,

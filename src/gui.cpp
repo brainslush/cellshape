@@ -26,6 +26,12 @@ group::~group() {
     folder = nullptr;
 }
 
+group* group::register_group(std::string iName) {
+    group *newGroup = new group(iName);
+    groups.insert(newGroup);
+    return newGroup;
+}
+
 ofxDatGuiFolder *&group::get_folder() {
     return folder;
 }

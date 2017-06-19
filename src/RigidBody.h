@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <iostream>
+#include <set>
 #include <eigen3/Eigen/Eigen>
 
 #ifndef SRC_RIGIDBODY_H_
@@ -17,16 +19,24 @@ namespace physic {
     /* Functor for torque and force calculation */
     class functor {
     public:
-        functor();
+        functor() {
 
-        virtual ~functor();
+        };
 
+        virtual ~functor() {
+
+        };
+
+        template<typename ... A>
         virtual Eigen::Vector3d calc(
                 Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
-                Eigen::Vector3d &L
-        );
+                Eigen::Vector3d &L,
+                A &Args
+        ) {
+            return Eigen::Vector3d(0, 0, 0);
+        };
     };
 
     /*******************************************************************/
@@ -39,8 +49,20 @@ namespace physic {
                 Eigen::Matrix3d iI,
                 double iM,
                 double iEpsilon,
-                functor *iForceFunctor,
-                functor *iTorqueFunctor
+                std::set<functor *> &iForceFunctors,
+                std::set<functor *> &iTorqueFunctors
+        );
+
+        RigidBody3d(
+                Eigen::Vector3d iX,
+                Eigen::Vector3d iV,
+                Eigen::Quaterniond iQ, // rotation in lab frame
+                Eigen::Vector3d iL,
+                Eigen::Matrix3d iI,
+                double iM,
+                double iEpsilon,
+                std::set<functor *> &iForceFunctors,
+                std::set<functor *> &iTorqueFunctors
         );
 
         virtual ~RigidBody3d();
@@ -55,22 +77,36 @@ namespace physic {
 
         virtual Eigen::Vector3d &get_angularMomentum();
 
-        virtual void set_inertia(Eigen::Matrix3d &iI);
+        virtual void set_inertia(Eigen::Matrix3d iI);
 
         virtual void set_mass(double &iM);
 
         virtual void add_force(Eigen::Vector3d &iX, Eigen::Vector3d &iF);
 
-        virtual void do_timeStep(double &dT);
+        template<typename ... A>
+        virtual void do_timeStep(double &dT, A Args) {
+            // variableUpdate force and torque
+            F = Eigen::Vector3d(0, 0, 0);
+            for (auto &it : forceFunctors) {
+                F += it->calc(X, v, q, L, Args...);
+            }
+            T = Eigen::Vector3d(0, 0, 0);
+            for (auto &it : torqueFunctors) {
+                T += it->calc(X, v, q, L, Args...);
+            }
+            // do simulation via verlet
+            do_verlet(dT);
+        };
 
     protected:
         Eigen::Vector3d X; // position
         Eigen::Quaterniond q; // quaternion
-        Eigen::Matrix3d I; // moment of inertia
+        //Eigen::Matrix3d I; // moment of inertia
+        Eigen::Vector3d I; // moment of inertia diagonalized and inversed.
         double M; // mass
         double epsilon; // precision for rotation calculation
-        functor *forceFunctor;
-        functor *torqueFunctor;
+        std::set<functor *> &forceFunctors;
+        std::set<functor *> &torqueFunctors;
         Eigen::Vector3d v; // velocity
         Eigen::Vector3d L; // angular momentum
         Eigen::Vector3d F; // forces

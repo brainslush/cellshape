@@ -180,6 +180,8 @@ namespace mygui {
 
         virtual void forceVariableUpdate();
 
+        virtual group *register_group(std::string iName);
+
         template<typename T>
         void register_action(
                 std::string iLabel,
@@ -191,6 +193,7 @@ namespace mygui {
                     iLabel,
                     iFunction
             );
+            actions.insert(newAction);
         };
 
         template<typename T, typename... A>
@@ -226,6 +229,7 @@ namespace mygui {
     protected:
         std::set<setting_base *> settings;
         std::set<action_base *> actions;
+        std::set<group *> groups;
         ofxDatGuiFolder *folder;
     };
 
