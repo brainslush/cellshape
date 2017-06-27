@@ -139,8 +139,7 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
         maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
         maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
-        guiForceGroup(guiGroup->register_group("Forces")),
-        guiTorqueGroup(guiGroup->register_group("Torques")) {
+        guiFunctorGroup(guiGroup->register_group("Forces")) {
 }
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
@@ -179,7 +178,8 @@ filament_base *functor_cell_filamentCreation::create_filament(cell *iCell) {
             find_tmVelocity(iCell, pos.second),
             find_maxLength(iCell),
             find_lifeTime(iCell),
-            find_stallingForce(iCell)
+            find_stallingForce(iCell),
+            functors
     );
     iCell->register_filament(newActin);
     return newActin;
