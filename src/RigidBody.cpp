@@ -131,4 +131,4 @@ void RigidBody3d::do_verlet(double &dT) {
     Eigen::Vector3d Tdt = torqueFunctor.calc(xdt, vdtt, q, ldt);
     L = L + 0.5 * dT * (T + Tdt);
     */
-F}
+}

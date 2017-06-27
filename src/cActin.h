@@ -22,7 +22,8 @@ public:
             Eigen::Vector3d iTmVelocity,
             double iMaxLength,
             double iLifeTime,
-            double iStallingForce
+            double iStallingForce,
+            std::set<physic::functor *> &iFunctors
     );
 
     virtual ~actin();
@@ -34,7 +35,6 @@ public:
     virtual bool make_timeStep(double &dT);
 
 protected:
-    physic::RigidBody3d *rigidBody;
     Eigen::Vector3d tmVelocity; // treadmilling velocity
     Eigen::Vector3d force; // current force vector in actin element
     const double birthTime; // time when object is created

@@ -43,10 +43,15 @@ void ofApp::setup() {
     // initialize some global variables
     Globals.time = 0;
     Globals.frameNo = 0;
-    // create cell components
+    // create surface
     Surface = new simple_surface(Globals, Globals.settings.sideLength);
+    // create cell components
     FilamentF = new functor_cell_filamentCreation(Globals); // filament creation functor for cell
-
+    // register force/torque functors
+    mygui::group *& guiFunctorGroup = FilamentF->get_guiFunctorGroup();
+    FilamentF->register_functor(new functor::filamentCollision(guiFunctorGroup));
+    FilamentF->register_functor(new functor::dampening(guiFunctorGroup));
+    // create actual cell
     Cell = new cell(Globals, FilamentF);
 }
 

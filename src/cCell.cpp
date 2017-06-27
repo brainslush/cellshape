@@ -147,12 +147,8 @@ functor_cell_filamentCreation::~functor_cell_filamentCreation() {
     globals.rndC->unregister_random(randomReal);
 }
 
-mygui::group *&functor_cell_filamentCreation::get_guiForceGroup() {
-    return guiForceGroup;
-}
-
-mygui::group *&functor_cell_filamentCreation::get_guiTorqueGroup() {
-    return guiTorqueGroup;
+mygui::group *&functor_cell_filamentCreation::get_guiFunctorGroup() {
+    return guiFunctorGroup;
 }
 
 void functor_cell_filamentCreation::setup(cell *iCell) {
@@ -161,12 +157,8 @@ void functor_cell_filamentCreation::setup(cell *iCell) {
     }
 }
 
-void functor_cell_filamentCreation::register_force(physic::functor *iFunctor) {
-    forceFunctors.insert(iFunctor);
-}
-
-void functor_cell_filamentCreation::register_torque(physic::functor *iFunctor) {
-    forceFunctors.insert(iFunctor);
+void functor_cell_filamentCreation::register_functor(physic::functor *iFunctor) {
+    functors.insert(iFunctor);
 }
 
 void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {

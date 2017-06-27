@@ -14,15 +14,13 @@
 
 namespace functor {
 
-    class FrictionForce : public physic::functor {
+    class filamentCollision : public physic::functor {
     public:
-        FrictionForce(functor_cell_filamentCreation& fuc,filament_base iFilament) {
+        filamentCollision(mygui::group *&iGroup);
 
-        };
+        virtual ~filamentCollision();
 
-        virtual ~functor_actin_force();
-
-        virtual Eigen::Vector3d calc(
+        virtual std::pair<Eigen::Vector3d,Eigen::Vector3d> calc(
                 Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
@@ -33,13 +31,13 @@ namespace functor {
         bool &activated;
     };
 
-    class torque : public physic::functor {
+    class dampening : public physic::functor {
     public:
-        torque();
+        dampening(mygui::group *&iGroup);
 
-        virtual ~functor_actin_torque();
+        virtual ~dampening();
 
-        virtual Eigen::Vector3d calc(
+        virtual std::pair<Eigen::Vector3d,Eigen::Vector3d> calc(
                 Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
@@ -50,6 +48,6 @@ namespace functor {
         bool &activated;
     };
 
-}
+};
 
 #endif // SRC_CFUNCTORS_H_

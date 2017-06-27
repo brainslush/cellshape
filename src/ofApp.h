@@ -3,6 +3,7 @@
 #include <functional>
 #include "cCell.h"
 #include "cSurface.h"
+#include "cFunctors.h"
 #include "gui.h"
 #include "ofMain.h"
 

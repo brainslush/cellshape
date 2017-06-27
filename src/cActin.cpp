@@ -14,7 +14,8 @@ actin::actin(
         Eigen::Vector3d iTmVelocity,
         double iMaxLength,
         double iLifeTime,
-        double iStallingForce
+        double iStallingForce,
+        std::set<physic::functor *> &iFunctors
 ) :
         filament_base(iGlobals, iCell),
         tmVelocity(iTmVelocity),
@@ -27,8 +28,6 @@ actin::actin(
     positions.clear();
     positions.push_back(iStart);
     positions.push_back(iStart);
-    forceF = new functor_actin_force(this);
-    torqueF = new functor_actin_torque(this);
     // test variables, remove them later
     double mass = 0.1;
     double length = (positions[0] - positions[1]).norm();
@@ -44,17 +43,11 @@ actin::actin(
             Eigen::Quaterniond(0, 0, 0, 1),
             mI,
             0.1,
-            0.1,
-            forceF,
-            torqueF
+            0.1
     );
 }
 
 actin::~actin() {
-    delete forceF;
-    forceF = nullptr;
-    delete torqueF;
-    torqueF = nullptr;
     delete rigidBody;
     rigidBody = nullptr;
 }
@@ -91,51 +84,8 @@ bool actin::make_timeStep(double &dT) {
             positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
         }
         if (length > std::numeric_limits<double>::min()) {
-
+            rigidBody->do_timeStep(dT, );
         }
         return false;
     }
-}
-
-/***************************
- * actin functors
- ***************************/
-functor_actin_force::functor_actin_force(
-        actin *iFillament
-) :
-        fillament(iFillament) {
-
-}
-
-functor_actin_force::~functor_actin_force() {
-
-}
-
-Eigen::Vector3d functor_actin_force::calc(
-        Eigen::Vector3d &X,
-        Eigen::Vector3d &v,
-        Eigen::Quaterniond &R,
-        Eigen::Vector3d &L
-) {
-    return Eigen::Vector3d(0, 0, 0);
-}
-
-functor_actin_torque::functor_actin_torque(
-        actin *iFillament
-) :
-        fillament(iFillament) {
-
-}
-
-functor_actin_torque::~functor_actin_torque() {
-
-}
-
-Eigen::Vector3d functor_actin_torque::calc(
-        Eigen::Vector3d &X,
-        Eigen::Vector3d &v,
-        Eigen::Quaterniond &R,
-        Eigen::Vector3d &L
-) {
-    return Eigen::Vector3d(0, 0, 0);
 }
