@@ -43,7 +43,8 @@ actin::actin(
             Eigen::Quaterniond(0, 0, 0, 1),
             mI,
             0.1,
-            0.1
+            0.1,
+            iFunctors
     );
 }
 
@@ -78,13 +79,13 @@ bool actin::make_timeStep(double &dT) {
     } else {
         double length = (positions[0]-positions[1]).norm();
         if (length < maxLength) {
-            positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
+            positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
         } else {
-            positions[0] = positions[0] + tmVelocity * globals.settings.deltaT;
-            positions[1] = positions[1] + tmVelocity * globals.settings.deltaT;
+            positions[0] = positions[0] + globals.settings.deltaT * tmVelocity;
+            positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
         }
         if (length > std::numeric_limits<double>::min()) {
-            rigidBody->do_timeStep(dT, );
+            rigidBody->do_timeStep(dT,this);
         }
         return false;
     }
