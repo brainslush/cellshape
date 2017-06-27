@@ -54,10 +54,10 @@ protected:
     std::vector<Eigen::Vector3d> positions; // position of object
     std::vector<double> parameters; // additional parameters of the object
     std::vector<base *> intersectors; // list of objects which intersect with
-    std::vector<Eigen::Vector3d> intersectorsVectors; // list of collision vectors of intersectors
+    std::vector<Eigen::Vector3d> intersectorsVectors; // list of filamentCollision vectors of intersectors
     std::set<base *> intersectorsChecked; // list of intersectors which are already checked
     std::set<grid::cell *> gridCells; // gridcells in which object lies
-    std::set<unsigned> ignoreIntersect; // ignore class types for collision
+    std::set<unsigned> ignoreIntersect; // ignore class types for filamentCollision
     visual_base *associatedVisualObj; // assignes a visual object
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
 };

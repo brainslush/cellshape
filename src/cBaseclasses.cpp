@@ -40,6 +40,23 @@ cell_base::cell_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
 cell_base::~cell_base() {}
 
 /***************************
+ * cellcomponents_base
+ ***************************/
+
+cellcomponents_base::cellcomponents_base(
+        sGlobalVars &iGlobals,
+        cell_base &iCell
+) :
+        components_base(iGlobals),
+        cell(iCell) {
+}
+
+cellcomponents_base::~cellcomponents_base() {
+    delete rigidBody;
+    rigidBody = nullptr;
+}
+
+/***************************
  * Matrix Base
  ***************************/
 
@@ -152,13 +169,4 @@ volume_base::~volume_base() {
 
 void volume_base::make_timeStep(double &dT) {}
 
-cellcomponents_base::cellcomponents_base(
-        sGlobalVars &iGlobals,
-        cell_base &iCell
-) :
-        components_base(iGlobals),
-        cell(iCell) {
 
-}
-
-cellcomponents_base::~cellcomponents_base() {}

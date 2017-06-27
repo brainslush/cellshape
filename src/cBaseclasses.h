@@ -69,6 +69,9 @@ public:
 
 protected:
     cell_base &cell;
+    physic::RigidBody3d *rigidBody;
+    Eigen::Vector3d responseForces;
+    Eigen::Vector3d responseTorque;
 };
 
 class matrix_base : public components_base {
@@ -79,7 +82,6 @@ public:
 
 protected:
 };
-
 
 /***************************
 * crosslinkers
