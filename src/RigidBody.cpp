@@ -15,7 +15,7 @@ RigidBody3d::RigidBody3d(
         Eigen::Matrix3d iI,
         double iM,
         double iEpsilon,
-        std::set<functor*> &iFunctors,
+        std::set<functor *> &iFunctors,
 ) :
         X(iX),
         q(iQ),
@@ -37,7 +37,7 @@ RigidBody3d::RigidBody3d(
         Eigen::Matrix3d iI,
         double iM,
         double iEpsilon,
-        std::set<functor*> &iFunctors
+        std::set<functor *> &iFunctors
 ) :
         X(iX),
         v(iV),
@@ -85,4 +85,29 @@ void RigidBody3d::set_mass(double &iM) {
 void RigidBody3d::add_force(Eigen::Vector3d &iX, Eigen::Vector3d &iF) {
     F += iF;
     T += (iX - X).cross(iF);
+}
+
+Eigen::Quaterniond RigidBody3d::qsum(const Eigen::Quaterniond &l, const Eigen::Quaterniond &r) {
+    Eigen::Quaterniond c;
+    c.coeffs() = l.coeffs() + r.coeffs();
+    return c;
+}
+
+Eigen::Quaterniond RigidBody3d::qdiff(const Eigen::Quaterniond &l, const Eigen::Quaterniond &r) {
+    Eigen::Quaterniond c;
+    c.coeffs() = l.coeffs() - r.coeffs();
+    return c;
+}
+
+Eigen::Quaterniond RigidBody3d::qscale(const double &s, const Eigen::Quaterniond &q) {
+    Eigen::Quaterniond c;
+    c.coeffs() = s * q.coeffs();
+    return c;
+}
+
+Eigen::Quaterniond RigidBody3d::vec2quat(const Eigen::Vector3d &v) {
+    Eigen::Quaterniond c;
+    c.w() = 0;
+    c.vec() = v;
+    return c;
 }
