@@ -21,10 +21,10 @@ namespace functor {
         virtual ~filamentCollision();
 
         virtual std::pair<Eigen::Vector3d,Eigen::Vector3d> calc(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L
         );
 
     protected:
@@ -38,10 +38,10 @@ namespace functor {
         virtual ~dampening();
 
         virtual std::pair<Eigen::Vector3d,Eigen::Vector3d> calc(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L
         );
 
     protected:

@@ -30,10 +30,10 @@ namespace physic {
 
         template<typename ... A>
         std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L,
                 A... Args
         ) {
             return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
@@ -41,10 +41,10 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_force(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L,
                 A... Args
         ) {
             return Eigen::Vector3d(0, 0, 0);
@@ -52,10 +52,10 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_torque(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L,
                 A... Args
         ) {
             return Eigen::Vector3d(0, 0, 0);
@@ -122,7 +122,6 @@ namespace physic {
     protected:
         Eigen::Vector3d X; // position
         Eigen::Quaterniond q; // quaternion
-        //Eigen::Matrix3d I; // moment of inertia
         Eigen::Vector3d I; // moment of inertia diagonalized and inversed.
         double M; // mass
         double epsilon; // precision for rotation calculation
@@ -132,9 +131,19 @@ namespace physic {
         Eigen::Vector3d F; // forces
         Eigen::Vector3d T; // torque
 
-        Eigen::Quaterniond qsum(const Eigen::Quaterniond &l, const Eigen::Quaterniond &r);
+        template <typename L, typename R>
+        Eigen::Quaterniond qsum(L l, R r) {
+            Eigen::Quaterniond c;
+            c.coeffs() = l.coeffs() + r.coeffs();
+            return c;
+        };
 
-        Eigen::Quaterniond qdiff(const Eigen::Quaterniond &l, const Eigen::Quaterniond &r);
+        template <typename L, typename R>
+        Eigen::Quaterniond qdiff(L l, R r) {
+            Eigen::Quaterniond c;
+            c.coeffs() = l.coeffs() - r.coeffs();
+            return c;
+        };
 
         Eigen::Quaterniond qscale(const double &s, const Eigen::Quaterniond &q);
 
@@ -144,7 +153,7 @@ namespace physic {
 
         template<typename ... A>
         std::pair<Eigen::Vector3d, Eigen::Vector3d> sum_functors(
-                Eigen::Vector3d &X,
+                const Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
@@ -159,10 +168,10 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_force(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L,
                 A... Args
         ) {
             Eigen::Vector3d ret;
@@ -174,10 +183,10 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_torque(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const Eigen::Quaterniond &R,
+                const Eigen::Vector3d &L,
                 A... Args
         ) {
             Eigen::Vector3d ret;
@@ -193,32 +202,39 @@ namespace physic {
             // translation part 1
             X = X + dT * v + 0.5 * dT * dT * _a; // calculating new position
             // rotational part 1
+            // normalize q
             q.normalize();
-            Eigen::Matrix3d _R = q.toRotationMatrix(); // transforming quaterinon to rotation matrix increases speed
-            //std::cout << "This is q: \n" << q << "\n";
+            // transforming quaterinon to rotation matrix increases speed
+            Eigen::Matrix3d _R = q.toRotationMatrix();
             std::cout << "This is R:\n" << _R << "\n";
             std::cout << "This is L:\n" << L << "\n";
-            Eigen::Vector3d _Lb = _R * L; // angular momentum in body frame
+            // angular momentum in body frame
+            Eigen::Vector3d _Lb = _R * L;
             std::cout << "This is L in body frame:  \n" << _Lb << "\n";
             std::cout << "This is T:\n" << _Lb << "\n";
-            Eigen::Vector3d _Tb = _R * T; // torque in body frame
+            // torque in body frame
+            Eigen::Vector3d _Tb = _R * T;
             std::cout << "This is T in body frame:  \n" << _Tb << "\n";
-            std::cout << "This is I⁻¹:\n" << I.diagonal() << "\n";
-            Eigen::Vector3d _Ib = _R * I; // moment of inertia in body frame diagonalized and inversed
+            // moment of inertia in body frame diagonalized and inversed
+            Eigen::Vector3d _Ib = _R * I;
+            _Ib = _Ib.inverse();
             std::cout << "This is I⁻¹m:\n" << _Ib << "\n";
-            Eigen::Vector3d _Lbt2 =
-                    _Lb + 0.5 * dT *
-                          (_Tb -
-                           (_Ib.cwiseProduct(_Lb)).cross(_Lb)); // angular momentum in body frame after half time step
-            Eigen::Quaterniond _qkt2 = qsum(q, Eigen::Quaterniond(
-                    q * (_Ib.cwiseProduct(0.25 * dT * _Lbt2)))); // quaternion at half time step at iteration k = 0
-            Eigen::Vector3d _Lwt2 = L + 0.5 * dT * T; // angular momentum in lab frame
-
+            // angular momentum in body frame after half time step
+            Eigen::Vector3d _Lbt2 = _Lb + 0.5 * dT * (_Tb - (_Ib.cwiseProduct(_Lb)).cross(_Lb));
+            // quaternion at half time step at iteration k = 0
+            Eigen::Quaterniond _qkt2 = qsum(q, q * vec2quat(_Ib.cwiseProduct(0.25 * dT * _Lbt2)));
+            // angular momentum in lab frame
+            Eigen::Quaterniond _Lwt2;
+            _Lwt2.w() = 0;
+            _Lwt2.vec() = L + 0.5 * dT * T;
+            // precision itterator
             Eigen::Quaterniond _qk1t2 = _qkt2;
             Eigen::Quaterniond _qdk1t2;
+            Eigen::Vector3d _Lbk1t2;
             do {
                 _qkt2 = _qk1t2;
-                _qdk1t2 = qscale(0.5, _qkt2) * vec2quat(_Ib.cwiseProduct((_qkt2 * vec2quat(_Lwt2) * _qkt2.inverse()).vec()));
+                _Lbk1t2 = (_qkt2 * _Lwt2 * _qkt2.inverse()).vec();
+                _qdk1t2 = qscale(0.5, _qkt2) * vec2quat(_Ib.cwiseProduct(_Lbk1t2));
                 _qk1t2 = qsum(q, qscale(0.5 * dT, _qdk1t2));
             } while ((qdiff(_qk1t2, _qkt2)).norm() > epsilon);
             q = qsum(q, qscale(dT, _qdk1t2));
