@@ -19,10 +19,10 @@ RigidBody3d::RigidBody3d(
 ) :
         X(iX),
         q(iQ),
-        I(iI.inverse().diagonal()),
         M(iM),
         epsilon(iEpsilon),
         functors(iFunctors) {
+    I.vec() = iI.diagonal();
     v = Eigen::Vector3d(0, 0, 0);
     L = Eigen::Vector3d(0, 0, 0);
     F = Eigen::Vector3d(0, 0, 0);
@@ -55,7 +55,7 @@ RigidBody3d::~RigidBody3d() {
 }
 
 Eigen::Vector3d &RigidBody3d::get_position() {
-    return X;
+    return X.vec();
 }
 
 Eigen::Matrix3d RigidBody3d::get_rotationMatrix() {
@@ -87,17 +87,6 @@ void RigidBody3d::add_force(Eigen::Vector3d &iX, Eigen::Vector3d &iF) {
     T += (iX - X).cross(iF);
 }
 
-Eigen::Quaterniond RigidBody3d::qsum(const Eigen::Quaterniond &l, const Eigen::Quaterniond &r) {
-    Eigen::Quaterniond c;
-    c.coeffs() = l.coeffs() + r.coeffs();
-    return c;
-}
-
-Eigen::Quaterniond RigidBody3d::qdiff(const Eigen::Quaterniond &l, const Eigen::Quaterniond &r) {
-    Eigen::Quaterniond c;
-    c.coeffs() = l.coeffs() - r.coeffs();
-    return c;
-}
 
 Eigen::Quaterniond RigidBody3d::qscale(const double &s, const Eigen::Quaterniond &q) {
     Eigen::Quaterniond c;
