@@ -33,24 +33,24 @@ actin::actin(
     double length = (positions[0] - positions[1]).norm();
     double I = 0.83333333 * mass * length * length;
     Eigen::Matrix3d mI;
-    mI <<   I,0,0,
-            0,I,0,
-            0,0,0;
+    mI << I, 0, 0,
+            0, I, 0,
+            0, 0, 0;
     Eigen::Matrix3d mI2 = mI.inverse();
     Eigen::Vector3d mI3 = mI2.diagonal();
-    rigidBody = new physic::RigidBody3d(
+    rigidBody = physic::RigidBody3d(
             Eigen::Vector3d(0, 0, 0),
             Eigen::Quaterniond(0, 0, 0, 1),
             mI,
             0.1,
             0.1,
-            iFunctors
+            &iFunctors
     );
 }
 
 actin::~actin() {
-    delete rigidBody;
-    rigidBody = nullptr;
+    // delete rigidBody;
+    // rigidBody = nullptr;
 }
 
 void actin::update_force() {
@@ -77,7 +77,7 @@ bool actin::make_timeStep(double &dT) {
     if (birthTime + lifeTime < globals.time) {
         return true;
     } else {
-        double length = (positions[0]-positions[1]).norm();
+        double length = (positions[0] - positions[1]).norm();
         if (length < maxLength) {
             positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
         } else {
@@ -85,7 +85,7 @@ bool actin::make_timeStep(double &dT) {
             positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
         }
         if (length > std::numeric_limits<double>::min()) {
-            rigidBody->do_timeStep(dT,this);
+            //rigidBody.do_timeStep(dT,this);
         }
         return false;
     }

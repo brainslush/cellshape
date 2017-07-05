@@ -13,7 +13,7 @@
 #ifndef SRC_CMEMBRANE_H_
 #define SRC_CMEMBRANE_H_
 
-class membrane_part : public cellcomponents_base {
+class membrane_part : public membrane_part_base {
 public:
     // 2D membrane part
     membrane_part(
@@ -24,8 +24,6 @@ public:
 
     virtual ~membrane_part();
 
-    virtual double &get_length();
-
     virtual Eigen::Vector3d &get_normal();
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
@@ -35,8 +33,6 @@ public:
     virtual void make_timeStep(double &dT);
 
 protected:
-    std::vector<membrane_part *> neighbours;
-    double length;
     Eigen::Vector3d normal;
 };
 

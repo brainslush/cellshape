@@ -16,18 +16,8 @@ membrane_part::membrane_part(
         cell_base &iCell,
         double iX1, double iY1,
         double iX2, double iY2
-) : cellcomponents_base(iGlobals, iCell) {
-    positions.clear();
-    positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
-    positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
-    neighbours.push_back(this);
-    neighbours.push_back(this);
-    associatedVisualObj = new visual_line(this);
-    associatedVisualObj->set_color(0.0, 0.0, 0.0);
-    associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
-    this->add_ignoreIntersect(typeid(*this).hash_code());
-    globals.grid->register_component(this);
-    length = (positions[1] - positions[0]).norm();
+) : membrane_part_base(iGlobals, iCell, iX1, iY1, iX2, iY2) {
+
     normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
 };
 
@@ -36,10 +26,6 @@ membrane_part::~membrane_part() {
     delete associatedVisualObj;
     associatedVisualObj = nullptr;
 };
-
-double &membrane_part::get_length() {
-    return length;
-}
 
 Eigen::Vector3d &membrane_part::get_normal() {
     return normal;

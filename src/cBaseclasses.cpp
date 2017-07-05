@@ -52,8 +52,8 @@ cellcomponents_base::cellcomponents_base(
 }
 
 cellcomponents_base::~cellcomponents_base() {
-    delete rigidBody;
-    rigidBody = nullptr;
+    // delete rigidBody;
+    // rigidBody = nullptr;
 }
 
 /***************************
@@ -170,3 +170,41 @@ volume_base::~volume_base() {
 void volume_base::make_timeStep(double &dT) {}
 
 
+membrane_part_base::membrane_part_base(
+        sGlobalVars &iGlobals,
+        cell_base &iCell,
+        double iX1, double iY1,
+        double iX2, double iY2
+) :
+        cellcomponents_base(iGlobals, iCell) {
+    positions.clear();
+    positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
+    positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
+    neighbours = {this,this};
+    associatedVisualObj = new visual_line(this);
+    associatedVisualObj->set_color(0.0, 0.0, 0.0);
+    associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
+    this->add_ignoreIntersect(typeid(*this).hash_code());
+    globals.grid->register_component(this);
+    restLength = get_restLength();
+}
+
+membrane_part_base::~membrane_part_base() {
+
+}
+
+std::pair<membrane_part_base *, membrane_part_base *> &membrane_part_base::get_neighbours() {
+    return neighbours;
+}
+
+double membrane_part_base::get_length() {
+    return (positions[1] - positions[0]).norm();
+}
+
+double &membrane_part_base::get_restLength() {
+    return restLength;
+}
+
+void membrane_part_base::set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours) {
+    neighbours = iNeighbours;
+}
