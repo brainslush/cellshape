@@ -43,6 +43,7 @@ protected:
 };
 
 class filament_base;
+
 /*****************************
  *  Cell Base
  */
@@ -56,7 +57,7 @@ public:
 
     virtual void unregister_filament(filament_base *iFilament) {};
 
-    virtual void unregister_filament(std::set<filament_base*>::iterator iIt) {};
+    virtual void unregister_filament(std::set<filament_base *>::iterator iIt) {};
 
 protected:
 };
@@ -69,7 +70,7 @@ public:
 
 protected:
     cell_base &cell;
-    physic::RigidBody3d *rigidBody;
+    physic::RigidBody3d rigidBody;
     Eigen::Vector3d responseForces;
     Eigen::Vector3d responseTorque;
 };
@@ -156,5 +157,32 @@ public:
 protected:
 };
 
+/***************************
+* membrane parts
+***************************/
+class membrane_part_base : public cellcomponents_base {
+public:
+    membrane_part_base(
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
+            double iX1, double iY1,
+            double iX2, double iY2
+    );
+
+    virtual ~membrane_part_base();
+
+    virtual std::pair<membrane_part_base *, membrane_part_base *> &get_neighbours();
+
+    virtual double get_length();
+
+    virtual double &get_restLength();
+
+    virtual void set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours);
+
+
+protected:
+    std::pair<membrane_part_base *, membrane_part_base *> neighbours;
+    double restLength;
+};
 
 #endif

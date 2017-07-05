@@ -67,13 +67,16 @@ namespace physic {
     class RigidBody3d {
 
     public:
+
+        RigidBody3d();
+
         RigidBody3d(
                 Eigen::Vector3d iX,
                 Eigen::Quaterniond iQ, // rotation in lab frame
                 Eigen::Matrix3d iI,
                 double iM,
                 double iEpsilon,
-                std::set<functor *> &iFunctors
+                std::set<functor *> *iFunctors
         );
 
         RigidBody3d(
@@ -84,7 +87,7 @@ namespace physic {
                 Eigen::Matrix3d iI,
                 double iM,
                 double iEpsilon,
-                std::set<functor *> &iFunctors
+                std::set<functor *> *iFunctors
         );
 
         virtual ~RigidBody3d();
@@ -110,14 +113,16 @@ namespace physic {
             // update force and torque
             F = Eigen::Vector3d(0, 0, 0);
             T = Eigen::Vector3d(0, 0, 0);
-            for (auto &it : functors) {
-                std::pair<Eigen::Vector3d, Eigen::Vector3d> temp = it->calc(X, v, q, L, Args...);
-                F += temp.first;
-                T += temp.second;
+            if (functors) {
+                for (auto &it : *functors) {
+                    std::pair<Eigen::Vector3d, Eigen::Vector3d> temp = it->calc(X, v, q, L, Args...);
+                    F += temp.first;
+                    T += temp.second;
+                }
+                // do simulation via verlet
+                do_verlet(dT, Args...);
             }
-            // do simulation via verlet
-            do_verlet(dT, Args...);
-        };
+        }
 
     protected:
         Eigen::Vector3d X; // position
@@ -125,11 +130,13 @@ namespace physic {
         Eigen::Vector3d I; // moment of inertia diagonalized and inversed.
         double M; // mass
         double epsilon; // precision for rotation calculation
-        std::set<functor *> &functors; // functors which calculate forces and torques
+        std::set<functor *> *functors; // functors which calculate forces and torques
         Eigen::Vector3d v; // velocity
         Eigen::Vector3d L; // angular momentum
         Eigen::Vector3d F; // forces
         Eigen::Vector3d T; // torque
+
+
 
         template <typename L, typename R>
         Eigen::Quaterniond qsum(L l, R r) {
@@ -160,8 +167,10 @@ namespace physic {
                 A... Args
         ) {
             std::pair<Eigen::Vector3d, Eigen::Vector3d> ret;
-            for (auto &it : functors) {
-                ret += it->calc(X, v, R, L, Args...);
+            if (functors) {
+                for (auto &it : *functors) {
+                    ret += it->calc(X, v, R, L, Args...);
+                }
             }
             return ret;
         }
@@ -175,8 +184,10 @@ namespace physic {
                 A... Args
         ) {
             Eigen::Vector3d ret;
-            for (auto &it : functors) {
-                ret += it->calc_force(X, v, R, L, Args...);
+            if (functors) {
+                for (auto &it : *functors) {
+                    ret += it->calc_force(X, v, R, L, Args...);
+                }
             }
             return ret;
         }
@@ -190,8 +201,10 @@ namespace physic {
                 A... Args
         ) {
             Eigen::Vector3d ret;
-            for (auto &it : functors) {
-                ret += it->calc_torque(X, v, R, L, Args...);
+            if (functors) {
+                for (auto &it : *functors) {
+                    ret += it->calc_torque(X, v, R, L, Args...);
+                }
             }
             return ret;
         }
@@ -217,7 +230,7 @@ namespace physic {
             std::cout << "This is T in body frame:  \n" << _Tb << "\n";
             // moment of inertia in body frame diagonalized and inversed
             Eigen::Vector3d _Ib = _R * I;
-            _Ib = _Ib.inverse();
+            _Ib = _Ib.cwiseInverse();
             std::cout << "This is I⁻¹m:\n" << _Ib << "\n";
             // angular momentum in body frame after half time step
             Eigen::Vector3d _Lbt2 = _Lb + 0.5 * dT * (_Tb - (_Ib.cwiseProduct(_Lb)).cross(_Lb));

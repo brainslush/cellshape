@@ -29,7 +29,7 @@ functor::filamentCollision::calc(
 }
 
 dampening::dampening(mygui::group *&iGroup) :
-        activated(iGroup->register_setting("Active", true, true)) {
+        activated(iGroup->register_setting<bool>("Active", true, true)) {
 
 }
 
@@ -46,3 +46,30 @@ dampening::calc(
 ) {
     return std::make_pair(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0));
 }
+
+
+membraneSpring::membraneSpring(mygui::group *&iGroup) :
+        activated(iGroup->register_setting<bool>("Active", true, true)) {
+
+}
+
+membraneSpring::~membraneSpring() {
+
+}
+
+std::pair<Eigen::Vector3d, Eigen::Vector3d>
+membraneSpring::calc(
+        const Eigen::Vector3d &X,
+        const Eigen::Vector3d &v,
+        const Eigen::Quaterniond &R,
+        const Eigen::Vector3d &L,
+        membrane_part_base *membrane
+) {
+    std::pair<membrane_part_base *, membrane_part_base *> &neighbours = membrane->get_neighbours();
+    double stretchForce = kStretch * (membrane->get_restLength() - membrane->get_length());
+    double stretchForceNeighA = kStretch * (neighbours.first->get_restLength() - neighbours.first->get_length());
+    double stretchForceNeighB =
+    return pair<Eigen::Vector3d, Eigen::Vector3d>();
+}
+
+

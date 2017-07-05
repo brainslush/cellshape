@@ -9,20 +9,25 @@
 
 using namespace physic;
 
+RigidBody3d::RigidBody3d() :
+        functors(nullptr) {
+
+}
+
 RigidBody3d::RigidBody3d(
         Eigen::Vector3d iX,
         Eigen::Quaterniond iQ, // rotation in lab frame
         Eigen::Matrix3d iI,
         double iM,
         double iEpsilon,
-        std::set<functor *> &iFunctors,
+        std::set<functor *> *iFunctors
 ) :
         X(iX),
         q(iQ),
         M(iM),
         epsilon(iEpsilon),
         functors(iFunctors) {
-    I.vec() = iI.diagonal();
+    I = iI.diagonal();
     v = Eigen::Vector3d(0, 0, 0);
     L = Eigen::Vector3d(0, 0, 0);
     F = Eigen::Vector3d(0, 0, 0);
@@ -37,13 +42,13 @@ RigidBody3d::RigidBody3d(
         Eigen::Matrix3d iI,
         double iM,
         double iEpsilon,
-        std::set<functor *> &iFunctors
+        std::set<functor *> *iFunctors
 ) :
         X(iX),
         v(iV),
         q(iQ),
         L(iL),
-        I(iI.inverse().diagonal()),
+        I(iI.diagonal()),
         M(iM),
         epsilon(iEpsilon),
         functors(iFunctors) {
@@ -55,7 +60,7 @@ RigidBody3d::~RigidBody3d() {
 }
 
 Eigen::Vector3d &RigidBody3d::get_position() {
-    return X.vec();
+    return X;
 }
 
 Eigen::Matrix3d RigidBody3d::get_rotationMatrix() {
@@ -75,7 +80,7 @@ Eigen::Vector3d &RigidBody3d::get_angularMomentum() {
 }
 
 void RigidBody3d::set_inertia(Eigen::Matrix3d iI) {
-    I = iI.inverse().diagonal();
+    I = iI.diagonal();
 }
 
 void RigidBody3d::set_mass(double &iM) {
