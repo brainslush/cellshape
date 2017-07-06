@@ -180,7 +180,7 @@ membrane_part_base::membrane_part_base(
     positions.clear();
     positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
     positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
-    neighbours = {this,this};
+    neighbours = {*this, *this};
     associatedVisualObj = new visual_line(this);
     associatedVisualObj->set_color(0.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
@@ -193,7 +193,7 @@ membrane_part_base::~membrane_part_base() {
 
 }
 
-std::pair<membrane_part_base *, membrane_part_base *> &membrane_part_base::get_neighbours() {
+std::pair<membrane_part_base &, membrane_part_base &> &membrane_part_base::get_neighbours() {
     return neighbours;
 }
 
@@ -205,6 +205,20 @@ double &membrane_part_base::get_restLength() {
     return restLength;
 }
 
-void membrane_part_base::set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours) {
+std::pair<Eigen::Vector3d &, Eigen::Vector3d &> &membrane_part_base::get_sharedPositions() {
+    return sharedPositions;
+}
+
+void membrane_part_base::set_neighbours(std::pair<membrane_part_base &, membrane_part_base &> iNeighbours) {
     neighbours = iNeighbours;
+}
+
+Eigen::Vector3d membrane_part_base::calc_dirVector(Eigen::Vector3d &iPoint) {
+    if (&iPoint == &positions[0]) {
+        return (positions[0] - positions[1]).normalized();
+    } else if (&iPoint == &positions[1]) {
+        return (positions[1] - positions[0]).normalized();
+    } else {
+        return Eigen::Vector3d(0,0,0);
+    }
 }

@@ -171,17 +171,21 @@ public:
 
     virtual ~membrane_part_base();
 
-    virtual std::pair<membrane_part_base *, membrane_part_base *> &get_neighbours();
+    virtual std::pair<membrane_part_base &, membrane_part_base &> &get_neighbours();
 
     virtual double get_length();
 
     virtual double &get_restLength();
 
-    virtual void set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours);
+    virtual std::pair<Eigen::Vector3d &, Eigen::Vector3d &> &get_sharedPositions();
 
+    virtual void set_neighbours(std::pair<membrane_part_base &, membrane_part_base &> iNeighbours);
+
+    virtual Eigen::Vector3d calc_dirVector (Eigen::Vector3d &iPoint);
 
 protected:
-    std::pair<membrane_part_base *, membrane_part_base *> neighbours;
+    std::pair<membrane_part_base &, membrane_part_base &> neighbours;
+    std::pair<Eigen::Vector3d &, Eigen::Vector3d &> sharedPositions;
     double restLength;
 };
 
