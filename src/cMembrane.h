@@ -28,8 +28,6 @@ public:
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void set_neighbours(membrane_part &iPartA, membrane_part &iPartB);
-
     virtual void make_timeStep(double &dT);
 
 protected:

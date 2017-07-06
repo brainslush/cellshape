@@ -36,8 +36,8 @@ void membrane_part::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 }
 
 void membrane_part::set_neighbours(membrane_part &iPartA, membrane_part &iPartB) {
-    neighbours[0] = &iPartA;
-    neighbours[1] = &iPartB;
+    neighbours.first = &iPartA;
+    neighbours.second = &iPartB;
 };
 
 void membrane_part::make_timeStep(double &dT) {
@@ -70,10 +70,13 @@ membrane_base::membrane_base(
         ));
     };
     for (unsigned long long i = 0; i < iResolution; i++) {
-        parts[i]->set_neighbours(*parts[(i - 1) % iResolution], *parts[(i + 1) % iResolution]);
+        std::pair<Eigen::Vector3d &, Eigen::Vector3d &> &sharedPositions = parts[i]->get_sharedPositions();
+        membrane_part_base& partA = *parts[(i - 1) % iResolution];
+        membrane_part_base& partB = *parts[(i + 1) % iResolution];
+        sharedPositions.first = partA.get_positions()[1];
+        sharedPositions.second = partB.get_positions()[0];
+        parts[i]->set_neighbours({partA, partB});
     };
-    //area.set_updated(false);
-    //length.set_updated(false);
     update_area();
     update_length();
 };
