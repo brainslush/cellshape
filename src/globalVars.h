@@ -16,7 +16,8 @@
 #define SRC_GLOBALVARS_H_
 
 struct sGlobalVars {
-    mygui::gui *guiBase;
+    mygui::container *guiC;
+    mygui::gui *guiMain;
     random_container *rndC;
     grid::container *grid;
     double time;
@@ -25,9 +26,10 @@ struct sGlobalVars {
 
     sGlobalVars() {};
 
-    sGlobalVars(
+    /*sGlobalVars(
             mygui::gui *iGuiBase
     ) : guiBase(iGuiBase) {};
+    */
 };
 
 #endif /* SRC_GLOBALVARS_H_ */

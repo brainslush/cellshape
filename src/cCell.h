@@ -72,7 +72,7 @@ public:
 
     virtual ~functor_cell_filamentCreation();
 
-    virtual mygui::group *&get_guiFunctorGroup();
+    virtual mygui::gui *&get_guiFunctor();
 
     virtual void setup(cell *iCell);
 
@@ -96,7 +96,7 @@ protected:
     sGlobalVars &globals;
     random_dist *randomReal;
     mygui::group *guiGroup;
-    mygui::group *guiFunctorGroup;
+    mygui::gui *guiFunctorGroup;
     unsigned &maxCount;
     double &maxSpeed;
     double &maxLength;
