@@ -46,11 +46,10 @@ public:
     void gotMessage(ofMessage msg);
 
 protected:
-    mygui::group *guiGroup;
-    sGlobalVars Globals;
-    functor_cell_filamentCreation *FilamentF;
-    simple_surface *Surface;
-    cell *Cell;
+    sGlobalVars globals;
+    functor_cell_filamentCreation *filamentF;
+    simple_surface *surface;
+    cell *ccell;
 
     bool halt;
     double scale;

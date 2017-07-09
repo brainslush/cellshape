@@ -30,10 +30,10 @@ namespace physic {
 
         template<typename ... A>
         std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
-                const Eigen::Vector3d &X,
-                const Eigen::Vector3d &v,
-                const Eigen::Quaterniond &R,
-                const Eigen::Vector3d &L,
+                Eigen::Vector3d &X,
+                Eigen::Vector3d &v,
+                Eigen::Quaterniond &R,
+                Eigen::Vector3d &L,
                 A... Args
         ) {
             return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
@@ -41,10 +41,10 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_force(
-                const Eigen::Vector3d &X,
-                const Eigen::Vector3d &v,
-                const Eigen::Quaterniond &R,
-                const Eigen::Vector3d &L,
+                Eigen::Vector3d &X,
+                Eigen::Vector3d &v,
+                Eigen::Quaterniond &R,
+                Eigen::Vector3d &L,
                 A... Args
         ) {
             return Eigen::Vector3d(0, 0, 0);
@@ -52,10 +52,10 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_torque(
-                const Eigen::Vector3d &X,
-                const Eigen::Vector3d &v,
-                const Eigen::Quaterniond &R,
-                const Eigen::Vector3d &L,
+                Eigen::Vector3d &X,
+                Eigen::Vector3d &v,
+                Eigen::Quaterniond &R,
+                Eigen::Vector3d &L,
                 A... Args
         ) {
             return Eigen::Vector3d(0, 0, 0);
@@ -111,17 +111,11 @@ namespace physic {
         template<typename ... A>
         void do_timeStep(double &dT, A... Args) {
             // update force and torque
-            F = Eigen::Vector3d(0, 0, 0);
-            T = Eigen::Vector3d(0, 0, 0);
-            if (functors) {
-                for (auto &it : *functors) {
-                    std::pair<Eigen::Vector3d, Eigen::Vector3d> temp = it->calc(X, v, q, L, Args...);
-                    F += temp.first;
-                    T += temp.second;
-                }
-                // do simulation via verlet
-                do_verlet(dT, Args...);
-            }
+            std::pair<Eigen::Vector3d, Eigen::Vector3d> temp = sum_functors(X, v, q, L, Args...);
+            F = temp.first;
+            T = temp.second;
+            // do simulation via verlet
+            do_vverlet(dT, Args...);
         }
 
     protected:
@@ -160,16 +154,16 @@ namespace physic {
 
         template<typename ... A>
         std::pair<Eigen::Vector3d, Eigen::Vector3d> sum_functors(
-                const Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
+                Eigen::Vector3d &iX,
+                Eigen::Vector3d &iv,
+                Eigen::Quaterniond &iR,
+                Eigen::Vector3d &iL,
                 A... Args
         ) {
             std::pair<Eigen::Vector3d, Eigen::Vector3d> ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc(X, v, R, L, Args...);
+                    ret += it->calc(iX, iv, iR, iL, Args...);
                 }
             }
             return ret;
@@ -177,16 +171,16 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_force(
-                const Eigen::Vector3d &X,
-                const Eigen::Vector3d &v,
-                const Eigen::Quaterniond &R,
-                const Eigen::Vector3d &L,
+                Eigen::Vector3d &iX,
+                Eigen::Vector3d &iv,
+                Eigen::Quaterniond &iR,
+                Eigen::Vector3d &iL,
                 A... Args
         ) {
             Eigen::Vector3d ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc_force(X, v, R, L, Args...);
+                    ret += it->calc_force(iX, iv, iR, iL, Args...);
                 }
             }
             return ret;
@@ -194,23 +188,28 @@ namespace physic {
 
         template<typename ... A>
         Eigen::Vector3d calc_torque(
-                const Eigen::Vector3d &X,
-                const Eigen::Vector3d &v,
-                const Eigen::Quaterniond &R,
-                const Eigen::Vector3d &L,
+                Eigen::Vector3d &iX,
+                Eigen::Vector3d &iv,
+                Eigen::Quaterniond &iR,
+                Eigen::Vector3d &iL,
                 A... Args
         ) {
             Eigen::Vector3d ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc_torque(X, v, R, L, Args...);
+                    ret += it->calc_torque(iX, iv, iR, iL, Args...);
                 }
             }
             return ret;
         }
 
         template<typename ... A>
-        void do_verlet(double &dT, A... Args) {
+        void do_leapFrog(double &dT, A... Args) {
+
+        }
+
+        template<typename ... A>
+        void do_vverlet(double &dT, A... Args) {
             Eigen::Vector3d _a = F / M;
             // translation part 1
             X = X + dT * v + 0.5 * dT * dT * _a; // calculating new position

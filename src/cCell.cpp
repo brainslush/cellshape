@@ -13,7 +13,7 @@ cell::cell(
 ) :
         cell_base(iGlobals),
         filamentF(iFunctor),
-        guiGroup(globals.guiBase->register_group("Cell")),
+        guiGroup(globals.guiMain->register_group("Cell")),
         x(guiGroup->register_setting<double>("X", false, 0, 500, 250)),
         y(guiGroup->register_setting<double>("Y", false, 0, 500, 250)),
         radius(guiGroup->register_setting<double>("Radius", false, 0, 200, 150)),
@@ -133,20 +133,20 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
 ) :
         globals(iGlobals),
         randomReal(globals.rndC->register_random("uniform_01")),
-        guiGroup(globals.guiBase->register_group("Filaments")),
+        guiGroup(globals.guiMain->register_group("Filaments")),
         maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
         maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
         maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
         maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
-        guiFunctorGroup(guiGroup->register_group("Forces")) {
+        guiFunctorGroup(globals.guiC->register_gui("Forces")) {
 }
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
     globals.rndC->unregister_random(randomReal);
 }
 
-mygui::group *&functor_cell_filamentCreation::get_guiFunctorGroup() {
+mygui::gui *&functor_cell_filamentCreation::get_guiFunctor() {
     return guiFunctorGroup;
 }
 

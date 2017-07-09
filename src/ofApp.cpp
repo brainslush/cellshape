@@ -1,31 +1,30 @@
 #include "ofApp.h"
 
 ofApp::ofApp() {
-    Globals.guiBase = new mygui::gui();
-    guiGroup = Globals.guiBase->register_group("General");
+    globals.guiC = new mygui::container();
+    globals.guiMain = globals.guiC->register_gui("General");
+    mygui::group * guiGroup = globals.guiMain->register_group("Control");
     //maxFPS =guiGroup->register_setting<unsigned>("Max FPS", true, 0, 60, 10));
     guiGroup->register_action<void()>("Start", [this]() { halt = false; });
     guiGroup->register_action<void()>("Stop", [this]() { halt = true; });
     guiGroup->register_action<void()>("Reset", [this]() {
                                           halt = true;
-                                          Cell->reset();
-                                          Surface->reset();
-                                          Globals.grid->reset();
-                                          Globals.grid->update_components();
+                                          ccell->reset();
+                                          surface->reset();
+                                          globals.grid->reset();
+                                          globals.grid->update_components();
                                       }
     );
     halt = true;
 }
 
 ofApp::~ofApp() {
-    delete guiGroup;
-    guiGroup = nullptr;
-    delete FilamentF;
-    FilamentF = nullptr;
-    delete Cell;
-    Cell = nullptr;
-    delete Surface;
-    Surface = nullptr;
+    delete filamentF;
+    filamentF = nullptr;
+    delete ccell;
+    ccell = nullptr;
+    delete surface;
+    surface = nullptr;
 }
 
 void ofApp::setup() {
@@ -33,44 +32,44 @@ void ofApp::setup() {
     ofSetFrameRate(10);
     ofBackground(50, 50, 50);
     // set settings
-    Globals.settings.deltaT = 1;
-    Globals.settings.sideLength = 500;
+    globals.settings.deltaT = 1;
+    globals.settings.sideLength = 500;
     // create grid
-    Globals.grid = new grid::container(Globals.guiBase, Globals.settings.sideLength);
+    globals.grid = new grid::container(globals.guiMain, globals.settings.sideLength);
     // initialize random
-    Globals.rndC = new random_container();
-    Globals.rndC->set_seed();
+    globals.rndC = new random_container();
+    globals.rndC->set_seed();
     // initialize some global variables
-    Globals.time = 0;
-    Globals.frameNo = 0;
+    globals.time = 0;
+    globals.frameNo = 0;
     // create surface
-    Surface = new simple_surface(Globals, Globals.settings.sideLength);
+    surface = new simple_surface(globals, globals.settings.sideLength);
     // create cell components
-    FilamentF = new functor_cell_filamentCreation(Globals); // filament creation functor for cell
+    filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
     // register force/torque functors
-    mygui::group *& guiFunctorGroup = FilamentF->get_guiFunctorGroup();
-    FilamentF->register_functor(new functor::filamentCollision(guiFunctorGroup));
-    FilamentF->register_functor(new functor::dampening(guiFunctorGroup));
+    mygui::gui *&guiForceFunctor = filamentF->get_guiFunctor();
+    filamentF->register_functor(new functor::filamentCollision(guiForceFunctor));
+    filamentF->register_functor(new functor::dampening(guiForceFunctor));
     // create actual cell
-    Cell = new cell(Globals, FilamentF);
+    ccell = new cell(globals, filamentF);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
     // calculate scale factor when window is resized
-    scale = std::min(ofGetHeight() / (double) Globals.settings.sideLength,
-                     ofGetWidth() / (double) Globals.settings.sideLength);
+    scale = std::min(ofGetHeight() / (double) globals.settings.sideLength,
+                     ofGetWidth() / (double) globals.settings.sideLength);
     // variableUpdate gui variables
-    Globals.guiBase->update();
+    globals.guiC->update();
     // only execute if simulation is not paused
     if (!halt) {
         // variableUpdate global variables
-        Globals.frameNo++;
-        Globals.time = Globals.frameNo * Globals.settings.deltaT;
+        globals.frameNo++;
+        globals.time = globals.frameNo * globals.settings.deltaT;
         // variableUpdate grid
-        Globals.grid->update_components();
+        globals.grid->update_components();
         // make timestep
-        Cell->make_timeStep(Globals.settings.deltaT);
+        ccell->make_timeStep(globals.settings.deltaT);
     }
 }
 
@@ -78,9 +77,9 @@ void ofApp::update() {
 void ofApp::draw() {
     /* obtain visual objects and draw them */
     std::vector<visual_base *> visualObjs;
-    Globals.grid->obtain_visualObjs(visualObjs);
-    Surface->obtain_visualObjs(visualObjs);
-    Cell->obtain_visualObjs(visualObjs);
+    globals.grid->obtain_visualObjs(visualObjs);
+    surface->obtain_visualObjs(visualObjs);
+    ccell->obtain_visualObjs(visualObjs);
     for (auto &it : visualObjs) {
         it->draw(scale);
     }

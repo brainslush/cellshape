@@ -46,7 +46,7 @@ simple_surface::simple_surface(
         double iSideLength
 ) : matrix_base(iGlobals),
     randomReal(globals.rndC->register_random("uniform_01")),
-    guiGroup(globals.guiBase->register_group("Surface")),
+    guiGroup(globals.guiMain->register_group("Surface")),
     facCount(guiGroup->register_setting<unsigned>("FAC Count", false, 0, 100, 20)),
     facRadius(guiGroup->register_setting<double>("FAC Radius", false, 0, 20, 10)),
     sideLength(iSideLength) {

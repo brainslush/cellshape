@@ -26,12 +26,6 @@ group::~group() {
     folder = nullptr;
 }
 
-group* group::register_group(std::string iName) {
-    group *newGroup = new group(iName);
-    groups.insert(newGroup);
-    return newGroup;
-}
-
 ofxDatGuiFolder *&group::get_folder() {
     return folder;
 }
@@ -48,8 +42,10 @@ void group::forceVariableUpdate() {
     }
 }
 
-gui::gui() {
+gui::gui(std::string iName) {
     datGui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
+    datGui->addHeader(iName);
+    datGui->addFooter();
 }
 
 gui::~gui() {
@@ -78,4 +74,32 @@ void gui::unregister_group(group *iGroup) {
     groups.erase(iGroup);
     delete iGroup;
     iGroup = nullptr;
+}
+
+container::container() {
+
+}
+
+container::~container() {
+    for (auto it : guis) {
+        delete it;
+        it = nullptr;
+    }
+}
+
+void container::update() {
+    for (auto &it : guis) {
+        it->update();
+    }
+}
+
+gui *container::register_gui(std::string iName) {
+    gui *tmp = new gui(iName);
+    guis.insert(tmp);
+    return tmp;
+}
+
+void container::unregister_gui(gui *iGui) {
+    guis.erase(iGui);
+    iGui = nullptr;
 }

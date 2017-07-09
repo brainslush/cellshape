@@ -147,25 +147,6 @@ namespace mygui {
         ofxDatGuiButton *control;
     };
 
-    /*
-    template<typename T, typename A, class L>
-    class action : public action_base {
-    public:
-        action(
-                ofxDatGuiFolder *iFolder,
-                std::string &iLabel,
-                T *&iOwner,
-                void (L::*listenerMethod)(A)
-        ) :
-                control(iFolder->addButton(iLabel)) {
-            control->onButtonEvent(iOwner, listenerMethod);
-        }
-
-    protected:
-        ofxDatGuiButton *control;
-    };
-    */
-
     class group {
     public:
         group();
@@ -180,14 +161,12 @@ namespace mygui {
 
         virtual void forceVariableUpdate();
 
-        virtual group *register_group(std::string iName);
-
         template<typename T>
         void register_action(
                 std::string iLabel,
                 std::function<T> iFunction
         ) {
-            iLabel.insert(0,"> ");
+            iLabel.insert(0, "> ");
             action<T> *newAction = new action<T>(
                     folder,
                     iLabel,
@@ -201,7 +180,7 @@ namespace mygui {
                 std::string iLabel,
                 A... iArgs
         ) {
-            iLabel.insert(0,"> ");
+            iLabel.insert(0, "> ");
             setting<T> *newSetting = new setting<T>(
                     folder,
                     iLabel,
@@ -216,7 +195,7 @@ namespace mygui {
                 bool iUpdatePerFrame,
                 A... iArgs
         ) {
-            iLabel.insert(0,"> ");
+            iLabel.insert(0, "> ");
             setting<T> *newSetting = new setting<T>(
                     folder,
                     iLabel,
@@ -235,7 +214,7 @@ namespace mygui {
 
     class gui {
     public:
-        gui();
+        gui(std::string iName);
 
         virtual ~gui();
 
@@ -249,6 +228,22 @@ namespace mygui {
         std::set<group *> groups;
         ofxDatGui *datGui;
     };
-}
+
+    class container {
+    public:
+        container();
+
+        virtual ~container();
+
+        virtual void update();
+
+        virtual gui *register_gui(std::string iName);
+
+        virtual void unregister_gui(gui *iGui);
+
+    protected:
+        std::set<gui *> guis;
+    };
+};
 
 #endif /* SRC_GUI_H_ */
