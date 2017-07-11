@@ -45,11 +45,15 @@ void ofApp::setup() {
     // create surface
     surface = new simple_surface(globals, globals.settings.sideLength);
     // create cell components
+    membraneF = new functor_cell_membraneCreation(globals); // membrane creation functor for cell
     filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
-    // register force/torque functors
-    mygui::gui *&guiForceFunctor = filamentF->get_guiFunctor();
-    filamentF->register_functor(new functor::filamentCollision(guiForceFunctor));
-    filamentF->register_functor(new functor::dampening(guiForceFunctor));
+    // register membrane force/torque functors
+    membraneF->register_functor(new functor::membraneSpring(membraneF->get_guiFunctor()));
+    // register filament  force/torque functors
+    filamentF->register_functor(new functor::filamentCollision(filamentF->get_guiFunctor()));
+    filamentF->register_functor(new functor::dampening(filamentF->get_guiFunctor()));
+
+
     // create actual cell
     ccell = new cell(globals, filamentF);
 }

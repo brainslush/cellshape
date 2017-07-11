@@ -15,9 +15,26 @@ membrane_part::membrane_part(
         sGlobalVars &iGlobals,
         cell_base &iCell,
         double iX1, double iY1,
-        double iX2, double iY2
+        double iX2, double iY2,
+        std::set<physic::functor *> &iFunctors
 ) : membrane_part_base(iGlobals, iCell, iX1, iY1, iX2, iY2) {
-
+    double mass = 0.1;
+    double length = (positions[0] - positions[1]).norm();
+    double I = 0.83333333 * mass * length * length;
+    Eigen::Matrix3d mI;
+    mI << I, 0, 0,
+            0, I, 0,
+            0, 0, 0;
+    Eigen::Matrix3d mI2 = mI.inverse();
+    Eigen::Vector3d mI3 = mI2.diagonal();
+    rigidBody = physic::RigidBody3d(
+            Eigen::Vector3d(0, 0, 0),
+            Eigen::Quaterniond(0, 0, 0, 1),
+            mI,
+            0.1,
+            0.1,
+            &iFunctors
+    );
     normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
 };
 
@@ -45,38 +62,15 @@ void membrane_part::make_timeStep(double &dT) {
  ***************************/
 
 // circular membrane
-membrane_base::membrane_base(
+membrane_container::membrane_container(
         sGlobalVars &iGlobals,
-        cell_base &iCell,
-        double iX,
-        double iY,
-        double iRadius,
-        unsigned long long iResolution
+        cell_base &iCell
 ) : cellcomponents_base(iGlobals, iCell) {
-    double dAngle = 2 * PI / (double) iResolution;
-    for (unsigned long long i = 0; i < iResolution; i++) {
-        parts.push_back(new membrane_part(
-                iGlobals,
-                iCell,
-                iRadius * cos(i * dAngle) + iX,
-                iRadius * sin(i * dAngle) + iY,
-                iRadius * cos((i + 1) * dAngle) + iX,
-                iRadius * sin((i + 1) * dAngle) + iY
-        ));
-    };
-    for (unsigned long long i = 0; i < iResolution; i++) {
-        std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &sharedPositions = parts[i]->get_sharedPositions();
-        membrane_part_base* partA = parts[(i - 1) % iResolution];
-        membrane_part_base* partB = parts[(i + 1) % iResolution];
-        sharedPositions.first = &partA->get_positions()[1];
-        sharedPositions.second = &partB->get_positions()[0];
-        parts[i]->set_neighbours({partA, partB});
-    };
     update_area();
     update_length();
 };
 
-membrane_base::~membrane_base() {
+membrane_container::~membrane_container() {
     for (auto &it : parts) {
         delete it;
         it = nullptr;
@@ -84,7 +78,7 @@ membrane_base::~membrane_base() {
 }
 
 /* calculate area */
-void membrane_base::update_area() {
+void membrane_container::update_area() {
     //if(!area.isUpdated()) {
     double temp = 0;
     /* calculate 2D volume aka the area */
@@ -99,7 +93,7 @@ void membrane_base::update_area() {
 }
 
 /* calculate length */
-void membrane_base::update_length() {
+void membrane_container::update_length() {
     //if (!length.isUpdated()) {
     double temp = 0;
     for (auto &it : parts) {
@@ -113,28 +107,28 @@ void membrane_base::update_length() {
 }
 
 /* */
-void membrane_base::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {
+void membrane_container::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {
     for (unsigned long long i = 0; i < parts.size(); i++) {
         parts[i]->obtain_visualObjs(oVisualComponents);
     }
 }
 
 /* get volume */
-double &membrane_base::get_area() {
+double &membrane_container::get_area() {
     update_area();
     return area;
 }
 
-double &membrane_base::get_length() {
+double &membrane_container::get_length() {
     update_length();
     return length;
 }
 
-std::vector<membrane_part *> &membrane_base::get_parts() {
+std::vector<membrane_part *> &membrane_container::get_parts() {
     return parts;
 }
 
 /* variableUpdate feature of the membrane */
-void membrane_base::make_timeStep(double &dT) {
+void membrane_container::make_timeStep(double &dT) {
 
 }
