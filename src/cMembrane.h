@@ -17,9 +17,11 @@ class membrane_part : public membrane_part_base {
 public:
     // 2D membrane part
     membrane_part(
-            sGlobalVars &iGlobals, cell_base &iCell,
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
             double iX1, double iY1,
-            double iX2, double iY2
+            double iX2, double iY2,
+            std::set<physic::functor *> &iFunctors
     );
 
     virtual ~membrane_part();
@@ -34,17 +36,14 @@ protected:
     Eigen::Vector3d normal;
 };
 
-class membrane_base : public cellcomponents_base {
+class membrane_container : public cellcomponents_base {
 public:
-    membrane_base(
+    membrane_container(
             sGlobalVars &iGlobals,
-            cell_base &iCell,
-            double iX, double iY,
-            double iRadius,
-            unsigned long long iResolution
+            cell_base &iCell
     );
 
-    virtual ~membrane_base();
+    virtual ~membrane_container();
 
     virtual double &get_area();
 

@@ -19,23 +19,32 @@
 
 class functor_cell_filamentCreation;
 
+class functor_cell_membraneCreation;
+
 class cell : public cell_base {
 public:
 
     cell(
             sGlobalVars &iGlobals,
-            functor_cell_filamentCreation *iFunctor
+            functor_cell_membraneCreation *iMembraneF,
+            functor_cell_filamentCreation *iFilamentF
     );
 
     virtual ~cell();
 
-    virtual functor_cell_filamentCreation *&get_filamentCreationFunctor();
-
-    virtual std::set<membrane_base *> &get_membranes();
+    virtual std::set<membrane_container *> &get_membranes();
 
     virtual std::set<filament_base *> &get_filaments();
 
     virtual std::set<volume_base *> &get_volumes();
+
+    virtual double &get_x();
+
+    virtual double &get_y();
+
+    virtual double &get_radius();
+
+    virtual double &get_resolution();
 
     virtual void set_filamentCreationFunctor(functor_cell_filamentCreation *iFunctor);
 
@@ -55,16 +64,35 @@ protected:
     mygui::group *guiGroup;
     double &x;
     double &y;
-    double &radius;
-    unsigned &resolution;
 
-    std::set<membrane_base *> membranes;
+    std::set<membrane_container *> membranes;
     std::set<filament_base *> filaments;
     std::set<volume_base *> volumes;
     functor_cell_filamentCreation *filamentF;
+    functor_cell_membraneCreation *membraneF;
 };
 
-class functor_cell_filamentCreation {
+class functor_cell_base {
+public:
+    functor_cell_base(
+            sGlobalVars &iGlobals,
+            std::string iName
+    );
+
+    virtual ~functor_cell_base();
+
+    virtual void register_functor(physic::functor *iFunctor);
+
+    virtual mygui::gui *&get_guiFunctor();
+
+protected:
+    sGlobalVars &globals;
+    mygui::group *guiGroup;
+    std::set<physic::functor *> functors;
+    mygui::gui *guiFunctorGroup;
+};
+
+class functor_cell_filamentCreation : public functor_cell_base {
 public:
     functor_cell_filamentCreation(
             sGlobalVars &iGlobals
@@ -72,37 +100,42 @@ public:
 
     virtual ~functor_cell_filamentCreation();
 
-    virtual mygui::gui *&get_guiFunctor();
-
-    virtual void setup(cell *iCell);
-
-    virtual void register_functor(physic::functor *iFunctor);
+    virtual void setup(cell &iCell);
 
     virtual void make_timeStep(double &dT, cell *iCell);
 
 protected:
-    virtual filament_base *create_filament(cell *iCell);
+    virtual filament_base *create_filament(cell &iCell);
 
-    virtual pair<Eigen::Vector3d, membrane_part *> find_creationPosition(cell *iCell);
+    virtual pair<Eigen::Vector3d, membrane_part *> find_creationPosition(cell &iCell);
 
-    virtual Eigen::Vector3d find_tmVelocity(cell *iCell, membrane_part *iMembrane);
+    virtual Eigen::Vector3d find_tmVelocity(cell &iCell, membrane_part &iMembrane);
 
-    virtual double find_maxLength(cell *iCell);
+    virtual double find_maxLength(cell &iCell);
 
-    virtual double find_lifeTime(cell *iCell);
+    virtual double find_lifeTime(cell &iCell);
 
-    virtual double find_stallingForce(cell *iCell);
+    virtual double find_stallingForce(cell &iCell);
 
-    sGlobalVars &globals;
     random_dist *randomReal;
-    mygui::group *guiGroup;
-    mygui::gui *guiFunctorGroup;
     unsigned &maxCount;
     double &maxSpeed;
     double &maxLength;
     double &maxLifeTime;
     double &maxStallingForce;
-    std::set<physic::functor *> functors;
+};
+
+class functor_cell_membraneCreation : public functor_cell_base {
+public:
+    functor_cell_membraneCreation(sGlobalVars &iGlobals);
+
+    virtual ~functor_cell_membraneCreation();
+
+    virtual void setup(cell &iCell);
+
+protected:
+    double &radius;
+    unsigned &resolution;
 };
 
 #endif /* SRC_CCELL_H_ */
