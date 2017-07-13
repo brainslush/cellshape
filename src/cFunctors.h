@@ -14,17 +14,18 @@
 
 namespace functor {
 
-    class filamentCollision : public physic::functor {
+    class fFriction : public physic::functor {
     public:
-        filamentCollision(mygui::gui *&iGui);
+        fFriction(mygui::gui *&iGui);
 
-        virtual ~filamentCollision();
+        virtual ~fFriction();
 
         virtual std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
                 Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
-                Eigen::Vector3d &L
+                Eigen::Vector3d &L,
+                physic::RigidBody3d &rigidBody
         );
 
     protected:
@@ -32,22 +33,24 @@ namespace functor {
         bool &activated;
     };
 
-    class dampening : public physic::functor {
+    class fViscosity : public physic::functor {
     public:
-        dampening(mygui::gui *&iGui);
+        fViscosity(mygui::gui *&iGui);
 
-        virtual ~dampening();
+        virtual ~fViscosity();
 
         virtual std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
                 Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
-                Eigen::Vector3d &L
+                Eigen::Vector3d &L,
+                physic::RigidBody3d &rigidBody
         );
 
     protected:
         mygui::group *guiGroup;
         bool &activated;
+        double &factor;
     };
 
     class membraneSpring : public physic::functor {
@@ -61,6 +64,7 @@ namespace functor {
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
+                physic::RigidBody3d &rigidBody,
                 membrane_part_base *cell
         );
 

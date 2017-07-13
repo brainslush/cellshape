@@ -59,24 +59,32 @@ RigidBody3d::RigidBody3d(
 RigidBody3d::~RigidBody3d() {
 }
 
-Eigen::Vector3d &RigidBody3d::get_position() {
+Eigen::Vector3d &RigidBody3d::get_X() {
     return X;
 }
 
-Eigen::Matrix3d RigidBody3d::get_rotationMatrix() {
+Eigen::Matrix3d RigidBody3d::get_R() {
     return q.toRotationMatrix();
 }
 
-Eigen::Quaterniond &RigidBody3d::get_quaternion() {
+Eigen::Quaterniond &RigidBody3d::get_q() {
     return q;
 }
 
-Eigen::Vector3d &RigidBody3d::get_velocity() {
+Eigen::Vector3d &RigidBody3d::get_v() {
     return v;
 }
 
-Eigen::Vector3d &RigidBody3d::get_angularMomentum() {
+Eigen::Vector3d &RigidBody3d::get_L() {
     return L;
+}
+
+double &RigidBody3d::get_M() {
+    return M;
+}
+
+Eigen::Vector3d &RigidBody3d::get_I() {
+    return I;
 }
 
 void RigidBody3d::set_inertia(Eigen::Matrix3d iI) {

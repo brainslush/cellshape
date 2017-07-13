@@ -42,10 +42,6 @@ public:
 
     virtual double &get_y();
 
-    virtual double &get_radius();
-
-    virtual double &get_resolution();
-
     virtual void set_filamentCreationFunctor(functor_cell_filamentCreation *iFunctor);
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
@@ -76,7 +72,8 @@ class functor_cell_base {
 public:
     functor_cell_base(
             sGlobalVars &iGlobals,
-            std::string iName
+            std::string iName,
+            std::string iFunctorGroupName
     );
 
     virtual ~functor_cell_base();

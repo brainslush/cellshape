@@ -110,12 +110,12 @@ void cell::reset() {
 void cell::make_timeStep(double &dT) {
     // filament creator makes time step
     filamentF->make_timeStep(dT, this);
-    // filaments make time step
+    // filaments make time step, is more complicated since they get
     for (std::set<filament_base *>::iterator it = filaments.begin(); it != filaments.end();) {
         if ((*it)->make_timeStep(dT)) {
             delete *it;
             filament_base *del = *it;
-            del = NULL;
+            del = nullptr;
             it = filaments.erase(it);
         } else {
             it++;
@@ -132,10 +132,12 @@ void cell::make_timeStep(double &dT) {
 
 functor_cell_base::functor_cell_base(
         sGlobalVars &iGlobals,
-        std::string iName
+        std::string iName,
+        std::string iFunctorGroupName
 ) :
         globals(iGlobals),
-        guiGroup(globals.guiMain->register_group(iName)) {
+        guiGroup(globals.guiMain->register_group(iName)),
+        guiFunctorGroup(globals.guiC->register_gui(iFunctorGroupName)) {
 
 }
 
@@ -155,14 +157,13 @@ mygui::gui *&functor_cell_base::get_guiFunctor() {
 functor_cell_filamentCreation::functor_cell_filamentCreation(
         sGlobalVars &iGlobals
 ) :
-        functor_cell_base(iGlobals, "Filaments"),
+        functor_cell_base(iGlobals, "Filaments", "Forces"),
         randomReal(globals.rndC->register_random("uniform_01")),
         maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
         maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
         maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
-        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
-        guiFunctorGroup(globals.guiC->register_gui("Forces")) {
+        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)) {
 }
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
@@ -238,10 +239,9 @@ double functor_cell_filamentCreation::find_stallingForce(cell &iCell) {
 }
 
 functor_cell_membraneCreation::functor_cell_membraneCreation(sGlobalVars &iGlobals) :
-        functor_cell_base(iGlobals, "Membrane"),
+        functor_cell_base(iGlobals, "Membrane", "Forces"),
         radius(guiGroup->register_setting<double>("Radius", false, 0, 200, 150)),
         resolution(guiGroup->register_setting<unsigned>("Resolution", false, 20, 200, 20)) {
-
 }
 
 functor_cell_membraneCreation::~functor_cell_membraneCreation() {
@@ -269,7 +269,8 @@ void functor_cell_membraneCreation::setup(cell &iCell) {
                 radius * cos(i * dAngle) + x,
                 radius * sin(i * dAngle) + y,
                 radius * cos((i + 1) * dAngle) + x,
-                radius * sin((i + 1) * dAngle) + y
+                radius * sin((i + 1) * dAngle) + y,
+                functors
         ));
     };
     for (unsigned long long i = 0; i < resolution; i++) {

@@ -53,7 +53,7 @@ void membrane_part::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 }
 
 void membrane_part::make_timeStep(double &dT) {
-
+    rigidBody.do_timeStep(dT, this);
 };
 
 

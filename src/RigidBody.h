@@ -34,6 +34,7 @@ namespace physic {
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
+                RigidBody3d &rigidBody3d,
                 A... Args
         ) {
             return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
@@ -45,6 +46,7 @@ namespace physic {
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
+                RigidBody3d &rigidBody3d,
                 A... Args
         ) {
             return Eigen::Vector3d(0, 0, 0);
@@ -56,6 +58,7 @@ namespace physic {
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
+                RigidBody3d &rigidBody3d,
                 A... Args
         ) {
             return Eigen::Vector3d(0, 0, 0);
@@ -92,15 +95,19 @@ namespace physic {
 
         virtual ~RigidBody3d();
 
-        virtual Eigen::Vector3d &get_position();
+        virtual Eigen::Vector3d &get_X();
 
-        virtual Eigen::Matrix3d get_rotationMatrix();
+        virtual Eigen::Matrix3d get_R();
 
-        virtual Eigen::Quaterniond &get_quaternion();
+        virtual Eigen::Quaterniond &get_q();
 
-        virtual Eigen::Vector3d &get_velocity();
+        virtual Eigen::Vector3d &get_v();
 
-        virtual Eigen::Vector3d &get_angularMomentum();
+        virtual Eigen::Vector3d &get_L();
+
+        virtual double &get_M();
+
+        virtual Eigen::Vector3d &get_I();
 
         virtual void set_inertia(Eigen::Matrix3d iI);
 
@@ -121,7 +128,7 @@ namespace physic {
     protected:
         Eigen::Vector3d X; // position
         Eigen::Quaterniond q; // quaternion
-        Eigen::Vector3d I; // moment of inertia diagonalized and inversed.
+        Eigen::Vector3d I; // moment of inertia diagonalized.
         double M; // mass
         double epsilon; // precision for rotation calculation
         std::set<functor *> *functors; // functors which calculate forces and torques
@@ -158,6 +165,7 @@ namespace physic {
                 Eigen::Vector3d &iv,
                 Eigen::Quaterniond &iR,
                 Eigen::Vector3d &iL,
+                RigidBody3d &rigidBody,
                 A... Args
         ) {
             std::pair<Eigen::Vector3d, Eigen::Vector3d> ret;
@@ -175,6 +183,7 @@ namespace physic {
                 Eigen::Vector3d &iv,
                 Eigen::Quaterniond &iR,
                 Eigen::Vector3d &iL,
+                RigidBody3d &rigidBody,
                 A... Args
         ) {
             Eigen::Vector3d ret;
@@ -192,6 +201,7 @@ namespace physic {
                 Eigen::Vector3d &iv,
                 Eigen::Quaterniond &iR,
                 Eigen::Vector3d &iL,
+                RigidBody3d &rigidBody,
                 A... Args
         ) {
             Eigen::Vector3d ret;
@@ -205,7 +215,19 @@ namespace physic {
 
         template<typename ... A>
         void do_leapFrog(double &dT, A... Args) {
+            Eigen::Vector3d _a = F / M;
+            Eigen::Vector3d _X = X + dT * v + 0.5 * dT * dT * _a;
+            //Eigen::Vector3d _v =
+        }
 
+        template<typename ... A>
+        void do_rk4(double &dT, A... Args) {
+            Eigen::Vector3d k1 = F / M;
+            Eigen::Vector3d _x = X + 0.5 * dT * v;
+            Eigen::Quaterniond =
+            Eigen::Vector3d k2 = calc_force(_x + 0.5 * dT * dT,)
+            Eigen::Vector3d k3 = calc_force()
+            //
         }
 
         template<typename ... A>
@@ -253,8 +275,9 @@ namespace physic {
             // part 2 estimate L and v w/ an estimated T and a at t+dt
             Eigen::Vector3d _Ldt = L + dT * T;
             Eigen::Vector3d _vdt = v + dT * _a;
-            _vdt = v + 0.5 * dT * (_a + calc_force(X, _vdt, q, _Ldt, Args...)); // something is missing here
-            _Ldt = L + 0.5 * dT * (T + calc_torque(X, _vdt, q, _Ldt, Args...)); // estimate ldt
+
+            _vdt = v + 0.5 * dT * (_a + calc_force(X, _vdt, q, _Ldt, *this, Args...)); // estimate vdt
+            _Ldt = L + 0.5 * dT * (T + calc_torque(X, _vdt, q, _Ldt, *this, Args...)); // estimate ldt
             std::pair<Eigen::Vector3d, Eigen::Vector3d> newFT = sum_functors(X, _vdt, q, _Ldt, Args...);
             v = v + 0.5 * dT * (_a + newFT.first);
             L = L + 0.5 * dT * (T + newFT.second);
