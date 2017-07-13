@@ -36,3 +36,5 @@ cmake-build-debug/
 \.settings/
 
 \.idea/workspace\.xml
+
+\.idea/
