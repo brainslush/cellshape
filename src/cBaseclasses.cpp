@@ -51,10 +51,9 @@ cellcomponents_base::cellcomponents_base(
         cell(iCell) {
 }
 
-cellcomponents_base::~cellcomponents_base() {
-    // delete rigidBody;
-    // rigidBody = nullptr;
-}
+cellcomponents_base::~cellcomponents_base() {}
+
+physic::RigidBody3d &cellcomponents_base::get_rigidBody() { return rigidBody; }
 
 /***************************
  * Matrix Base

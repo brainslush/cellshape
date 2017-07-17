@@ -33,29 +33,29 @@ std::vector<Eigen::Vector3d> &base::get_positions() { return positions; }
 
 std::vector<double> &base::get_parameters() { return parameters; }
 
-std::set<unsigned> &base::get_ignoreIntersect() { return ignoreIntersect; }
+std::set<std::size_t> &base::get_ignoreIntersect() { return ignoreIntersect; }
 
 std::set<base *> &base::get_intersectorsChecked() { return intersectorsChecked; }
 
 std::set<grid::cell *> &base::get_gridCells() { return gridCells; }
+
+std::set<std::pair<base *, Eigen::Vector3d>> &base::get_intersectors() { return intersectors};
 
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 
 unsigned long long &base::get_timeStamp() { return timeStamp; }
 
 void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) {
-    intersectors.push_back(iIntersector);
-    intersectorsVectors.push_back(iIntersectorVec);
+    intersectors.insert({iIntersector,iIntersectorVec});
     intersectorsChecked.insert(iIntersector);
 }
 
-void base::add_ignoreIntersect(size_t iIgnore) {
+void base::add_ignoreIntersect(std::size_t iIgnore) {
     ignoreIntersect.insert(iIgnore);
 }
 
 void base::clear_intersectors() {
     intersectors.clear();
-    intersectorsVectors.clear();
     intersectorsChecked.clear();
 }
 
@@ -117,16 +117,16 @@ void visual_base::set_associatedComponent(base *iComponent) {
 }
 
 void visual_base::set_color(double iRed, double iGreen, double iBlue, double iAlpha) {
-    color.r = iRed;
-    color.g = iGreen;
-    color.b = iBlue;
-    color.a = iAlpha;
+    color.r = (float)iRed;
+    color.g = (float)iGreen;
+    color.b = (float)iBlue;
+    color.a = (float)iAlpha;
 }
 
 void visual_base::set_color(double iRed, double iGreen, double iBlue) {
-    color.r = iRed;
-    color.g = iGreen;
-    color.b = iBlue;
+    color.r = (float)iRed;
+    color.g = (float)iGreen;
+    color.b = (float)iBlue;
     color.a = 1.0;
 }
 

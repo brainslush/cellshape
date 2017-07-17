@@ -68,6 +68,8 @@ public:
 
     virtual ~cellcomponents_base();
 
+    virtual physic::RigidBody3d &get_rigidBody();
+
 protected:
     cell_base &cell;
     physic::RigidBody3d rigidBody;
@@ -141,6 +143,7 @@ public:
 
 protected:
     std::set<crosslinker_base *> connectedCrosslinkers;
+    double length;
 };
 
 /***************************
