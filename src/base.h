@@ -30,11 +30,13 @@ public:
 
     virtual std::vector<double> &get_parameters();
 
-    virtual std::set<unsigned> &get_ignoreIntersect();
+    virtual std::set<std::size_t> &get_ignoreIntersect();
 
     virtual std::set<base *> &get_intersectorsChecked();
 
     virtual std::set<grid::cell *> &get_gridCells();
+
+    virtual std::set<std::pair<base *, Eigen::Vector3d>> &get_intersectors();
 
     virtual visual_base *get_visualObj();
 
@@ -42,7 +44,7 @@ public:
 
     virtual void add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec);
 
-    virtual void add_ignoreIntersect(size_t iIgnore);
+    virtual void add_ignoreIntersect(std::size_t iIgnore);
 
     virtual void clear_intersectors();
 
@@ -53,11 +55,10 @@ protected:
 
     std::vector<Eigen::Vector3d> positions; // position of object
     std::vector<double> parameters; // additional parameters of the object
-    std::vector<base *> intersectors; // list of objects which intersect with
-    std::vector<Eigen::Vector3d> intersectorsVectors; // list of filamentCollision vectors of intersectors
+    std::set<std::pair<base *, Eigen::Vector3d>> intersectors; // list of objects which intersect with
     std::set<base *> intersectorsChecked; // list of intersectors which are already checked
     std::set<grid::cell *> gridCells; // gridcells in which object lies
-    std::set<unsigned> ignoreIntersect; // ignore class types for filamentCollision
+    std::set<std::size_t> ignoreIntersect; // ignore class types for filamentCollision
     visual_base *associatedVisualObj; // assignes a visual object
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
 };

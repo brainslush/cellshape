@@ -14,20 +14,42 @@
 
 namespace functor {
 
-    class fFriction : public physic::functor {
+    class ffFriction : public physic::functor {
     public:
-        fFriction(mygui::gui *&iGui);
+        ffFriction(mygui::gui *&iGui);
 
-        virtual ~fFriction();
+        virtual ~ffFriction();
 
         virtual std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
                 Eigen::Vector3d &X,
                 Eigen::Vector3d &v,
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
-                physic::RigidBody3d &rigidBody
+                physic::RigidBody3d &rigidBody,
+                filament_base &filament
         );
 
+    protected:
+        mygui::group *guiGroup;
+        bool &activated;
+        double &frictionCoeff;
+        double &angleCoeff;
+    };
+
+    class fmCollision : public physic::functor {
+    public:
+        fmCollision(mygui::gui *&iGui);
+
+        virtual ~fmCollision();
+
+        virtual std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
+                Eigen::Vector3d &X,
+                Eigen::Vector3d &v,
+                Eigen::Quaterniond &R,
+                Eigen::Vector3d &L,
+                physic::RigidBody3d &rigidBody,
+                filament_base &filament
+        );
     protected:
         mygui::group *guiGroup;
         bool &activated;
