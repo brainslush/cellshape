@@ -119,8 +119,7 @@ void crosslinker_base::remove_connectedFilament(filament_base *iFilament) {
 filament_base::filament_base(
         sGlobalVars &iGlobals,
         cell_base &iCell
-) :
-        cellcomponents_base(iGlobals, iCell) {
+) : cellcomponents_base(iGlobals, iCell) {
     canColide = true;
     canMove = true;
     associatedVisualObj = new visual_line(this);

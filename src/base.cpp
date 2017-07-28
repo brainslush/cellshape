@@ -39,14 +39,15 @@ std::set<base *> &base::get_intersectorsChecked() { return intersectorsChecked; 
 
 std::set<grid::cell *> &base::get_gridCells() { return gridCells; }
 
-std::set<std::pair<base *, Eigen::Vector3d>> &base::get_intersectors() { return intersectors};
+std::set<std::pair<base *, Eigen::Vector3d *>> &base::get_intersectors() { return intersectors; };
 
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 
 unsigned long long &base::get_timeStamp() { return timeStamp; }
 
 void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) {
-    intersectors.insert({iIntersector,iIntersectorVec});
+    intersectionVectors.push_back(iIntersectorVec);
+    intersectors.insert(std::make_pair(iIntersector,&*intersectionVectors.end()));
     intersectorsChecked.insert(iIntersector);
 }
 
@@ -56,6 +57,7 @@ void base::add_ignoreIntersect(std::size_t iIgnore) {
 
 void base::clear_intersectors() {
     intersectors.clear();
+    intersectionVectors.clear();
     intersectorsChecked.clear();
 }
 
@@ -131,16 +133,16 @@ void visual_base::set_color(double iRed, double iGreen, double iBlue) {
 }
 
 void visual_base::set_fillColor(double iRed, double iGreen, double iBlue, double iAlpha) {
-    fillColor.r = iRed;
-    fillColor.g = iGreen;
-    fillColor.b = iBlue;
-    fillColor.a = iAlpha;
+    fillColor.r = (float)iRed;
+    fillColor.g = (float)iGreen;
+    fillColor.b = (float)iBlue;
+    fillColor.a = (float)iAlpha;
 }
 
 void visual_base::set_fillColor(double iRed, double iGreen, double iBlue) {
-    fillColor.r = iRed;
-    fillColor.g = iGreen;
-    fillColor.b = iBlue;
+    fillColor.r = (float)iRed;
+    fillColor.g = (float)iGreen;
+    fillColor.b = (float)iBlue;
     fillColor.a = 1.0;
 }
 
@@ -160,10 +162,10 @@ visual_line::~visual_line() {
 void visual_line::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawLine(
-            iScale * get_positions()[0](0),
-            iScale * get_positions()[0](1),
-            iScale * get_positions()[1](0),
-            iScale * get_positions()[1](1)
+            (float)(iScale * get_positions()[0](0)),
+            (float)(iScale * get_positions()[0](1)),
+            (float)(iScale * get_positions()[1](0)),
+            (float)(iScale * get_positions()[1](1))
     );
 }
 
@@ -179,10 +181,10 @@ visual_ellipse::~visual_ellipse() {
 void visual_ellipse::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawEllipse(
-            iScale * get_positions()[0](0),
-            iScale * get_positions()[0](1),
-            2 * iScale * get_parameters()[0],
-            2 * iScale * get_parameters()[1]
+            (float)(iScale * get_positions()[0](0)),
+            (float)(iScale * get_positions()[0](1)),
+            (float)(2 * iScale * get_parameters()[0]),
+            (float)(2 * iScale * get_parameters()[1])
     );
 }
 
@@ -198,10 +200,10 @@ visual_rectangle::~visual_rectangle() {
 void visual_rectangle::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawRectangle(
-            iScale * get_positions()[0](0),
-            iScale * get_positions()[0](1),
-            iScale * (get_positions()[2](0) - get_positions()[0](0)),
-            iScale * (get_positions()[2](1) - get_positions()[0](1))
+            (float)(iScale * get_positions()[0](0)),
+            (float)(iScale * get_positions()[0](1)),
+            (float)(iScale * (get_positions()[2](0) - get_positions()[0](0))),
+            (float)(iScale * (get_positions()[2](1) - get_positions()[0](1)))
     );
 }
 
@@ -217,11 +219,11 @@ visual_triangle::~visual_triangle() {
 void visual_triangle::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawTriangle(
-            iScale * get_positions()[0](0),
-            iScale * get_positions()[0](1),
-            iScale * get_positions()[1](0),
-            iScale * get_positions()[1](1),
-            iScale * get_positions()[2](0),
-            iScale * get_positions()[2](1)
+            (float)(iScale * get_positions()[0](0)),
+            (float)(iScale * get_positions()[0](1)),
+            (float)(iScale * get_positions()[1](0)),
+            (float)(iScale * get_positions()[1](1)),
+            (float)(iScale * get_positions()[2](0)),
+            (float)(iScale * get_positions()[2](1))
     );
 }

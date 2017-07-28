@@ -116,20 +116,6 @@ protected:
     Eigen::Vector3d force;
 };
 
-class crosslinker_static : public crosslinker_base {
-public:
-    crosslinker_static(sGlobalVars &iGlobals, cell_base &iCell);
-
-    virtual ~crosslinker_static();
-};
-
-class crosslinker_friction : public crosslinker_base {
-public:
-    crosslinker_friction(sGlobalVars &iGlobals, cell_base &iCell);
-
-    virtual ~crosslinker_friction();
-};
-
 /***************************
 * filaments
 ***************************/

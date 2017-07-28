@@ -16,10 +16,14 @@
 #define SRC_RIGIDBODY_H_
 
 namespace physic {
-    /********************************************/
-    /* Functor for torque and force calculation */
+
+    // ahead declaration
+    class RigidBody3d;
+
+    // Functor for torque and force calculation
     class functor {
     public:
+
         functor() {
 
         };
@@ -65,8 +69,7 @@ namespace physic {
         };
     };
 
-    /*******************************************************************/
-    /* Rigid body class which uses velocity-verlet to calculate changes*/
+    // Rigid body class which uses numerical integrators to calculate changes
     class RigidBody3d {
 
     public:
@@ -118,7 +121,7 @@ namespace physic {
         template<typename ... A>
         void do_timeStep(double &dT, A... Args) {
             // update force and torque
-            std::pair<Eigen::Vector3d, Eigen::Vector3d> temp = sum_functors(X, v, q, L, Args...);
+            std::pair<Eigen::Vector3d, Eigen::Vector3d> temp = sum_functors(X, v, q, L, *this, Args...);
             F = temp.first;
             T = temp.second;
             // do simulation via verlet
@@ -139,14 +142,14 @@ namespace physic {
 
 
 
-        template <typename L, typename R>
+        template<typename L, typename R>
         Eigen::Quaterniond qsum(L l, R r) {
             Eigen::Quaterniond c;
             c.coeffs() = l.coeffs() + r.coeffs();
             return c;
         };
 
-        template <typename L, typename R>
+        template<typename L, typename R>
         Eigen::Quaterniond qdiff(L l, R r) {
             Eigen::Quaterniond c;
             c.coeffs() = l.coeffs() - r.coeffs();
@@ -171,7 +174,7 @@ namespace physic {
             std::pair<Eigen::Vector3d, Eigen::Vector3d> ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc(iX, iv, iR, iL, Args...);
+                    ret += it->calc(iX, iv, iR, iL, rigidBody, Args...);
                 }
             }
             return ret;
@@ -189,7 +192,7 @@ namespace physic {
             Eigen::Vector3d ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc_force(iX, iv, iR, iL, Args...);
+                    ret += it->calc_force(iX, iv, iR, iL, rigidBody, Args...);
                 }
             }
             return ret;
@@ -207,7 +210,7 @@ namespace physic {
             Eigen::Vector3d ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc_torque(iX, iv, iR, iL, Args...);
+                    ret += it->calc_torque(iX, iv, iR, iL, rigidBody, Args...);
                 }
             }
             return ret;
@@ -220,6 +223,7 @@ namespace physic {
             //Eigen::Vector3d _v =
         }
 
+        /*
         template<typename ... A>
         void do_rk4(double &dT, A... Args) {
             Eigen::Vector3d k1 = F / M;
@@ -229,6 +233,7 @@ namespace physic {
             Eigen::Vector3d k3 = calc_force()
             //
         }
+         */
 
         template<typename ... A>
         void do_vverlet(double &dT, A... Args) {
@@ -278,7 +283,7 @@ namespace physic {
 
             _vdt = v + 0.5 * dT * (_a + calc_force(X, _vdt, q, _Ldt, *this, Args...)); // estimate vdt
             _Ldt = L + 0.5 * dT * (T + calc_torque(X, _vdt, q, _Ldt, *this, Args...)); // estimate ldt
-            std::pair<Eigen::Vector3d, Eigen::Vector3d> newFT = sum_functors(X, _vdt, q, _Ldt, Args...);
+            std::pair<Eigen::Vector3d, Eigen::Vector3d> newFT = sum_functors(X, _vdt, q, _Ldt, *this, Args...);
             v = v + 0.5 * dT * (_a + newFT.first);
             L = L + 0.5 * dT * (T + newFT.second);
         }

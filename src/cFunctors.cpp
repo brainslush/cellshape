@@ -37,7 +37,7 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> ffFriction::calc(
         for (auto &it : intersectors) {
 
             auto &el = it.first;
-            auto &pos = it.second;
+            auto &pos = *it.second;
             // check if element is actually a filament
             if (filament_base *element = dynamic_cast<filament_base *>(el)) {
                 Eigen::Vector3d vNorm = element->get_rigidBody().get_v().normalized();
@@ -125,7 +125,7 @@ fViscosity::calc(
         physic::RigidBody3d &rigidBody
 ) {
     if (activated) {
-        Eigen::Vector3d _F = -factor * rigidBody.get_M * v;
+        Eigen::Vector3d _F = -factor * rigidBody.get_M() * v;
         Eigen::Vector3d _T = -factor * rigidBody.get_I().cwiseInverse().cwiseProduct(L);
         return {_F, _T};
     } else {
