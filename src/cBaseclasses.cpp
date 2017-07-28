@@ -15,13 +15,18 @@ bool &components_base::get_canMove() { return canMove; }
 
 bool &components_base::get_canColide() { return canColide; }
 
+Eigen::Vector3d &components_base::get_responseForce() { return responseForce; }
+
+Eigen::Vector3d &components_base::get_responseTorque() { return responseTorque; }
+
 void components_base::set_canMove(bool iCanMove) { canMove = iCanMove; }
 
 void components_base::set_canColide(bool iCanColide) { canColide = iCanColide; }
 
-void components_base::set_componentModel(std::string, std::string) {
-    /* TODO */
-}
+void components_base::add_responseForce(Eigen::Vector3d iForce) { responseForce += iForce; }
+
+void components_base::add_responseTorque(Eigen::Vector3d iTorque) { responseTorque += iTorque; }
+
 
 /*
 void components_base::make_timeStep(double &dT) {
