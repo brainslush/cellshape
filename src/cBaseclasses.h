@@ -27,17 +27,25 @@ public:
 
     virtual bool &get_canColide();
 
+    virtual Eigen::Vector3d &get_responseForce();
+
+    virtual Eigen::Vector3d &get_responseTorque ();
+
     virtual void set_canMove(bool iCanMove);
 
     virtual void set_canColide(bool iCanColide);
 
-    virtual void set_componentModel(std::string, std::string);
+    virtual void add_responseForce(Eigen::Vector3d iForce);
+
+    virtual void add_responseTorque(Eigen::Vector3d iTorque);
 
     //virtual void make_timeStep(double &dT);
 
 protected:
     bool canMove; // is it a fixed object
     bool canColide; // can this object collide aka does it have physics?
+    Eigen::Vector3d responseForce;
+    Eigen::Vector3d responseTorque;
     //std::set<variable_base*> variables;
     sGlobalVars &globals;
 };

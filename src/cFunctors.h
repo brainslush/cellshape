@@ -2,6 +2,11 @@
 // Created by brainslush on 19.06.17.
 //
 
+/*
+ * The functors are classes which are handed to the rigid body class of the cell elements.
+ * As subclasses of the physic::functor class they calculate interactive forces and torques of the rigid bodies.
+ */
+
 #pragma once
 
 #include "utility"
@@ -13,6 +18,10 @@
 #define SRC_CFUNCTORS_H_
 
 namespace functor {
+
+    /*
+     * This functor calculates the friction force between Actin filaments which can be direction dependent
+     */
 
     class ffFriction : public physic::functor {
     public:
@@ -36,6 +45,10 @@ namespace functor {
         double &angleCoeff;
     };
 
+    /*
+     * This functor models the membrane - filament interaction in form of inelastic collisions.
+     */
+
     class fmCollision : public physic::functor {
     public:
         fmCollision(mygui::gui *&iGui);
@@ -54,6 +67,10 @@ namespace functor {
         mygui::group *guiGroup;
         bool &activated;
     };
+
+    /*
+     * Introduces a damping force to reduce momentum effects in form of viscous force
+     */
 
     class fViscosity : public physic::functor {
     public:
@@ -75,6 +92,8 @@ namespace functor {
         double &factor;
     };
 
+    /* Calculates the spring froces which model the membrane behavior */
+
     class membraneSpring : public physic::functor {
     public:
         membraneSpring(mygui::gui *&iGui);
@@ -87,7 +106,7 @@ namespace functor {
                 Eigen::Quaterniond &R,
                 Eigen::Vector3d &L,
                 physic::RigidBody3d &rigidBody,
-                membrane_part_base *cell
+                membrane_part_base &membrane
         );
 
     protected:

@@ -38,7 +38,7 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> ffFriction::calc(
 
             auto &el = it.first;
             auto &pos = it.second;
-            // check if element is acutally a filament
+            // check if element is actually a filament
             if (filament_base *element = dynamic_cast<filament_base *>(el)) {
                 Eigen::Vector3d vNorm = element->get_rigidBody().get_v().normalized();
                 force += frictionCoeff * vNorm;
@@ -62,9 +62,48 @@ fmCollision::~fmCollision() {
 }
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d>
-fmCollision::calc(Eigen::Vector3d &X, Eigen::Vector3d &v, Eigen::Quaterniond &R, Eigen::Vector3d &L,
-                  physic::RigidBody3d &rigidBody, filament_base &filament) {
-    return pair<Eigen::Vector3d, Eigen::Vector3d>();
+fmCollision::calc(
+        Eigen::Vector3d &X,
+        Eigen::Vector3d &v,
+        Eigen::Quaterniond &R,
+        Eigen::Vector3d &L,
+        physic::RigidBody3d &rigidBody,
+        filament_base &filament
+) {
+    if (activated) {
+        // get intersecting elelments and position data
+        auto &intersectors = filament.get_intersectors();
+        auto &If = rigidBody.get_I();
+        auto &Mf = rigidBody.get_M();
+        auto &vf = rigidBody.get_v();
+        auto &Lf = rigidBody.get_L();
+        Eigen::Vector3d wf = If.cwiseInverse().cwiseProduct(Lf);
+        auto &positions = filament.get_positions();
+        Eigen::Vector3d force;
+        Eigen::Vector3d torque;
+        // run through all intersecting elements and check if one of them is a membrane part
+        for (auto &it : intersectors) {
+            auto &el = it.first;
+            auto &pos = it.second;
+            if (membrane_part_base *element = dynamic_cast<membrane_part_base *>(el)) {
+                auto &Im = element->get_rigidBody().get_I();
+                auto &Mm = element->get_rigidBody().get_M();
+                auto &vm = element->get_rigidBody().get_v();
+                auto &Lm = element->get_rigidBody().get_L();
+                Eigen::Vector3d wm = Im.cwiseInverse().cwiseProduct(Lm);
+                // calculated conserved quanitities
+                Eigen::Vector3d Pt = Mf * vf + Mm * vm;
+                double Et = 0.5 * (Mf * vf.squaredNorm() + Mm * vm.squaredNorm() + wf.transpose() * Lf + wm.transpose() * Lm);
+                Eigen::Vector3d Lt = Lf + Lm;
+
+
+            }
+        }
+        return {force, torque};
+    } else {
+        return {Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,0,0)};
+    }
+
 }
 
 fViscosity::fViscosity(mygui::gui *&iGui) :
@@ -114,15 +153,15 @@ membraneSpring::calc(
         Eigen::Quaterniond &R,
         Eigen::Vector3d &L,
         physic::RigidBody3d &rigidBody,
-        membrane_part_base *membrane
+        membrane_part_base &membrane
 ) {
     if (activated) {
         // acquire some data
-        std::pair<membrane_part_base *, membrane_part_base *> &neighbours = membrane->get_neighbours();
-        std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &sharedPositions = membrane->get_sharedPositions();
-        double length = membrane->get_length();
+        auto &neighbours = membrane.get_neighbours();
+        auto &sharedPositions = membrane.get_sharedPositions();
+        double length = membrane.get_length();
         // calculate the normalized direction vector of the membrane element
-        Eigen::Vector3d dirVector = membrane->calc_dirVector(&membrane->get_positions()[1]);
+        Eigen::Vector3d dirVector = membrane.calc_dirVector(&membrane.get_positions()[1]);
         // calculate the normalized direction vectors of the neighbouring membrane elements
         Eigen::Vector3d springForceNeighA = neighbours.first->calc_dirVector(sharedPositions.first);
         Eigen::Vector3d springForceNeighB = neighbours.second->calc_dirVector(sharedPositions.second);
@@ -135,7 +174,7 @@ membraneSpring::calc(
         // calculate torque due to stretching above
         Eigen::Vector3d stretchTorqueNeighA = (0.5 * length) * springForceNeighA.cross(dirVector);
         Eigen::Vector3d stretchTorqueNeighB = (0.5 * length) * springForceNeighB.cross(-dirVector);
-        // set velocity and angular momentum to zero for complete overdampining
+        // set velocity and angular momentum to zero for complete overdamping
         v = Eigen::Vector3d(0, 0, 0);
         L = Eigen::Vector3d(0, 0, 0);
 
