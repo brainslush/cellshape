@@ -3,6 +3,7 @@
 #include <set>
 #include <vector>
 #include <eigen3/Eigen/Eigen>
+#include <eigen3/Eigen/StdVector>
 #include "ofMain.h"
 
 #ifndef SRC_BASE_H_
@@ -36,7 +37,7 @@ public:
 
     virtual std::set<grid::cell *> &get_gridCells();
 
-    virtual std::set<std::pair<base *, Eigen::Vector3d>> &get_intersectors();
+    virtual std::set<std::pair<base *, Eigen::Vector3d *>> &get_intersectors();
 
     virtual visual_base *get_visualObj();
 
@@ -55,7 +56,8 @@ protected:
 
     std::vector<Eigen::Vector3d> positions; // position of object
     std::vector<double> parameters; // additional parameters of the object
-    std::set<std::pair<base *, Eigen::Vector3d>> intersectors; // list of objects which intersect with
+    std::vector<Eigen::Vector3d> intersectionVectors; // save the actual
+    std::set<std::pair<base *, Eigen::Vector3d *>> intersectors; // list of objects which intersect with the object
     std::set<base *> intersectorsChecked; // list of intersectors which are already checked
     std::set<grid::cell *> gridCells; // gridcells in which object lies
     std::set<std::size_t> ignoreIntersect; // ignore class types for filamentCollision

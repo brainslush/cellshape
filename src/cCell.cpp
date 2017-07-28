@@ -158,7 +158,7 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
         sGlobalVars &iGlobals
 ) :
         functor_cell_base(iGlobals, "Filaments", "Forces"),
-        randomReal(globals.rndC->register_random("uniform_01")),
+        randomReal(globals.rndC->register_random("uniform_real_distribution", 0.1, 1)),
         maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
         maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
         maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
@@ -252,7 +252,7 @@ void functor_cell_membraneCreation::setup(cell &iCell) {
     guiGroup->forceVariableUpdate();
     // create new mebrane
     auto &membranes = iCell.get_membranes();
-    membrane_container *newMembrane = new membrane_container(globals,iCell);
+    membrane_container *newMembrane = new membrane_container(globals, iCell);
     membranes.insert(newMembrane);
     // get some data for membrane parts creation
     auto &parts = newMembrane->get_parts();
@@ -275,8 +275,8 @@ void functor_cell_membraneCreation::setup(cell &iCell) {
     };
     for (unsigned long long i = 0; i < resolution; i++) {
         std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &sharedPositions = parts[i]->get_sharedPositions();
-        membrane_part_base* partA = parts[(i - 1) % resolution];
-        membrane_part_base* partB = parts[(i + 1) % resolution];
+        membrane_part_base *partA = parts[(i - 1) % resolution];
+        membrane_part_base *partB = parts[(i + 1) % resolution];
         sharedPositions.first = &partA->get_positions()[1];
         sharedPositions.second = &partB->get_positions()[0];
         parts[i]->set_neighbours({partA, partB});

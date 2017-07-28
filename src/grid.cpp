@@ -73,34 +73,46 @@ std::set<base *> &cell::get_components() {
 
 std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRef, base *iCom) {
     // get data
-    std::vector<Eigen::Vector3d> &posRef = iRef->get_positions();
-    std::vector<Eigen::Vector3d> &posCom = iCom->get_positions();
-    std::vector<double> &parCom = iCom->get_parameters();
+    auto &posRef = iRef->get_positions();
+    auto &posCom = iCom->get_positions();
+    auto &parCom = iCom->get_parameters();
     // get vector direction
     Eigen::Vector3d diff(posRef[1] - posRef[0]);
-    // get length
-    double length = diff.norm();
     // create parameterized line and project sphere center onto it
     Eigen::ParametrizedLine<double, 3> line(posRef[0], diff.normalized());
+    // get projection of circle center onto the line
     Eigen::Vector3d proj = line.projection(posCom[0]);
     Eigen::Vector3d projDiff(proj - posCom[0]);
-
-    // check if projection lies on line and inside the sphere
-    if (
-            (proj - posRef[0]).norm() < length &&
-            projDiff.norm() < parCom[0]
-            ) {
-        return std::make_pair(iCom, projDiff);
+    // check if projection lies inside the circle
+    if (projDiff.norm() < parCom[0]) {
+        // check if any end lies inside the circle
+        if ((posRef[0] - posCom[0]).norm() <= parCom[0] || (posRef[1] - posCom[0]).norm() <= parCom[0]) {
+            return {iCom, projDiff.normalized()};
+        } else {
+            // check if the end points and projection difference vectors are antiparralel
+            if ((posRef[0] - proj).dot(posRef[1] - proj) < 0) {
+                return {iCom, projDiff.normalized()};
+            }
+        }
     }
-    return std::make_pair(iRef, posRef[0]);
+    return {iRef, posRef[0]};
 }
 
 std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>>
 cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
-    std::vector<Eigen::Vector3d> &posRef = iRef->get_positions();
-    std::vector<Eigen::Vector3d> &posCom = iCom->get_positions();
+    auto &posRef = iRef->get_positions();
+    auto &posCom = iCom->get_positions();
 
-    Eigen::Vector3d &l1S = posRef[0];
+    Eigen::Vector3d diffRef = posRef[0] - posRef[1];
+    Eigen::Vector3d diffCom = posCom[0] - posCom[1];
+
+    double det = diffRef(0)*diffCom(1) - diffRef(1)*diffCom(0);
+
+    if (det >= std::numeric_limits<double>::min()) {
+
+    }
+
+    /*Eigen::Vector3d &l1S = posRef[0];
     Eigen::Vector3d &l1E = posRef[1];
     Eigen::Vector3d &l2S = posCom[0];
     Eigen::Vector3d &l2E = posCom[1];
@@ -112,7 +124,7 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
     compareA1 = diffL1(0) * l1S(1) - diffL1(1) * l1S(0);
     compareA2 = diffL1(0) * l2S(1) - diffL1(1) * l2S(0);
     if (compareA1 >= compareA2) {
-        compareD = diffL1(0) * diffL2(1) - diffL2(0) * diffL1 (1);
+        compareD = diffL1(0) * diffL2(1) - diffL2(0) * diffL1(1);
         if (compareA1 - compareA2 <= compareD) {
             compareB1 = diffL2(0) * l2S(1) - diffL2(1) * l2S(0);
             compareB2 = diffL2(0) * l1S(1) - diffL2(1) * l1S(0);
@@ -120,12 +132,12 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
                 if (compareB2 - compareB1 <= compareD) {
                     diffL1.normalize();
                     diffL2.normalize();
-                    return std::make_pair(iCom, std::make_pair(diffL1, diffL2));
+                    return {iCom, {diffL1, diffL2}};
                 }
             }
         }
-    }
-    return std::make_pair(iRef, std::make_pair(l1S, l2S));
+    }*/
+    return {iRef, {l1S, l2S}});
 
     /*
     if ((
@@ -190,7 +202,6 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
 
     if (iComponentA != iComponentB) {
         // handle two circles
-        /*
         if (typeA == typeB && typeA == 2) {
             // check whether the two circles overlap
             if ((posA[0] - posB[0]).norm() < parA[0] + parB[0]) {
@@ -217,9 +228,8 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
                 ret = true;
             }
         }
-
             // handle line objects
-        else */if (
+        else if (
                 (typeA == 1 || typeA == 3 || typeA == 4)
                 && (typeB == 1 || typeB == 3 || typeB == 4)
                 ) {
