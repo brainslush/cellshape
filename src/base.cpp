@@ -33,8 +33,6 @@ std::vector<Eigen::Vector3d> &base::get_positions() { return positions; }
 
 std::vector<double> &base::get_parameters() { return parameters; }
 
-std::set<std::size_t> &base::get_ignoreIntersect() { return ignoreIntersect; }
-
 std::set<base *> &base::get_intersectorsChecked() { return intersectorsChecked; }
 
 std::set<grid::cell *> &base::get_gridCells() { return gridCells; }
@@ -43,15 +41,17 @@ std::set<std::pair<base *, Eigen::Vector3d *>> &base::get_intersectors() { retur
 
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 
-unsigned long long &base::get_timeStamp() { return timeStamp; }
+bool base::isIntersectorChecked(base * iRef) {
+    return intersectorsChecked.find(iRef) == intersectorsChecked.end();
+};
 
 void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) {
     intersectionVectors.push_back(iIntersectorVec);
-    intersectors.insert(std::make_pair(iIntersector,&*intersectionVectors.end()));
+    intersectors.insert(std::make_pair(iIntersector, &*intersectionVectors.end()));
     intersectorsChecked.insert(iIntersector);
 }
 
-void base::add_ignoreIntersect(std::size_t iIgnore) {
+void base::add_ignoreIntersect(base *iIgnore) {
     ignoreIntersect.insert(iIgnore);
 }
 
@@ -119,30 +119,30 @@ void visual_base::set_associatedComponent(base *iComponent) {
 }
 
 void visual_base::set_color(double iRed, double iGreen, double iBlue, double iAlpha) {
-    color.r = (float)iRed;
-    color.g = (float)iGreen;
-    color.b = (float)iBlue;
-    color.a = (float)iAlpha;
+    color.r = (float) iRed;
+    color.g = (float) iGreen;
+    color.b = (float) iBlue;
+    color.a = (float) iAlpha;
 }
 
 void visual_base::set_color(double iRed, double iGreen, double iBlue) {
-    color.r = (float)iRed;
-    color.g = (float)iGreen;
-    color.b = (float)iBlue;
+    color.r = (float) iRed;
+    color.g = (float) iGreen;
+    color.b = (float) iBlue;
     color.a = 1.0;
 }
 
 void visual_base::set_fillColor(double iRed, double iGreen, double iBlue, double iAlpha) {
-    fillColor.r = (float)iRed;
-    fillColor.g = (float)iGreen;
-    fillColor.b = (float)iBlue;
-    fillColor.a = (float)iAlpha;
+    fillColor.r = (float) iRed;
+    fillColor.g = (float) iGreen;
+    fillColor.b = (float) iBlue;
+    fillColor.a = (float) iAlpha;
 }
 
 void visual_base::set_fillColor(double iRed, double iGreen, double iBlue) {
-    fillColor.r = (float)iRed;
-    fillColor.g = (float)iGreen;
-    fillColor.b = (float)iBlue;
+    fillColor.r = (float) iRed;
+    fillColor.g = (float) iGreen;
+    fillColor.b = (float) iBlue;
     fillColor.a = 1.0;
 }
 
@@ -162,10 +162,10 @@ visual_line::~visual_line() {
 void visual_line::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawLine(
-            (float)(iScale * get_positions()[0](0)),
-            (float)(iScale * get_positions()[0](1)),
-            (float)(iScale * get_positions()[1](0)),
-            (float)(iScale * get_positions()[1](1))
+            (float) (iScale * get_positions()[0](0)),
+            (float) (iScale * get_positions()[0](1)),
+            (float) (iScale * get_positions()[1](0)),
+            (float) (iScale * get_positions()[1](1))
     );
 }
 
@@ -181,10 +181,10 @@ visual_ellipse::~visual_ellipse() {
 void visual_ellipse::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawEllipse(
-            (float)(iScale * get_positions()[0](0)),
-            (float)(iScale * get_positions()[0](1)),
-            (float)(2 * iScale * get_parameters()[0]),
-            (float)(2 * iScale * get_parameters()[1])
+            (float) (iScale * get_positions()[0](0)),
+            (float) (iScale * get_positions()[0](1)),
+            (float) (2 * iScale * get_parameters()[0]),
+            (float) (2 * iScale * get_parameters()[1])
     );
 }
 
@@ -200,10 +200,10 @@ visual_rectangle::~visual_rectangle() {
 void visual_rectangle::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawRectangle(
-            (float)(iScale * get_positions()[0](0)),
-            (float)(iScale * get_positions()[0](1)),
-            (float)(iScale * (get_positions()[2](0) - get_positions()[0](0))),
-            (float)(iScale * (get_positions()[2](1) - get_positions()[0](1)))
+            (float) (iScale * get_positions()[0](0)),
+            (float) (iScale * get_positions()[0](1)),
+            (float) (iScale * (get_positions()[2](0) - get_positions()[0](0))),
+            (float) (iScale * (get_positions()[2](1) - get_positions()[0](1)))
     );
 }
 
@@ -219,11 +219,11 @@ visual_triangle::~visual_triangle() {
 void visual_triangle::draw(double iScale) {
     ofSetColor(get_fillColor());
     ofDrawTriangle(
-            (float)(iScale * get_positions()[0](0)),
-            (float)(iScale * get_positions()[0](1)),
-            (float)(iScale * get_positions()[1](0)),
-            (float)(iScale * get_positions()[1](1)),
-            (float)(iScale * get_positions()[2](0)),
-            (float)(iScale * get_positions()[2](1))
+            (float) (iScale * get_positions()[0](0)),
+            (float) (iScale * get_positions()[0](1)),
+            (float) (iScale * get_positions()[1](0)),
+            (float) (iScale * get_positions()[1](1)),
+            (float) (iScale * get_positions()[2](0)),
+            (float) (iScale * get_positions()[2](1))
     );
 }

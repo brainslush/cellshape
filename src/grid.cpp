@@ -106,12 +106,55 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
     Eigen::Vector3d diffRef = posRef[0] - posRef[1];
     Eigen::Vector3d diffCom = posCom[0] - posCom[1];
 
-    double det = diffRef(0)*diffCom(1) - diffRef(1)*diffCom(0);
+    double det = diffRef(0) * diffCom(1) - diffRef(1) * diffCom(0);
 
-    if (det >= std::numeric_limits<double>::min()) {
-
+    if (abs(det) >= std::numeric_limits<double>::min()) {
+        double detR = 1 / det;
+        double a = posRef[0](0) * posRef[1](1) - posRef[1](0) * posRef[0](1);
+        double b = posCom[0](0) * posCom[1](1) - posCom[1](0) * posCom[0](1);
+        double x = (diffCom(0) * a - diffRef(0) * b) * detR;
+        double y = (diffCom(1) * a - diffRef(1) * b) * detR;
+        Eigen::Vector3d ret (x,y,0);
+        if (bmath::isInBounds(x,posRef[0](0),posRef[1](0))) return {iRef, {ret, ret}};
+        if (bmath::isInBounds(y,posRef[0](1),posRef[1](1))) return {iRef, {ret, ret}};
+        if (bmath::isInBounds(x,posCom[0](0),posCom[1](0))) return {iRef, {ret, ret}};
+        if (bmath::isInBounds(y,posCom[0](1),posCom[1](1))) return {iRef, {ret, ret}};
+        return {iCom,{ret,ret}};
     }
 
+    /*
+    public Point2D.Double
+    intersection(
+            double
+    x1,
+            double
+    y1,
+            double
+    x2,
+            double
+    y2,
+            double
+    x3,
+            double
+    y3,
+            double
+    x4,
+            double
+    y4
+    ) {
+        double det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (d == 0) return null;
+        double xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+        double yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
+        if (x3 == x4) {
+            if (yi < Math.min(y1, y2) || yi > Math.max(y1, y2))return null;
+        }
+        Point2D.Double
+        p = new Point2D.Double(xi, yi);
+        if (xi < Math.min(x1, x2) || xi > Math.max(x1, x2)) return null;
+        if (xi < Math.min(x3, x4) || xi > Math.max(x3, x4)) return null;
+        return p;
+    }
     /*Eigen::Vector3d &l1S = posRef[0];
     Eigen::Vector3d &l1E = posRef[1];
     Eigen::Vector3d &l2S = posCom[0];
@@ -136,10 +179,9 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
                 }
             }
         }
-    }*/
+    }
     return {iRef, {l1S, l2S}});
 
-    /*
     if ((
                 (
                         compareC = diffL1(0) * l2S(1) - diffL1(1) * l2S(0);
@@ -255,8 +297,10 @@ void cell::update_intersecting() {
         for (auto &itB : components) {
             if (
                     itA != itB &&
-                    itA->get_ignoreIntersect().find(typeid(*itB).hash_code()) == itA->get_ignoreIntersect().end() &&
-                    itB->get_ignoreIntersect().find(typeid(*itA).hash_code()) == itB->get_ignoreIntersect().end()
+                    !itA->isIgnored(itB) &&
+                    !itB->isIgnored(itA) &&
+                    !itA->isIntersectorChecked(itB) &&
+                    !itB->isIntersectorChecked(itA)
                     ) {
                 intersection = intersection || obtain_intersecting(itA, itB);
             }
@@ -355,16 +399,16 @@ void container::update_component(base *iComponent) {
             double yMax = std::max(posA(1), posB(1));
             double xMin = std::min(posA(0), posB(0));
             double xMax = std::max(posA(0), posB(0));
-            unsigned indexXMin = floor(xMin / cellLength);
-            unsigned indexXMax = floor(xMax / cellLength);
-            unsigned indexYMin = floor(yMin / cellLength);
-            unsigned indexYMax = floor(yMax / cellLength);
+            unsigned indexXMin = (unsigned)floor(xMin / cellLength);
+            unsigned indexXMax = (unsigned)floor(xMax / cellLength);
+            unsigned indexYMin = (unsigned)floor(yMin / cellLength);
+            unsigned indexYMax = (unsigned)floor(yMax / cellLength);
             // get cells
             if (abs(m) < 1) {
                 while (indexXMin <= indexXMax) {
                     // calculate y value
-                    unsigned indexTestT = floor(f0Red + m * indexXMin);
-                    unsigned indexTestB = boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
+                    unsigned indexTestT = (unsigned)floor(f0Red + m * indexXMin);
+                    unsigned indexTestB = (unsigned)boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
                                                                   indexYMin, indexYMax);
                     unsigned indexT =
                             std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestT);
@@ -382,8 +426,8 @@ void container::update_component(base *iComponent) {
                 while (indexYMin <= indexYMax) {
                     if (abs(m) < std::numeric_limits<double>::max()) {
                         // calculate x value
-                        unsigned indexTestL = floor((indexYMin - f0Red) / m);
-                        unsigned indexTestR = boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
+                        unsigned indexTestL = (unsigned)floor((indexYMin - f0Red) / m);
+                        unsigned indexTestR = (unsigned)boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
                                                                       indexXMin, indexXMax);
                         unsigned indexL =
                                 std::min(resolution - 1, indexTestL) * resolution + std::min(resolution - 1, indexYMin);

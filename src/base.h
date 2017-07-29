@@ -15,6 +15,7 @@ namespace grid {
 
 class visual_base;
 
+template<class D>
 class base {
 public:
     base();
@@ -31,8 +32,6 @@ public:
 
     virtual std::vector<double> &get_parameters();
 
-    virtual std::set<std::size_t> &get_ignoreIntersect();
-
     virtual std::set<base *> &get_intersectorsChecked();
 
     virtual std::set<grid::cell *> &get_gridCells();
@@ -41,17 +40,37 @@ public:
 
     virtual visual_base *get_visualObj();
 
-    virtual unsigned long long &get_timeStamp();
+    template<typename A>
+    bool isIgnored(const A &iRef) {
+        bool ret = false;
+        auto it = ignoreIntersect.begin();
+
+        do {
+            ret = ret || isIgnoredInt(*it, iRef);
+            it++;
+        } while (!ret && it != ignoreIntersect.end());
+        return ret;
+    };
+
+    virtual bool isIntersectorChecked(base *iRef);
 
     virtual void add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec);
 
-    virtual void add_ignoreIntersect(std::size_t iIgnore);
+    virtual void add_ignoreIntersect(base *iIgnore);
 
     virtual void clear_intersectors();
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
 protected:
+
+    static std::set<size_t> subtypes;
+
+    template<typename A, typename B>
+    bool isIgnoredInt(const A &iRef, const B &iCom) {
+        return is_base_of<A, B>::value;
+    };
+
     virtual void update_timeStamp();
 
     std::vector<Eigen::Vector3d> positions; // position of object
@@ -60,7 +79,7 @@ protected:
     std::set<std::pair<base *, Eigen::Vector3d *>> intersectors; // list of objects which intersect with the object
     std::set<base *> intersectorsChecked; // list of intersectors which are already checked
     std::set<grid::cell *> gridCells; // gridcells in which object lies
-    std::set<std::size_t> ignoreIntersect; // ignore class types for filamentCollision
+    std::set<base *> ignoreIntersect; // ignore class types for filamentCollision
     visual_base *associatedVisualObj; // assignes a visual object
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
 };

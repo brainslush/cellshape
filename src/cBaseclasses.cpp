@@ -186,7 +186,7 @@ membrane_part_base::membrane_part_base(
     associatedVisualObj = new visual_line(this);
     associatedVisualObj->set_color(0.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
-    this->add_ignoreIntersect(typeid(*this).hash_code());
+    this->add_ignoreIntersect(new membrane_part_base(iGlobals,));
     globals.grid->register_component(this);
     restLength = get_restLength();
 }
