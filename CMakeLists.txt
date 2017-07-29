@@ -39,7 +39,13 @@ set(SOURCE_FILES
         src/RigidBody.cpp
         src/RigidBody.h
         src/settings.h
-        src/variable_type.h src/cFunctors.cpp src/cFunctors.h src/std.cpp src/std.h)
+        src/variable_type.h
+        src/cFunctors.cpp
+        src/cFunctors.h
+        src/std.cpp
+        src/std.h
+        src/bmath.h
+        )
 
 add_executable(
         ${APP}
@@ -50,4 +56,10 @@ add_executable(
 target_link_libraries(
         ${APP}
         ${OPENFRAMEWORKS_LIBRARIES}
+)
+
+add_custom_command(
+        TARGET ${APP} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${OF_ROOT}/addons/ofxDatGui/ofxbraitsch $<TARGET_FILE_DIR:${APP}>/data/ofxbraitsch
 )
