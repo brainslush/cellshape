@@ -61,15 +61,10 @@ cellcomponents_base::~cellcomponents_base() {}
 physic::RigidBody3d &cellcomponents_base::get_rigidBody() { return rigidBody; }
 
 /***************************
- * Matrix Base
+ * cellcomponents_baseX
  ***************************/
 
-matrix_base::matrix_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
-    canColide = false;
-    canMove = false;
-}
-
-matrix_base::~matrix_base() {
+cellcomponents_baseX::cellcomponents_baseX(sGlobalVars &iGlobals, cell_base &iCell) : cellcomponents_base(iGlobals,iCell) {
 
 }
 
@@ -81,7 +76,7 @@ crosslinker_base::crosslinker_base(
         sGlobalVars &iGlobals,
         cell_base &iCell
 ) :
-        cellcomponents_base(iGlobals, iCell) {
+        cellcomponents_baseX(iGlobals, iCell) {
     canColide = false;
     canMove = true;
     force = Eigen::Vector3d(0, 0, 0);
@@ -223,4 +218,17 @@ Eigen::Vector3d membrane_part_base::calc_dirVector(Eigen::Vector3d *iPoint) {
     } else {
         return Eigen::Vector3d(0,0,0);
     }
+}
+
+/***************************
+ * Matrix Base
+ ***************************/
+
+matrix_base::matrix_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
+    canColide = false;
+    canMove = false;
+}
+
+matrix_base::~matrix_base() {
+
 }

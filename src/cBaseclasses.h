@@ -29,7 +29,7 @@ public:
 
     virtual Eigen::Vector3d &get_responseForce();
 
-    virtual Eigen::Vector3d &get_responseTorque ();
+    virtual Eigen::Vector3d &get_responseTorque();
 
     virtual void set_canMove(bool iCanMove);
 
@@ -46,15 +46,13 @@ protected:
     bool canColide; // can this object collide aka does it have physics?
     Eigen::Vector3d responseForce;
     Eigen::Vector3d responseTorque;
-    //std::set<variable_base*> variables;
     sGlobalVars &globals;
 };
 
 class filament_base;
 
-/*****************************
- *  Cell Base
- */
+// cell base classes
+
 class cell_base : public components_base {
 public:
     cell_base(sGlobalVars &iGlobals);
@@ -85,19 +83,24 @@ protected:
     Eigen::Vector3d responseTorque;
 };
 
-class matrix_base : public components_base {
+template<typename Derived>
+class cellcomponents_baseX : public cellcomponents_base {
 public:
-    matrix_base(sGlobalVars &iGlobals);
+    cellcomponents_baseX(sGlobalVars &iGlobals, cell_base &iCell);
 
-    virtual ~matrix_base();
+    static std::set<size_t> typeids;
 
-protected:
+    template<typename T>
+    static void typeregistrar() {
+        typeids.insert(typeid(T));
+    }
 };
 
-/***************************
-* crosslinkers
-***************************/
-class crosslinker_base : public cellcomponents_base {
+cellcomponents_baseX::typeids = {};
+
+// crosslinkers
+
+class crosslinker_base : public cellcomponents_baseX<crosslinker_base> {
 public:
     crosslinker_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -116,10 +119,11 @@ protected:
     Eigen::Vector3d force;
 };
 
-/***************************
-* filaments
-***************************/
-class filament_base : public cellcomponents_base {
+crosslinker_base::typeids
+
+// filaments
+
+class filament_base : public cellcomponents_baseX<filament_base> {
 public:
     filament_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -140,10 +144,10 @@ protected:
     double length;
 };
 
-/***************************
-* volume
-***************************/
-class volume_base : public cellcomponents_base {
+
+// volume
+
+class volume_base : public cellcomponents_baseX<volume_base> {
 public:
     volume_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -154,10 +158,10 @@ public:
 protected:
 };
 
-/***************************
-* membrane parts
-***************************/
-class membrane_part_base : public cellcomponents_base {
+
+// membrane parts
+
+class membrane_part_base : public cellcomponents_baseX<membrane_part_base> {
 public:
     membrane_part_base(
             sGlobalVars &iGlobals,
@@ -184,6 +188,45 @@ protected:
     std::pair<membrane_part_base *, membrane_part_base *> neighbours;
     std::pair<Eigen::Vector3d *, Eigen::Vector3d *> sharedPositions;
     double restLength;
+};
+
+// matrix components base class
+
+class matrixcomponents_base : public components_base {
+public:
+    matrixcomponents_base(sGlobalVars &iGlobals);
+
+    virtual ~matrix_base();
+
+protected:
+};
+
+template<typename Derived>
+class matrixcomponents_baseX : public matrixcomponents_base {
+public:
+    matrixcomponents_baseX(sGlobalVars &iGlobals);
+
+    ~matrixcomponents_baseX();
+
+    static std::set<size_t> typeids;
+protected:
+};
+
+// fac base class
+class fac_base : public matrixcomponents_baseX<fac_base> {
+public:
+    fac_base(sGlobalVars &iGlobals);
+
+    virtual ~fac_base();
+};
+
+class surface_border_base : public matrixcomponents_baseX<>
+
+class surface_base : public matrixcomponents_baseX<surface_base> {
+public:
+    surface_base(sGlobalVars &iGlobals);
+
+    virtual ~surface_base();
 };
 
 #endif

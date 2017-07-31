@@ -15,7 +15,6 @@ namespace grid {
 
 class visual_base;
 
-template<class D>
 class base {
 public:
     base();
@@ -63,8 +62,6 @@ public:
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
 protected:
-
-    static std::set<size_t> subtypes;
 
     template<typename A, typename B>
     bool isIgnoredInt(const A &iRef, const B &iCom) {
