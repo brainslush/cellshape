@@ -13,6 +13,7 @@
 #ifndef SRC_CMEMBRANE_H_
 #define SRC_CMEMBRANE_H_
 
+// classical membrane element
 class membrane_part : public membrane_part_base {
 public:
     // 2D membrane part
@@ -36,6 +37,10 @@ protected:
     Eigen::Vector3d normal;
 };
 
+// add class to the registrar
+registrar::n::registerType<membrane_part_base,membrane_part>();
+
+// membrane container which organizes membrane parts and its creation
 class membrane_container : public cellcomponents_base {
 public:
     membrane_container(
@@ -49,7 +54,7 @@ public:
 
     virtual double &get_length();
 
-    virtual std::vector<membrane_part *> &get_parts();
+    virtual std::vector<membrane_part_base *> &get_parts();
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &oVisualComponents);
 
@@ -59,11 +64,14 @@ protected:
     double area;
     double length;
     const bool canColide = true;
-    std::vector<membrane_part *> parts;
+    std::vector<membrane_part_base *> parts;
 
     virtual void update_area();
 
     virtual void update_length();
 };
+
+// add class to the registrar
+registrar::n::registerType<cellcomponents_base,membrane_container>();
 
 #endif /* SRC_CMEMBRANE_H_ */

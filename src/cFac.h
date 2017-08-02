@@ -13,7 +13,7 @@
 #ifndef SRC_CFAC_H_
 #define SRC_CFAC_H_
 
-class fac : public matrix_base {
+class fac : public fac_base {
 public:
     fac(
             sGlobalVars &iGlobals,
@@ -32,5 +32,8 @@ public:
 
 protected:
 };
+
+// add class to the registrar
+registrar::n::registerType<fac_base,fac>();
 
 #endif /* SRC_CFAC_H_ */
