@@ -49,10 +49,12 @@ protected:
     sGlobalVars &globals;
 };
 
+// add class to the registrar
+registrar::n::registerType<base,components_base>();
+
 class filament_base;
 
 // cell base classes
-
 class cell_base : public components_base {
 public:
     cell_base(sGlobalVars &iGlobals);
@@ -67,6 +69,9 @@ public:
 
 protected:
 };
+
+// add class to the registrar
+registrar::n::registerType<components_base,cell_base>();
 
 class cellcomponents_base : public components_base {
 public:
@@ -83,24 +88,11 @@ protected:
     Eigen::Vector3d responseTorque;
 };
 
-template<typename Derived>
-class cellcomponents_baseX : public cellcomponents_base {
-public:
-    cellcomponents_baseX(sGlobalVars &iGlobals, cell_base &iCell);
-
-    static std::set<size_t> typeids;
-
-    template<typename T>
-    static void typeregistrar() {
-        typeids.insert(typeid(T));
-    }
-};
-
-cellcomponents_baseX::typeids = {};
+// add class to the registrar
+registrar::n::registerType<components_base,cellcomponents_base>();
 
 // crosslinkers
-
-class crosslinker_base : public cellcomponents_baseX<crosslinker_base> {
+class crosslinker_base : public cellcomponents_base {
 public:
     crosslinker_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -119,11 +111,11 @@ protected:
     Eigen::Vector3d force;
 };
 
-crosslinker_base::typeids
+// add class to the registrar
+registrar::n::registerType<cellcomponents_base,crosslinker_base>();
 
 // filaments
-
-class filament_base : public cellcomponents_baseX<filament_base> {
+class filament_base : public cellcomponents_base {
 public:
     filament_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -144,10 +136,11 @@ protected:
     double length;
 };
 
+// add class to the registrar
+registrar::n::registerType<cellcomponents_base,filament_base>();
 
 // volume
-
-class volume_base : public cellcomponents_baseX<volume_base> {
+class volume_base : public cellcomponents_base {
 public:
     volume_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -158,10 +151,11 @@ public:
 protected:
 };
 
+// add class to the registrar
+registrar::n::registerType<cellcomponents_base,volume_base>();
 
 // membrane parts
-
-class membrane_part_base : public cellcomponents_baseX<membrane_part_base> {
+class membrane_part_base : public cellcomponents_base {
 public:
     membrane_part_base(
             sGlobalVars &iGlobals,
@@ -190,8 +184,10 @@ protected:
     double restLength;
 };
 
-// matrix components base class
+// add class to the registrar
+registrar::n::registerType<cellcomponents_base,membrane_part_base>();
 
+// matrix components base class
 class matrixcomponents_base : public components_base {
 public:
     matrixcomponents_base(sGlobalVars &iGlobals);
@@ -201,32 +197,40 @@ public:
 protected:
 };
 
-template<typename Derived>
-class matrixcomponents_baseX : public matrixcomponents_base {
-public:
-    matrixcomponents_baseX(sGlobalVars &iGlobals);
-
-    ~matrixcomponents_baseX();
-
-    static std::set<size_t> typeids;
-protected:
-};
+// add class to the registrar
+registrar::n::registerType<components_base,matrixcomponents_base>();
 
 // fac base class
-class fac_base : public matrixcomponents_baseX<fac_base> {
+class fac_base : public matrixcomponents_base {
 public:
     fac_base(sGlobalVars &iGlobals);
 
     virtual ~fac_base();
 };
 
-class surface_border_base : public matrixcomponents_baseX<>
+// add class to the registrar
+registrar::n::registerType<matrixcomponents_base,fac_base>();
 
-class surface_base : public matrixcomponents_baseX<surface_base> {
+// surface border base class
+class surface_border_base : public matrixcomponents_base {
+public:
+    surface_border_base(sGlobalVars &iGlobals);
+
+    virtual ~surface_border_base();
+}
+
+// add class to the registrar
+registrar::n::registerType<matrixcomponents_base,surface_border_base>();
+
+// surface base class
+class surface_base : public matrixcomponents_base {
 public:
     surface_base(sGlobalVars &iGlobals);
 
     virtual ~surface_base();
 };
+
+// add class to the registrar
+registrar::n::registerType<matrixcomponents_base,surface_base>();
 
 #endif

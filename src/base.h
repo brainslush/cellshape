@@ -81,6 +81,8 @@ protected:
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
 };
 
+registrar::n::registerBase<base>();
+
 /*
  *  Those are all accessible visual elements which can be used to represent the components.
  *  The name might be misleading as the visual element also determines the physical form of the component.
