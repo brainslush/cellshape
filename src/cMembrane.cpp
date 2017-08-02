@@ -7,6 +7,7 @@
 
 #include "cMembrane.h"
 
+
 /***************************
  * membrane part
  ***************************/
@@ -124,7 +125,7 @@ double &membrane_container::get_length() {
     return length;
 }
 
-std::vector<membrane_part *> &membrane_container::get_parts() {
+std::vector<membrane_part_base *> &membrane_container::get_parts() {
     return parts;
 }
 

@@ -16,7 +16,7 @@ fac::fac(
         double iRadius,
         double iX,
         double iY
-) : matrix_base(iGlobals) {
+) : fac_base(iGlobals) {
     parameters.clear();
     parameters.push_back(iRadius);
     parameters.push_back(iRadius);
@@ -25,7 +25,6 @@ fac::fac(
     associatedVisualObj = new visual_ellipse(this);
     associatedVisualObj->set_color(1.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(1.0, 0.0, 0.0);
-    this->add_ignoreIntersect(typeid(*this).hash_code());
     globals.grid->register_component(this);
 }
 

@@ -2,119 +2,88 @@
 // Created by siegbahn on 31.07.17.
 //
 
-#include <set>
+#include <vector>
 #include <string>
+#include <queue>
+#include <iostream>
+#include <typeinfo>
 
 #ifndef SRC_TYPEREGISTRAR_H_
 #define SRC_TYPEREGISTRAR_H_
 
 namespace registrar {
 
-    template<typename T>
     class node {
     public:
 
-        node(size_t iId) :
-                id(typeid(T).hash_code()),
-                name(typeid(T).name()) {
-            parent = this;
-        };
+        node(size_t iId, std::string iName);
 
-        node(node *iParent) :
-                id(typeid(T).hash_code()),
-                name(typeid(T).name()),
-                parentnode(iParent){
+        node(size_t iId, std::string iName, node *iParent);
 
-        };
+        ~node();
 
-        ~node() {};
+        std::vector<node *> &get_childs();
 
-        std::vector &get_childs() {
-            return childs;
-        }
+        void addChild(node *iChild);
 
-        void addChild(node *iChild) {
-            childs.insert(iChild);
-        };
+        size_t &get_Id();
 
-        size_t &id();
     protected:
         size_t id;
-        string name;
+        std::string name;
         node *parentnode;
         std::vector<node *> childs;
     };
 
-    class n {
-    public:
+    node *baseNode = nullptr;
 
-        template<typename Base>
-        static void registerBase() {
-            if (baseN) {
-                baseNode = new node<Base>();
-            } else {
-                cout << "A base class does already exist!\n";
-            }
+    node *findNodeById(node *startNode, size_t id);
+
+    template<typename Base>
+    void registerBase() {
+        if (baseNode) {
+            auto &type = typeid(Base);
+            baseNode = new node(type.hash_code(), type.name());
+        } else {
+            std::cout << "A base class does already exist!\n";
         }
+    }
 
-        template<typename Base, typename Derived>
-        static void registerType() {
-            size_t idBase = typeid(Base).hash_code();
-            size_t idDerived = typeid(Derived).hash_code();
+    template<typename Base, typename Derived>
+    void registerType() {
+        auto idBase = typeid(Base).hash_code();
 
-            node *parenNode = findNodeNyId(baseNode, idBase);
-            if (parentNode) {
-                node *newChild = new node<Derived>(queue.first());
-                queue.first()->addChild(newChild);
+        node *parentNode = findNodeById(baseNode, idBase);
+        if (parentNode) {
+            auto &type = typeid(Derived);
+            node *newChild = new node(type.hash_code(), type.name(), parentNode);
+            parentNode->addChild(newChild);
+        }
+    }
+
+    bool isChild(size_t iIdBase, size_t iIdDerived);
+
+    template<typename Derived>
+    static bool isChild(size_t iIdBase) {
+        return isChild(iIdBase, typeid(Derived).hash_code());
+    }
+
+    bool isChildSet(std::vector<size_t> *iList, size_t iIdDerived) {
+        bool found = false;
+        auto it = iList->begin();
+        do {
+            if (isChild(*it, iIdDerived)) {
                 found = true;
-            }
-        }
-
-        static bool isChild (size_t iIdBase, size_t iIdDerived) {
-            node *nodeA = findNodeById(baseNode, iIdBase);
-            if (nodeA) {
-                node *nodeB = findNodeById(nodeA, iIdDerived);
-                if (nodeB) {
-                    return true
-                }
-            }
-            return false;
-        }
-
-        template<typename Derived>
-        static bool isChild (size_t iIdBase) {
-            size_t idDerived = typeid(Derived);
-
-        }
-
-    protected:
-        static node *findNodeById (node *startNode, size_t id) {
-            if (!startNode) {
-                bool found = false;
-                std::queue<node *> queue;
-                queue.push_back(startNode);
-                do {
-                    if (queue.first()->id() != id) {
-                        auto &childs = queue.first()->get_childs();
-                        for (auto &it : childs) {
-                            queue.push_back(it);
-                        }
-                        queue.pop_front();
-                    } else {
-                        return queue.first();
-                    }
-                } while (!found || queue.size() > 0);
-                if (!found) {
-                    cout << "Class not found!\n";
-                    return nullptr;
-                }
             } else {
-                cout << "Start node is nullptr!\n";
-                return nullptr;
+                it++;
             }
-        }
+        } while (!found && it != iList->end());
+        return found;
+    }
 
-        static node *baseNode = nullptr;
+    template<typename Derived>
+    bool isChildSet(std::vector<size_t> *iList) {
+        return isChildSet(iList, typeid(Derived).hash_code());
     }
 }
 

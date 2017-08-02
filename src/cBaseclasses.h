@@ -49,8 +49,7 @@ protected:
     sGlobalVars &globals;
 };
 
-// add class to the registrar
-registrar::n::registerType<base,components_base>();
+
 
 class filament_base;
 
@@ -70,8 +69,7 @@ public:
 protected:
 };
 
-// add class to the registrar
-registrar::n::registerType<components_base,cell_base>();
+
 
 class cellcomponents_base : public components_base {
 public:
@@ -87,9 +85,6 @@ protected:
     Eigen::Vector3d responseForces;
     Eigen::Vector3d responseTorque;
 };
-
-// add class to the registrar
-registrar::n::registerType<components_base,cellcomponents_base>();
 
 // crosslinkers
 class crosslinker_base : public cellcomponents_base {
@@ -111,9 +106,6 @@ protected:
     Eigen::Vector3d force;
 };
 
-// add class to the registrar
-registrar::n::registerType<cellcomponents_base,crosslinker_base>();
-
 // filaments
 class filament_base : public cellcomponents_base {
 public:
@@ -133,11 +125,7 @@ public:
 
 protected:
     std::set<crosslinker_base *> connectedCrosslinkers;
-    double length;
 };
-
-// add class to the registrar
-registrar::n::registerType<cellcomponents_base,filament_base>();
 
 // volume
 class volume_base : public cellcomponents_base {
@@ -150,9 +138,6 @@ public:
 
 protected:
 };
-
-// add class to the registrar
-registrar::n::registerType<cellcomponents_base,volume_base>();
 
 // membrane parts
 class membrane_part_base : public cellcomponents_base {
@@ -184,21 +169,15 @@ protected:
     double restLength;
 };
 
-// add class to the registrar
-registrar::n::registerType<cellcomponents_base,membrane_part_base>();
-
 // matrix components base class
 class matrixcomponents_base : public components_base {
 public:
     matrixcomponents_base(sGlobalVars &iGlobals);
 
-    virtual ~matrix_base();
+    virtual ~matrixcomponents_base();
 
 protected:
 };
-
-// add class to the registrar
-registrar::n::registerType<components_base,matrixcomponents_base>();
 
 // fac base class
 class fac_base : public matrixcomponents_base {
@@ -208,19 +187,13 @@ public:
     virtual ~fac_base();
 };
 
-// add class to the registrar
-registrar::n::registerType<matrixcomponents_base,fac_base>();
-
 // surface border base class
 class surface_border_base : public matrixcomponents_base {
 public:
     surface_border_base(sGlobalVars &iGlobals);
 
     virtual ~surface_border_base();
-}
-
-// add class to the registrar
-registrar::n::registerType<matrixcomponents_base,surface_border_base>();
+};
 
 // surface base class
 class surface_base : public matrixcomponents_base {
@@ -229,8 +202,5 @@ public:
 
     virtual ~surface_base();
 };
-
-// add class to the registrar
-registrar::n::registerType<matrixcomponents_base,surface_base>();
 
 #endif

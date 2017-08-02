@@ -1,5 +1,6 @@
 #include "cBaseclasses.h"
 
+
 /***************************
  * Components Base
  ***************************/
@@ -61,14 +62,6 @@ cellcomponents_base::~cellcomponents_base() {}
 physic::RigidBody3d &cellcomponents_base::get_rigidBody() { return rigidBody; }
 
 /***************************
- * cellcomponents_baseX
- ***************************/
-
-cellcomponents_baseX::cellcomponents_baseX(sGlobalVars &iGlobals, cell_base &iCell) : cellcomponents_base(iGlobals,iCell) {
-
-}
-
-/***************************
  * crosslinker base
  ***************************/
 
@@ -76,7 +69,7 @@ crosslinker_base::crosslinker_base(
         sGlobalVars &iGlobals,
         cell_base &iCell
 ) :
-        cellcomponents_baseX(iGlobals, iCell) {
+        cellcomponents_base(iGlobals, iCell) {
     canColide = false;
     canMove = true;
     force = Eigen::Vector3d(0, 0, 0);
@@ -167,6 +160,9 @@ volume_base::~volume_base() {
 
 void volume_base::make_timeStep(double &dT) {}
 
+/***************************
+ * Membrane Part Base
+ ***************************/
 
 membrane_part_base::membrane_part_base(
         sGlobalVars &iGlobals,
@@ -181,7 +177,6 @@ membrane_part_base::membrane_part_base(
     associatedVisualObj = new visual_line(this);
     associatedVisualObj->set_color(0.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
-    this->add_ignoreIntersect(new membrane_part_base(iGlobals,));
     globals.grid->register_component(this);
     restLength = get_restLength();
 }
@@ -221,14 +216,50 @@ Eigen::Vector3d membrane_part_base::calc_dirVector(Eigen::Vector3d *iPoint) {
 }
 
 /***************************
- * Matrix Base
+ * Matrix Compoents Base
  ***************************/
 
-matrix_base::matrix_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
+matrixcomponents_base::matrixcomponents_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
     canColide = false;
     canMove = false;
 }
 
-matrix_base::~matrix_base() {
+matrixcomponents_base::~matrixcomponents_base() {
+
+}
+
+/***************************
+ * Fac Base
+ ***************************/
+
+fac_base::fac_base(sGlobalVars &iGlobals) : matrixcomponents_base(iGlobals) {
+
+}
+
+fac_base::~fac_base() {
+
+}
+
+/***************************
+ * Surface Border Base
+ ***************************/
+
+surface_border_base::surface_border_base(sGlobalVars &iGlobals) : matrixcomponents_base(iGlobals) {
+
+}
+
+surface_border_base::~surface_border_base() {
+
+}
+
+/***************************
+ * Surface Base
+ ***************************/
+
+surface_base::surface_base(sGlobalVars &iGlobals) : matrixcomponents_base(iGlobals) {
+
+}
+
+surface_base::~surface_base() {
 
 }

@@ -16,7 +16,7 @@ surface_border::surface_border(
         simple_surface *iSurface,
         Eigen::Vector3d iStart,
         Eigen::Vector3d iEnd
-) : matrix_base(iGlobals),
+) : surface_border_base(iGlobals),
     surface(iSurface) {
     associatedVisualObj = new visual_line(this);
     positions.clear();
@@ -45,7 +45,7 @@ void surface_border::obtain_visualObjs(std::vector<visual_base *> &oVisualCompon
 simple_surface::simple_surface(
         sGlobalVars &iGlobals,
         double iSideLength
-) : matrix_base(iGlobals),
+) : surface_base(iGlobals),
     randomReal(globals.rndC->register_random("uniform_01")),
     guiGroup(globals.guiMain->register_group("Surface")),
     facCount(guiGroup->register_setting<unsigned>("FAC Count", false, 0, 100, 20)),
