@@ -5,6 +5,8 @@
 #include <eigen3/Eigen/Eigen>
 #include <eigen3/Eigen/StdVector>
 #include "ofMain.h"
+#include "typeRegistrar.h"
+#include "ignoreList.h"
 
 #ifndef SRC_BASE_H_
 #define SRC_BASE_H_
@@ -39,49 +41,24 @@ public:
 
     virtual visual_base *get_visualObj();
 
-    template<typename A>
-    bool isIgnored(const A &iRef) {
-        bool ret = false;
-        auto it = ignoreIntersect.begin();
-
-        do {
-            ret = ret || isIgnoredInt(*it, iRef);
-            it++;
-        } while (!ret && it != ignoreIntersect.end());
-        return ret;
-    };
-
     virtual bool isIntersectorChecked(base *iRef);
 
     virtual void add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec);
-
-    virtual void add_ignoreIntersect(base *iIgnore);
 
     virtual void clear_intersectors();
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
 protected:
-
-    template<typename A, typename B>
-    bool isIgnoredInt(const A &iRef, const B &iCom) {
-        return is_base_of<A, B>::value;
-    };
-
-    virtual void update_timeStamp();
-
     std::vector<Eigen::Vector3d> positions; // position of object
     std::vector<double> parameters; // additional parameters of the object
     std::vector<Eigen::Vector3d> intersectionVectors; // save the actual
     std::set<std::pair<base *, Eigen::Vector3d *>> intersectors; // list of objects which intersect with the object
     std::set<base *> intersectorsChecked; // list of intersectors which are already checked
     std::set<grid::cell *> gridCells; // gridcells in which object lies
-    std::set<base *> ignoreIntersect; // ignore class types for filamentCollision
     visual_base *associatedVisualObj; // assignes a visual object
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
 };
-
-registrar::n::registerBase<base>();
 
 /*
  *  Those are all accessible visual elements which can be used to represent the components.
@@ -94,8 +71,6 @@ public:
 
     virtual ~visual_base();
 
-    virtual base &get_associatedComponent();
-
     virtual ofFloatColor &get_color();
 
     virtual ofFloatColor &get_fillColor();
@@ -105,8 +80,6 @@ public:
     virtual std::vector<Eigen::Vector3d> &get_positions();
 
     virtual std::vector<double> &get_parameters();
-
-    virtual void set_associatedComponent(base *iComponent);
 
     virtual void set_color(double iRed, double iGreen, double iBlue, double iAlpha);
 

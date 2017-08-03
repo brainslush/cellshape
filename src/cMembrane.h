@@ -37,9 +37,6 @@ protected:
     Eigen::Vector3d normal;
 };
 
-// add class to the registrar
-registrar::n::registerType<membrane_part_base,membrane_part>();
-
 // membrane container which organizes membrane parts and its creation
 class membrane_container : public cellcomponents_base {
 public:
@@ -70,8 +67,5 @@ protected:
 
     virtual void update_length();
 };
-
-// add class to the registrar
-registrar::n::registerType<cellcomponents_base,membrane_container>();
 
 #endif /* SRC_CMEMBRANE_H_ */

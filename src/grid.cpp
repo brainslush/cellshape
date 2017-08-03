@@ -119,104 +119,8 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
         if (bmath::isInBounds(y,posRef[0](1),posRef[1](1))) return {iRef, {ret, ret}};
         if (bmath::isInBounds(x,posCom[0](0),posCom[1](0))) return {iRef, {ret, ret}};
         if (bmath::isInBounds(y,posCom[0](1),posCom[1](1))) return {iRef, {ret, ret}};
-        return {iCom,{ret,ret}};
     }
-
-    /*
-    public Point2D.Double
-    intersection(
-            double
-    x1,
-            double
-    y1,
-            double
-    x2,
-            double
-    y2,
-            double
-    x3,
-            double
-    y3,
-            double
-    x4,
-            double
-    y4
-    ) {
-        double det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-        if (d == 0) return null;
-        double xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
-        double yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
-        if (x3 == x4) {
-            if (yi < Math.min(y1, y2) || yi > Math.max(y1, y2))return null;
-        }
-        Point2D.Double
-        p = new Point2D.Double(xi, yi);
-        if (xi < Math.min(x1, x2) || xi > Math.max(x1, x2)) return null;
-        if (xi < Math.min(x3, x4) || xi > Math.max(x3, x4)) return null;
-        return p;
-    }
-    /*Eigen::Vector3d &l1S = posRef[0];
-    Eigen::Vector3d &l1E = posRef[1];
-    Eigen::Vector3d &l2S = posCom[0];
-    Eigen::Vector3d &l2E = posCom[1];
-
-    double compareA1, compareA2, compareB1, compareB2, compareD;
-    Eigen::Vector3d diffL1 = l1E - l1S;
-    Eigen::Vector3d diffL2 = l2E - l2S;
-
-    compareA1 = diffL1(0) * l1S(1) - diffL1(1) * l1S(0);
-    compareA2 = diffL1(0) * l2S(1) - diffL1(1) * l2S(0);
-    if (compareA1 >= compareA2) {
-        compareD = diffL1(0) * diffL2(1) - diffL2(0) * diffL1(1);
-        if (compareA1 - compareA2 <= compareD) {
-            compareB1 = diffL2(0) * l2S(1) - diffL2(1) * l2S(0);
-            compareB2 = diffL2(0) * l1S(1) - diffL2(1) * l1S(0);
-            if (compareB1 <= compareB2) {
-                if (compareB2 - compareB1 <= compareD) {
-                    diffL1.normalize();
-                    diffL2.normalize();
-                    return {iCom, {diffL1, diffL2}};
-                }
-            }
-        }
-    }
-    return {iRef, {l1S, l2S}});
-
-    if ((
-                (
-                        compareC = diffL1(0) * l2S(1) - diffL1(1) * l2S(0);
-                        compareA2 <= compareA1
-                ) ^
-                ((diffL1(0) * l2E(1) - diffL1(1) * l2E(0)) < compareA)
-        ) && (
-                ((diffL2(0) * l1S(1) - diffL2(1) * l1S(0)) >= compareB) ^
-                ((diffL2(0) * l1E(1) - diffL2(1) * l1E(0)) < compareB)
-        )) {
-        diffL1.normalize();
-        diffL2.normalize();
-        return std::make_pair(iCom, std::make_pair(diffL1, diffL2));
-    }
-
-    float s, t;
-    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y) >= 0;
-    s = s1_x * p0_y - s1_y * p0_x >= s1_x * p2_y - s1_y * p2_x;
-
-    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y) <= 1;
-    s = -s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y) <= -s2_x * s1_y + s1_x * s2_y;
-
-
-    t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y) >= 0;
-    t = s2_x * p0_y - s2_y * p0_x >= s2_x * p2_y - s2_y * p2_x;
-
-    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-        // Collision detected
-        if (i_x)
-            *i_x = p0_x + (t * s1_x);
-        if (i_y)
-            *i_y = p0_y + (t * s1_y);
-        return 1;
-    }
-     */
+    return {iCom,{posCom[0],posCom[0]}};
 }
 
 void cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
@@ -297,8 +201,7 @@ void cell::update_intersecting() {
         for (auto &itB : components) {
             if (
                     itA != itB &&
-                    !itA->isIgnored(itB) &&
-                    !itB->isIgnored(itA) &&
+                    !ignore::isIgnored(typeid(*itA).hash_code(), typeid(*itB).hash_code()) &&
                     !itA->isIntersectorChecked(itB) &&
                     !itB->isIntersectorChecked(itA)
                     ) {
@@ -462,10 +365,10 @@ void container::update_component(base *iComponent) {
             double xMax = pos(0) + a;
             double yMin = pos(1) - b;
             double yMax = pos(1) + b;
-            unsigned indexXMin = floor(xMin / cellLength);
-            unsigned indexXMax = floor(xMax / cellLength);
-            unsigned indexYMin = floor(yMin / cellLength);
-            unsigned indexYMax = floor(yMax / cellLength);
+            unsigned indexXMin = (unsigned)floor(xMin / cellLength);
+            unsigned indexXMax = (unsigned)floor(xMax / cellLength);
+            unsigned indexYMin = (unsigned)floor(yMin / cellLength);
+            unsigned indexYMax = (unsigned)floor(yMax / cellLength);
             // get grid cells
             if (indexXMin != indexXMax) {
                 while (indexXMin <= indexXMax) {
@@ -473,8 +376,8 @@ void container::update_component(base *iComponent) {
                     double xR = boost::algorithm::clamp(cellLength * (indexXMin + 1), xMin, xMax);
                     double yL = sqrt(b * b * (1 - pow((xL - pos(0)) / a, 2)));
                     double yR = sqrt(b * b * (1 - pow((xR - pos(0)) / a, 2)));
-                    indexYMin = std::min(floor((pos(1) - yL) / cellLength), floor((pos(1) - yR) / cellLength));
-                    indexYMax = std::max(floor((pos(1) + yL) / cellLength), floor((pos(1) + yR) / cellLength));
+                    indexYMin = (unsigned)std::min(floor((pos(1) - yL) / cellLength), floor((pos(1) - yR) / cellLength));
+                    indexYMax = (unsigned)std::max(floor((pos(1) + yL) / cellLength), floor((pos(1) + yR) / cellLength));
                     while (indexYMin <= indexYMax) {
                         unsigned index =
                                 std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
@@ -512,12 +415,12 @@ void container::update_component(base *iComponent) {
             double yMin = std::min(posA(1), posB(1));
             double yMax = std::max(posA(1), posB(1));
             // get grid cells
-            unsigned xA = floor(xMin / cellLength);
-            unsigned xB = floor(xMax / cellLength);
-            unsigned yA = floor(yMin / cellLength);
-            unsigned yB = floor(yMax / cellLength);
+            unsigned xA = (unsigned)floor(xMin / cellLength);
+            unsigned xB = (unsigned)floor(xMax / cellLength);
+            unsigned yA = (unsigned)floor(yMin / cellLength);
+            unsigned yB = (unsigned)floor(yMax / cellLength);
             while (xMin < xMax) {
-                unsigned x = floor(xMin / cellLength);
+                unsigned x = (unsigned)floor(xMin / cellLength);
                 unsigned indexA = x * resolution + yA;
                 unsigned indexB = x * resolution + yB;
                 assignedCells.insert(cells[indexA]);
@@ -527,7 +430,7 @@ void container::update_component(base *iComponent) {
                 xMin += cellLength;
             }
             while (yMin < yMax) {
-                unsigned y = floor(yMin / cellLength);
+                unsigned y = (unsigned)floor(yMin / cellLength);
                 unsigned indexA = xA * resolution + y;
                 unsigned indexB = xB * resolution + y;
                 assignedCells.insert(cells[indexA]);

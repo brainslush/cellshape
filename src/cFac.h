@@ -33,7 +33,4 @@ public:
 protected:
 };
 
-// add class to the registrar
-registrar::n::registerType<fac_base,fac>();
-
 #endif /* SRC_CFAC_H_ */

@@ -68,9 +68,6 @@ protected:
     functor_cell_membraneCreation *membraneF;
 };
 
-// add class to the registrar
-registrar::n::registerType<cell_base,cell>();
-
 // base class for cell functor
 class functor_cell_base {
 public:

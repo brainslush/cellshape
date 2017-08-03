@@ -17,7 +17,7 @@
 
 class simple_surface;
 
-class surface_border : public matrix_base {
+class surface_border : public surface_border_base {
 public:
     surface_border(
             sGlobalVars &iGlobals,
@@ -34,7 +34,7 @@ protected:
     simple_surface *surface;
 };
 
-class simple_surface : public matrix_base {
+class simple_surface : public surface_base {
 public:
     simple_surface(
             sGlobalVars &iGlobals,

@@ -1,5 +1,9 @@
 #include "base.h"
 
+// register base class to registrar
+
+
+// base class defines
 base::base() {
     associatedVisualObj = nullptr;
     timeStamp = ofGetFrameNum();
@@ -51,10 +55,6 @@ void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) 
     intersectorsChecked.insert(iIntersector);
 }
 
-void base::add_ignoreIntersect(base *iIgnore) {
-    ignoreIntersect.insert(iIgnore);
-}
-
 void base::clear_intersectors() {
     intersectors.clear();
     intersectionVectors.clear();
@@ -64,10 +64,6 @@ void base::clear_intersectors() {
 void base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     /*do nothing*/
 }
-
-void base::update_timeStamp() {
-    timeStamp = ofGetFrameNum();
-};
 
 /***************************
  * visual_base
@@ -90,10 +86,6 @@ visual_base::~visual_base() {
 
 }
 
-base &visual_base::get_associatedComponent() {
-    return *associatedComponent;
-}
-
 ofFloatColor &visual_base::get_color() {
     return color;
 }
@@ -112,10 +104,6 @@ std::vector<Eigen::Vector3d> &visual_base::get_positions() {
 
 std::vector<double> &visual_base::get_parameters() {
     return associatedComponent->get_parameters();
-}
-
-void visual_base::set_associatedComponent(base *iComponent) {
-    associatedComponent = iComponent;
 }
 
 void visual_base::set_color(double iRed, double iGreen, double iBlue, double iAlpha) {

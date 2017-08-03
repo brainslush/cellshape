@@ -43,7 +43,4 @@ protected:
     const double stallingForce; // force at which actin doesn't treadmills anymore
 };
 
-// add class to the registrar
-registrar::n::registerType<filament_base,actin>();
-
 #endif /* SRC_ACTIN_H_ */
