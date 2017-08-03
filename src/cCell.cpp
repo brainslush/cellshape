@@ -217,7 +217,7 @@ pair<Eigen::Vector3d, membrane_part *> functor_cell_filamentCreation::find_creat
     length -= currLength;
     auto &pos = (*it)->get_positions();
     Eigen::Vector3d ret = Eigen::Vector3d(pos[0] + length * (pos[0] - pos[1]).normalized());
-    return {ret, *it};
+    return std::make_pair(ret, static_cast<membrane_part *>(*it));
 }
 
 Eigen::Vector3d functor_cell_filamentCreation::find_tmVelocity(cell &iCell, membrane_part &iMembrane) {

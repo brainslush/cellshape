@@ -3,6 +3,7 @@
 #include "base.h"
 #include "gui.h"
 #include "bmath.h"
+#include "ignoreList.h"
 
 #ifndef SRC_GRID_H_
 #define SRC_GRID_H_

@@ -201,7 +201,7 @@ void cell::update_intersecting() {
         for (auto &itB : components) {
             if (
                     itA != itB &&
-                    !ignore::isIgnored(typeid(*itA).hash_code(), typeid(*itB).hash_code()) &&
+                    !ignore::n::isIgnored(typeid(*itA).hash_code(), typeid(*itB).hash_code()) &&
                     !itA->isIntersectorChecked(itB) &&
                     !itB->isIntersectorChecked(itA)
                     ) {

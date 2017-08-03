@@ -5,8 +5,6 @@
 #include <eigen3/Eigen/Eigen>
 #include <eigen3/Eigen/StdVector>
 #include "ofMain.h"
-#include "typeRegistrar.h"
-#include "ignoreList.h"
 
 #ifndef SRC_BASE_H_
 #define SRC_BASE_H_
