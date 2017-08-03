@@ -25,7 +25,6 @@ surface_border::surface_border(
     associatedVisualObj->set_fillColor(1.0, 1.0, 1.0);
     associatedVisualObj->set_color(1.0, 1.0, 1.0);
     globals.grid->register_component(this);
-    add_ignoreIntersect(typeid(*this).hash_code());
 }
 
 surface_border::~surface_border() {

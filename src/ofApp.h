@@ -6,6 +6,8 @@
 #include "cFunctors.h"
 #include "gui.h"
 #include "ofMain.h"
+#include "typeRegistrar.h"
+#include "ignoreList.h"
 
 #ifndef SRC_OFAPP_H_
 #define SRC_OFAPP_H_

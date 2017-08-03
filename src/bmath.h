@@ -2,6 +2,8 @@
 // Created by siegbahn on 29.07.17.
 //
 
+#pragma once
+
 #ifndef SRC_MATH_H_
 #define SRC_MATH_H_
 

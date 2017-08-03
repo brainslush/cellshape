@@ -17,28 +17,30 @@ ofApp::ofApp() {
     );
     halt = true;
     // add classes to the registrar
-    registrar::registerType<base, components_base>();
-    registrar::registerType<components_base, cell_base>();
-    registrar::registerType<cell_base, cell>();
-    registrar::registerType<components_base, cellcomponents_base>();
-    registrar::registerType<cellcomponents_base, crosslinker_base>();
-    registrar::registerType<cellcomponents_base, filament_base>();
-    registrar::registerType<filament_base, actin>();
-    registrar::registerType<cellcomponents_base, volume_base>();
-    registrar::registerType<cellcomponents_base, membrane_part_base>();
-    registrar::registerType<components_base, matrixcomponents_base>();
-    registrar::registerType<matrixcomponents_base, fac_base>();
-    registrar::registerType<matrixcomponents_base, surface_border_base>();
-    registrar::registerType<matrixcomponents_base, surface_base>();
-    registrar::registerType<fac_base, fac>();
-    registrar::registerType<membrane_part_base, membrane_part>();
-    registrar::registerType<cellcomponents_base,membrane_container>();
+    registrar::n::registerBase<base>();
+    halt = true;
+    registrar::n::registerType<base, components_base>();
+    registrar::n::registerType<components_base, cell_base>();
+    registrar::n::registerType<cell_base, cell>();
+    registrar::n::registerType<components_base, cellcomponents_base>();
+    registrar::n::registerType<cellcomponents_base, crosslinker_base>();
+    registrar::n::registerType<cellcomponents_base, filament_base>();
+    registrar::n::registerType<filament_base, actin>();
+    registrar::n::registerType<cellcomponents_base, volume_base>();
+    registrar::n::registerType<cellcomponents_base, membrane_part_base>();
+    registrar::n::registerType<components_base, matrixcomponents_base>();
+    registrar::n::registerType<matrixcomponents_base, fac_base>();
+    registrar::n::registerType<matrixcomponents_base, surface_border_base>();
+    registrar::n::registerType<matrixcomponents_base, surface_base>();
+    registrar::n::registerType<fac_base, fac>();
+    registrar::n::registerType<membrane_part_base, membrane_part>();
+    registrar::n::registerType<cellcomponents_base,membrane_container>();
     // add self ignore rules
-    ignore::addRule<membrane_part_base, membrane_part_base>();
-    ignore::addRule<fac_base, fac_base>();
-    ignore::addRule<surface_border_base, surface_border_base>();
+    ignore::n::addRule<membrane_part_base, membrane_part_base>();
+    ignore::n::addRule<fac_base, fac_base>();
+    ignore::n::addRule<surface_border_base, surface_border_base>();
     // add further ignore rules
-    ignore::addRule<membrane_part_base, fac_base>();
+    ignore::n::addRule<membrane_part_base, fac_base>();
 }
 
 ofApp::~ofApp() {
