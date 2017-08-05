@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 3.7)
 project(Cellformation)
 set(APP Cellformation)
 
-set(CMAKE_CXX_STANDARD 11)
-
 set(OF_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../of/" CACHE PATH "The root directory of ofnode/of project.")
 
 include(${OF_ROOT}/openFrameworks.cmake)
+
+## Compiler options
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-O3")        ## Optimize enabled
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")  ## Optimize disabled
+##set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 
 ofxaddon(ofxDatGui)
 
