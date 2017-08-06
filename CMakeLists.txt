@@ -8,8 +8,9 @@ include(${OF_ROOT}/openFrameworks.cmake)
 
 ## Compiler options
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-O3")        ## Optimize enabled
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")  ## Optimize disabled
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")  ## Optimize disabled
+set(CMAKE_CXX_FLAGS_RELEASE "-O3") ## Maximum opt level
 ##set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 
 ofxaddon(ofxDatGui)
