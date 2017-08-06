@@ -2,9 +2,9 @@
 
 using namespace grid;
 
-/***************************
-* grid_borders
-***************************/
+/*
+* The grid borders only exist as visual component holders so one can see the grid borders.
+*/
 
 border::border(
         double iX1,
@@ -30,9 +30,10 @@ void border::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 }
 
 
-/***************************
-* grid_cell
-***************************/
+/*
+* The grid cells store which cell components are inside their boundaries. The stored cell components are updated after
+ * each time step. All grid cells are stored in the class 'grid' and form the complete grid
+*/
 
 cell::cell(
         bool &iShowGrid,
@@ -71,6 +72,19 @@ std::set<base *> &cell::get_components() {
     return components;
 }
 
+/*
+ * Function which is used to calculate and obtain the intersection information of a circle and a segemented line
+ *
+ * Arguments:
+ * 1: cell component (Line) <pointer>
+ * 2: cell component (Circle) <pointer>
+ *
+ * Return Value:
+ * 1: std::pair<
+ *  1: cell component <pointer>
+ *  2: normal vector from line to circle center <Eigen::Vector3d>>
+ */
+
 std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRef, base *iCom) {
     // get data
     auto &posRef = iRef->get_positions();
@@ -98,6 +112,21 @@ std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRe
     return {iRef, posRef[0]};
 }
 
+/*
+ * Function which is used to calculate and obtain the intersection information of two segmented lines
+ *
+ * Arguments:
+ * 1: cell component (Line) <pointer>
+ * 2: cell component (Line) <pointer>
+ *
+ * Return Value:
+ * 1: std::pair<
+ *  1: cell component <pointer>
+ *  2: std::pair<
+ *   1: normal vector from line to circle center <Eigen::Vector3d>>
+ *   2:
+ */
+
 std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>>
 cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
     auto &posRef = iRef->get_positions();
@@ -123,6 +152,10 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
     return {iCom,{posCom[0],posCom[0]}};
 }
 
+/*
+ * Function which pushes the pointer to the visual elements of the grid cell into the handed vector
+ */
+
 void cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     if (showGridOccupation && components.size() > 0) {
         iVisualObjs.push_back(associatedVisualObj);
@@ -133,6 +166,11 @@ void cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
         }
     }
 }
+
+/*
+ * Function which handles the update of the intersection information by differentiating between intersection cases
+ * e.g. line-circle, line-line, circle-circle
+ */
 
 bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
     bool ret = false;
@@ -199,6 +237,8 @@ void cell::update_intersecting() {
     bool intersection = false;
     for (auto &itA : components) {
         for (auto &itB : components) {
+            base *testA = itA;
+            base *testB = itB;
             if (
                     itA != itB &&
                     !ignore::n::isIgnored(typeid(*itA).hash_code(), typeid(*itB).hash_code()) &&
@@ -274,6 +314,10 @@ void container::unregister_component(base *iComponent) {
     }
     components.erase(iComponent);
 }
+
+/*
+ *  updates and finds the cell components which are located inside the grid cell
+ */
 
 void container::update_component(base *iComponent) {
     double cellLength = sideLength / (double) resolution;
