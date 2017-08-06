@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 #include <typeinfo>
-#include <vector>
+#include <set>
 #include "typeRegistrar.h"
 
 #ifndef SRC_IGNORELIST_H_
@@ -14,9 +14,9 @@ namespace ignore {
 
     class n {
     public:
-        static std::unordered_map<size_t, std::vector<size_t >> list;
+        static std::unordered_map<size_t, std::set<size_t >> list;
 
-        static std::vector<size_t> *obtainIgnoreEntries(size_t iId);
+        static std::set<size_t> *obtainIgnoreEntries(size_t iId);
 
         template<typename T>
         static std::vector<size_t> *obtainIgnoreEntries() {
@@ -27,23 +27,35 @@ namespace ignore {
         static void addRule() {
             auto idA = typeid(A).hash_code();
             auto idB = typeid(B).hash_code();
+            // get the ids of all childs of the id
+            auto childrenIdsA = registrar::n::obtainChildren(idA);
+            auto childrenIdsB = registrar::n::obtainChildren(idB);
 
-            auto find = list.find(idA);
-            if (find != list.end()) {
-                // append existing entry
-                find->second.push_back(idB);
-            } else {
-                // add new entry
-                list.insert({idA, {idB}});
-            }
-            if (idA != idB) {
-                find = list.find(idB);
+            for (auto &itA : childrenIdsA) {
+                auto find = list.find(itA);
                 if (find != list.end()) {
                     // append existing entry
-                    find->second.push_back(idA);
+                    for (auto &itB : childrenIdsB) {
+                        find->second.insert(itB);
+                    }
                 } else {
                     // add new entry
-                    list.insert({idB, {idA}});
+                    list.insert({idA, childrenIdsB});
+                }
+            }
+
+            if (idA != idB) {
+                for (auto &itB : childrenIdsB) {
+                    auto find = list.find(itB);
+                    if (find != list.end()) {
+                        // append existing entry
+                        for (auto &itA : childrenIdsA) {
+                            find->second.insert(itA);
+                        }
+                    } else {
+                        // add new entry
+                        list.insert({idB, childrenIdsA});
+                    }
                 }
             }
         };

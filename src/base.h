@@ -39,6 +39,14 @@ public:
 
     virtual visual_base *get_visualObj();
 
+    virtual size_t get_typeId();
+
+    virtual size_t get_typeId2();
+
+    virtual std::string get_name();
+
+    virtual std::string get_name2();
+
     virtual bool isIntersectorChecked(base *iRef);
 
     virtual void add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec);

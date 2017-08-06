@@ -237,15 +237,16 @@ void cell::update_intersecting() {
     bool intersection = false;
     for (auto &itA : components) {
         for (auto &itB : components) {
-            base *testA = itA;
-            base *testB = itB;
-            if (
-                    itA != itB &&
-                    !ignore::n::isIgnored(typeid(*itA).hash_code(), typeid(*itB).hash_code()) &&
+            auto test = itA->get_typeId();
+            auto test2 = itA->get_typeId2();
+            auto test3 = itA->get_name();
+            if (itA != itB) {
+                bool ignore = ignore::n::isIgnored(typeid(&(*itA)).hash_code(), typeid(&(*itB)).hash_code());
+                if (!ignore &&
                     !itA->isIntersectorChecked(itB) &&
-                    !itB->isIntersectorChecked(itA)
-                    ) {
-                intersection = intersection || obtain_intersecting(itA, itB);
+                    !itB->isIntersectorChecked(itA)) {
+                    intersection = intersection || obtain_intersecting(itA, itB);
+                }
             }
         }
     }

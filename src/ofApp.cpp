@@ -17,30 +17,39 @@ ofApp::ofApp() {
     );
     halt = true;
     // add classes to the registrar
-    registrar::n::registerBase<base>();
-    halt = true;
-    registrar::n::registerType<base, components_base>();
-    registrar::n::registerType<components_base, cell_base>();
-    registrar::n::registerType<cell_base, cell>();
-    registrar::n::registerType<components_base, cellcomponents_base>();
-    registrar::n::registerType<cellcomponents_base, crosslinker_base>();
-    registrar::n::registerType<cellcomponents_base, filament_base>();
-    registrar::n::registerType<filament_base, actin>();
-    registrar::n::registerType<cellcomponents_base, volume_base>();
-    registrar::n::registerType<cellcomponents_base, membrane_part_base>();
-    registrar::n::registerType<components_base, matrixcomponents_base>();
-    registrar::n::registerType<matrixcomponents_base, fac_base>();
-    registrar::n::registerType<matrixcomponents_base, surface_border_base>();
-    registrar::n::registerType<matrixcomponents_base, surface_base>();
-    registrar::n::registerType<fac_base, fac>();
-    registrar::n::registerType<membrane_part_base, membrane_part>();
-    registrar::n::registerType<cellcomponents_base,membrane_container>();
+    registrar::n::registerBase(typeid(base));
+    registrar::n::registerType(typeid(base), typeid(components_base));
+    // cell container registration
+    registrar::n::registerType(typeid(components_base), typeid(cell_base));
+    registrar::n::registerType(typeid(cell_base), typeid(cell));
+    // cellcomponents base registration
+    registrar::n::registerType(typeid(components_base), typeid(cellcomponents_base));
+    // crosslinker registration
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(crosslinker_base));
+    // fillament registration
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(filament_base));
+    registrar::n::registerType(typeid(filament_base), typeid(actin));
+    // volume registration
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(volume_base));
+    // matrixcomponents registration
+    registrar::n::registerType(typeid(components_base), typeid(matrixcomponents_base));
+    // fac registration
+    registrar::n::registerType(typeid(matrixcomponents_base), typeid(fac_base));
+    registrar::n::registerType(typeid(fac_base), typeid(fac));
+    // surface border registration
+    registrar::n::registerType(typeid(matrixcomponents_base), typeid(surface_border_base));
+    registrar::n::registerType(typeid(surface_border_base), typeid(surface_base));
+    // membrane registration
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(membrane_part_base));
+    registrar::n::registerType(typeid(membrane_part_base), typeid(membrane_part));
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(membrane_container));
     // add self ignore rules
-    ignore::n::addRule<membrane_part_base, membrane_part_base>();
-    ignore::n::addRule<fac_base, fac_base>();
-    ignore::n::addRule<surface_border_base, surface_border_base>();
+    ignore::n::addRule(typeid(membrane_part_base), typeid(membrane_part_base));
+    ignore::n::addRule(typeid(fac_base), typeid(fac_base));
+    ignore::n::addRule(typeid(surface_border_base), typeid(surface_border_base));
     // add further ignore rules
-    ignore::n::addRule<membrane_part_base, fac_base>();
+    ignore::n::addRule(typeid(membrane_part_base), typeid(fac_base));
+
 }
 
 ofApp::~ofApp() {
@@ -83,6 +92,7 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
+    //std::cout << "surface_border :: " << typeid(surface_border).name();
     // calculate scale factor when window is resized
     scale = std::min(ofGetHeight() / (double) globals.settings.sideLength,
                      ofGetWidth() / (double) globals.settings.sideLength);
