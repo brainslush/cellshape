@@ -58,6 +58,15 @@ node *registrar::n::findNodeById(node *startNode, size_t id) {
     }
 }
 
+void registrar::n::registerType(const std::type_info &idA, const std::type_info &idB) {
+
+    node *parentNode = findNodeById(registrar::n::baseNode, idA.hash_code());
+    if (parentNode) {
+        node *newChild = new node(idB.hash_code(), idB.name(), parentNode);
+        parentNode->addChild(newChild);
+    }
+}
+
 bool registrar::n::isChild(size_t iIdBase, size_t iIdDerived) {
     node *nodeA = findNodeById(baseNode, iIdBase);
     if (nodeA) {
@@ -80,4 +89,23 @@ bool registrar::n::isChildSet(std::vector<size_t> *iList, size_t iIdDerived) {
         }
     } while (!found && it != iList->end());
     return found;
+}
+
+std::set<size_t> registrar::n::obtainChildren(size_t iId) {
+    auto startnode = findNodeById(baseNode, iId);
+    if (startnode) {
+        std::set<size_t> children;
+        std::queue<node *> queue;
+        queue.push(startnode);
+        do {
+            children.insert(queue.front()->get_id());
+            auto &childNodes = queue.front()->get_childs();
+            queue.pop();
+            for (auto &it : childNodes) {
+                queue.push(it);
+            }
+        } while (queue.size() > 0);
+        return children;
+    }
+    return {iId};
 }

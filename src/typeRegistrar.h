@@ -2,7 +2,7 @@
 // Created by siegbahn on 31.07.17.
 //
 
-#include <vector>
+#include <set>
 #include <string>
 #include <queue>
 #include <iostream>
@@ -43,6 +43,15 @@ namespace registrar {
 
         static node *findNodeById(node *startNode, size_t id);
 
+        static void registerBase(const std::type_info &id) {
+            if (!registrar::n::baseNode) {
+                baseNode = new node(id.hash_code(), id.name());
+            } else {
+                std::cout << "A base class does already exist! [" << baseNode->get_name() << ", " << baseNode->get_id() << "]\n";
+            }
+        }
+
+        /*
         template<typename Base>
         static void registerBase() {
             if (!registrar::n::baseNode) {
@@ -52,18 +61,24 @@ namespace registrar {
                 std::cout << "A base class does already exist! [" << baseNode->get_name() << ", " << baseNode->get_id() << "]\n";
             }
         }
+        */
 
+        static void registerType(const std::type_info &idA, const std::type_info &idB);
+
+        /*
         template<typename Base, typename Derived>
         static void registerType() {
-            auto idBase = typeid(Base).hash_code();
+            Base tempBase();
+            Derived tempDerived();
+            auto idBase = typeid(tempBase).hash_code();
 
             node *parentNode = findNodeById(registrar::n::baseNode, idBase);
             if (parentNode) {
-                auto &type = typeid(Derived);
-                node *newChild = new node(type.hash_code(), type.name(), parentNode);
+                node *newChild = new node(typeid(Derived).hash_code(), typeid(Derived).name(), parentNode);
                 parentNode->addChild(newChild);
             }
         }
+        */
 
         static bool isChild(size_t iIdBase, size_t iIdDerived);
 
@@ -78,6 +93,8 @@ namespace registrar {
         static bool isChildSet(std::vector<size_t> *iList) {
             return isChildSet(iList, typeid(Derived).hash_code());
         }
+
+        static std::set<size_t> obtainChildren(size_t iId);
     };
 }
 

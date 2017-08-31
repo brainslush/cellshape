@@ -45,6 +45,22 @@ std::set<std::pair<base *, Eigen::Vector3d *>> &base::get_intersectors() { retur
 
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 
+size_t base::get_typeId() {
+    return typeid(this).hash_code();
+}
+
+size_t base::get_typeId2() {
+    return typeid(*this).hash_code();
+}
+
+std::string base::get_name() {
+    return typeid(this).name();
+}
+
+std::string base::get_name2() {
+    return typeid(*this).name();
+}
+
 bool base::isIntersectorChecked(base * iRef) {
     return intersectorsChecked.find(iRef) == intersectorsChecked.end();
 };
