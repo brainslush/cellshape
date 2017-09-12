@@ -19,12 +19,12 @@ node::node(size_t iId, std::string iName, node *iParent) :
 
 node::~node() {};
 
-std::vector<node *> &node::get_childs() {
-    return childs;
+std::vector<node *> &node::get_children() {
+    return children;
 }
 
 void node::addChild(node *iChild) {
-    childs.push_back(iChild);
+    children.push_back(iChild);
 }
 
 size_t &node::get_id() {
@@ -41,8 +41,8 @@ node *registrar::n::findNodeById(node *startNode, size_t id) {
         queue.push(startNode);
         do {
             if (queue.front()->get_id() != id) {
-                auto &childs = queue.front()->get_childs();
-                for (auto &it : childs) {
+                auto &children = queue.front()->get_children();
+                for (auto &it : children) {
                     queue.push(it);
                 }
                 queue.pop();
@@ -99,7 +99,7 @@ std::set<size_t> registrar::n::obtainChildren(size_t iId) {
         queue.push(startnode);
         do {
             children.insert(queue.front()->get_id());
-            auto &childNodes = queue.front()->get_childs();
+            auto &childNodes = queue.front()->get_children();
             queue.pop();
             for (auto &it : childNodes) {
                 queue.push(it);

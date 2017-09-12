@@ -39,13 +39,7 @@ public:
 
     virtual visual_base *get_visualObj();
 
-    virtual size_t get_typeId();
-
-    virtual size_t get_typeId2();
-
-    virtual std::string get_name();
-
-    virtual std::string get_name2();
+    virtual size_t &get_typeHash();
 
     virtual bool isIntersectorChecked(base *iRef);
 
@@ -64,6 +58,7 @@ protected:
     std::set<grid::cell *> gridCells; // gridcells in which object lies
     visual_base *associatedVisualObj; // assignes a visual object
     unsigned long long timeStamp; // timestamp is relevant for variableUpdate features
+    std::size_t typeHash;
 };
 
 /*
