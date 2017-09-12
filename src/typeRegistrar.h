@@ -22,7 +22,7 @@ namespace registrar {
 
         ~node();
 
-        std::vector<node *> &get_childs();
+        std::vector<node *> &get_children();
 
         void addChild(node *iChild);
 
@@ -34,7 +34,7 @@ namespace registrar {
         size_t id;
         std::string name;
         node *parentnode;
-        std::vector<node *> childs;
+        std::vector<node *> children;
     };
 
     class n {

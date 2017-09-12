@@ -237,11 +237,10 @@ void cell::update_intersecting() {
     bool intersection = false;
     for (auto &itA : components) {
         for (auto &itB : components) {
-            auto test = itA->get_typeId();
-            auto test2 = itA->get_typeId2();
-            auto test3 = itA->get_name();
+            auto test = itA->get_typeHash();
+            auto test3 = itB->get_typeHash();
             if (itA != itB) {
-                bool ignore = ignore::n::isIgnored(typeid(&(*itA)).hash_code(), typeid(&(*itB)).hash_code());
+                bool ignore = ignore::n::isIgnored(itA->get_typeHash(),itB->get_typeHash());
                 if (!ignore &&
                     !itA->isIntersectorChecked(itB) &&
                     !itB->isIntersectorChecked(itA)) {

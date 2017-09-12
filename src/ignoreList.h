@@ -18,16 +18,10 @@ namespace ignore {
 
         static std::set<size_t> *obtainIgnoreEntries(size_t iId);
 
-        template<typename T>
-        static std::vector<size_t> *obtainIgnoreEntries() {
-            return obtainIgnoreEntries(typeid(T).hash_code());
-        };
-
-        template<typename A, typename B>
-        static void addRule() {
-            auto idA = typeid(A).hash_code();
-            auto idB = typeid(B).hash_code();
-            // get the ids of all childs of the id
+        static void addRule(const std::type_info &typeA, const std::type_info &typeB) {
+            // get the ids of all children of the id
+            auto idA = typeA.hash_code();
+            auto idB = typeB.hash_code();
             auto childrenIdsA = registrar::n::obtainChildren(idA);
             auto childrenIdsB = registrar::n::obtainChildren(idB);
 

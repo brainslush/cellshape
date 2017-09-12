@@ -4,27 +4,28 @@
 
 
 // base class defines
-base::base() {
-    associatedVisualObj = nullptr;
-    timeStamp = ofGetFrameNum();
-}
+base::base() :
+        associatedVisualObj(nullptr),
+        timeStamp(ofGetFrameNum()),
+        typeHash(0) {}
 
 base::base(
         std::vector<Eigen::Vector3d> iPositions
 ) :
-        positions(iPositions) {
-    associatedVisualObj = nullptr;
-    timeStamp = ofGetFrameNum();
-}
+        associatedVisualObj(nullptr),
+        timeStamp(ofGetFrameNum()),
+        typeHash(0),
+        positions(iPositions) {}
 
-base::base(std::vector<Eigen::Vector3d> iPositions, std::vector<double> iParameters
-
+base::base(
+        std::vector<Eigen::Vector3d> iPositions,
+        std::vector<double> iParameters
 ) :
+        associatedVisualObj(nullptr),
+        timeStamp(ofGetFrameNum()),
+        typeHash(0),
         positions(iPositions),
-        parameters(iParameters) {
-    associatedVisualObj = nullptr;
-    timeStamp = ofGetFrameNum();
-}
+        parameters(iParameters) {}
 
 base::~base() {
     delete associatedVisualObj;
@@ -45,23 +46,7 @@ std::set<std::pair<base *, Eigen::Vector3d *>> &base::get_intersectors() { retur
 
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 
-size_t base::get_typeId() {
-    return typeid(this).hash_code();
-}
-
-size_t base::get_typeId2() {
-    return typeid(*this).hash_code();
-}
-
-std::string base::get_name() {
-    return typeid(this).name();
-}
-
-std::string base::get_name2() {
-    return typeid(*this).name();
-}
-
-bool base::isIntersectorChecked(base * iRef) {
+bool base::isIntersectorChecked(base *iRef) {
     return intersectorsChecked.find(iRef) == intersectorsChecked.end();
 };
 
@@ -79,6 +64,13 @@ void base::clear_intersectors() {
 
 void base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     /*do nothing*/
+}
+
+size_t &base::get_typeHash() {
+    if (typeHash == 0) {
+        typeHash = typeid(*this).hash_code();
+    }
+    return typeHash;
 }
 
 /***************************
