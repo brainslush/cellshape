@@ -7,7 +7,7 @@ set(OF_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../of/" CACHE PATH "The root directory 
 include(${OF_ROOT}/openFrameworks.cmake)
 
 ## Compiler options
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17   )
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")  ## Optimize disabled
 set(CMAKE_CXX_FLAGS_RELEASE "-O3") ## Maximum opt level
