@@ -66,9 +66,9 @@ void base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     /*do nothing*/
 }
 
-size_t &base::get_typeHash() {
+size_t &base::get_typeHash(base *it) {
     if (typeHash == 0) {
-        typeHash = typeid(*this).hash_code();
+        typeHash = typeid(*it).hash_code();
     }
     return typeHash;
 }
