@@ -39,7 +39,7 @@ public:
 
     virtual visual_base *get_visualObj();
 
-    virtual size_t &get_typeHash();
+    virtual size_t &get_typeHash(base *it);
 
     virtual bool isIntersectorChecked(base *iRef);
 
