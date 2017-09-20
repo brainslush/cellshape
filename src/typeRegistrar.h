@@ -30,6 +30,10 @@ namespace registrar {
 
         std::string &get_name();
 
+        friend std::ostream &operator<<(std::ostream &lhs, node &rhs) {
+            return (lhs << rhs.get_name() << " :: " << rhs.get_id());
+        };
+
     protected:
         size_t id;
         std::string name;
@@ -93,6 +97,8 @@ namespace registrar {
         static bool isChildSet(std::vector<size_t> *iList) {
             return isChildSet(iList, typeid(Derived).hash_code());
         }
+
+        static std::set<node *> obtainChildrenNodes(size_t iId);
 
         static std::set<size_t> obtainChildren(size_t iId);
     };

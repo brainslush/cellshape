@@ -49,7 +49,7 @@ ofApp::ofApp() {
     ignore::n::addRule(typeid(surface_border_base), typeid(surface_border_base));
     // add further ignore rules
     ignore::n::addRule(typeid(membrane_part_base), typeid(fac_base));
-
+    ignore::n::listRules();
 }
 
 ofApp::~ofApp() {

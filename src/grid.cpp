@@ -236,9 +236,9 @@ void cell::update_intersecting() {
     bool intersection = false;
     for (auto &itA : components) {
         for (auto &itB : components) {
-            auto test = itA->get_typeHash(itA);
-            auto test3 = itB->get_typeHash(itB);
             if (itA != itB) {
+                auto test = itA->get_typeHash(itA);
+                auto test3 = itB->get_typeHash(itB);
                 bool ignore = ignore::n::isIgnored(itA->get_typeHash(itA),itB->get_typeHash(itB));
                 if (!ignore &&
                     !itA->isIntersectorChecked(itB) &&
@@ -279,7 +279,7 @@ container::container(mygui::gui *&iGuiBase, double iSideLength) :
         guiGroup(guiBase->register_group("Grid")),
         showGrid(guiGroup->register_setting<bool>("Show grid", true, false)),
         showGridOccupation(guiGroup->register_setting<bool>("show Occ", true, false)),
-        resolution(guiGroup->register_setting<unsigned>("Resolution", false, 50, 250, 100)) {
+        resolution(guiGroup->register_setting<unsigned>("Resolution", false, 2, 250, 100)) {
     create_cells();
 }
 
@@ -299,12 +299,14 @@ void container::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 }
 
 void container::register_component(base *iComponent) {
-    if (iComponent->get_visualObj()) {
+    // removed check b/c this function is mostly called in headers and causes problems with virtuality
+    //if (iComponent->get_visualObj()) {
         components.insert(iComponent);
-    } else {
+    /*} else {
         std::cout << "Could not register object with ID: " << typeid(*iComponent).name()
                   << "\n Visual object is missing";
-    }
+    }*/
+    return void();
 }
 
 void container::unregister_component(base *iComponent) {
