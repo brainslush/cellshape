@@ -14,41 +14,47 @@ namespace ignore {
 
     class n {
     public:
-        static std::unordered_map<size_t, std::set<size_t >> list;
+        static std::unordered_map<std::size_t, registrar::node *> idMap;
+        static std::unordered_map<registrar::node*, std::set<registrar::node *>> list;
 
-        static std::set<size_t> *obtainIgnoreEntries(size_t iId);
+        static std::set<registrar::node *> *obtainIgnoreEntries(registrar::node *iId);
+
+        static void listRules();
 
         static void addRule(const std::type_info &typeA, const std::type_info &typeB) {
-            // get the ids of all children of the id
+            // get ids
             auto idA = typeA.hash_code();
             auto idB = typeB.hash_code();
-            auto childrenIdsA = registrar::n::obtainChildren(idA);
-            auto childrenIdsB = registrar::n::obtainChildren(idB);
-
-            for (auto &itA : childrenIdsA) {
+            // get all children ids
+            auto childrenNodesA = registrar::n::obtainChildrenNodes(idA);
+            auto childrenNodesB = registrar::n::obtainChildrenNodes(idB);
+            // run through all children and add the rule
+            for (auto itA : childrenNodesA) {
                 auto find = list.find(itA);
                 if (find != list.end()) {
                     // append existing entry
-                    for (auto &itB : childrenIdsB) {
+                    for (auto &itB : childrenNodesB) {
                         find->second.insert(itB);
                     }
                 } else {
                     // add new entry
-                    list.insert({idA, childrenIdsB});
+                    idMap.insert({itA->get_id(),itA});
+                    list.insert({itA, childrenNodesB});
                 }
             }
 
             if (idA != idB) {
-                for (auto &itB : childrenIdsB) {
+                for (auto &itB : childrenNodesB) {
                     auto find = list.find(itB);
                     if (find != list.end()) {
                         // append existing entry
-                        for (auto &itA : childrenIdsA) {
+                        for (auto &itA : childrenNodesA) {
                             find->second.insert(itA);
                         }
                     } else {
                         // add new entry
-                        list.insert({idB, childrenIdsA});
+                        idMap.insert({itB->get_id(),itB});
+                        list.insert({itB, childrenNodesA});
                     }
                 }
             }

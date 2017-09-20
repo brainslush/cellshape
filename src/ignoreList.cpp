@@ -2,24 +2,35 @@
 
 using namespace ignore;
 
-std::unordered_map<size_t, std::set<size_t >> n::list = {};
+std::unordered_map<std::size_t, registrar::node *> n::idMap = {};
+std::unordered_map<registrar::node *, std::set<registrar::node *>> n::list = {};
 
-std::set<size_t> *n::obtainIgnoreEntries(size_t iId) {
+std::set<registrar::node *> *n::obtainIgnoreEntries(registrar::node *iId) {
     auto search = list.find(iId);
     if (search != list.end()) {
         return &(search->second);
-    } else {
-        return nullptr;
     }
+    return nullptr;
 }
 
 bool n::isIgnored(const size_t &idA, const size_t &idB) {
-    //auto idA = oA.hash_code();
-    //auto idB = oB.hash_code();
-    auto entries = ignore::n::obtainIgnoreEntries(idA);
-    if (entries) {
-        //return registrar::n::isChildSet(entries, idB);
-        return entries->find(idB) != entries->end();
+    auto node = idMap.find(idA);
+    if (node != idMap.end()) {
+        auto entries = ignore::n::obtainIgnoreEntries(node->second);
+        if (entries) {
+            node = idMap.find(idB);
+            return entries->find(node->second) != entries->end();
+        }
+        return false;
     }
     return false;
+}
+
+void n::listRules() {
+    for (auto &it : list) {
+        std::cout << it.first << "\n";
+        for (auto &lit2 : it.second) {
+            std::cout << "|--" << lit2 << "\n";
+        }
+    }
 };

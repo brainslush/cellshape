@@ -91,6 +91,25 @@ bool registrar::n::isChildSet(std::vector<size_t> *iList, size_t iIdDerived) {
     return found;
 }
 
+std::set<node*> registrar::n::obtainChildrenNodes(size_t iId) {
+    auto startnode = findNodeById(baseNode, iId);
+    if (startnode) {
+        std::set<node *> children;
+        std::queue<node *> queue;
+        queue.push(startnode);
+        do {
+            children.insert(queue.front());
+            auto &childNodes = queue.front()->get_children();
+            queue.pop();
+            for (auto &it : childNodes) {
+                queue.push(it);
+            }
+        } while (queue.size() > 0);
+        return children;
+    }
+    return {startnode};
+};
+
 std::set<size_t> registrar::n::obtainChildren(size_t iId) {
     auto startnode = findNodeById(baseNode, iId);
     if (startnode) {
