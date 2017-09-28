@@ -237,9 +237,9 @@ void cell::update_intersecting() {
     for (auto &itA : components) {
         for (auto &itB : components) {
             if (itA != itB) {
-                auto test = itA->get_typeHash(itA);
-                auto test3 = itB->get_typeHash(itB);
-                bool ignore = ignore::n::isIgnored(itA->get_typeHash(itA),itB->get_typeHash(itB));
+                auto test = itA->get_typeHash();
+                auto test3 = itB->get_typeHash();
+                bool ignore = ignore::n::isIgnored(itA->get_typeHash(),itB->get_typeHash());
                 if (!ignore &&
                     !itA->isIntersectorChecked(itB) &&
                     !itB->isIntersectorChecked(itA)) {

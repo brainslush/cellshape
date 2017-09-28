@@ -38,7 +38,7 @@ ofApp::ofApp() {
     registrar::n::registerType(typeid(fac_base), typeid(fac));
     // surface border registration
     registrar::n::registerType(typeid(matrixcomponents_base), typeid(surface_border_base));
-    registrar::n::registerType(typeid(surface_border_base), typeid(surface_base));
+    registrar::n::registerType(typeid(surface_border_base), typeid(surface_border));
     // membrane registration
     registrar::n::registerType(typeid(cellcomponents_base), typeid(membrane_part_base));
     registrar::n::registerType(typeid(membrane_part_base), typeid(membrane_part));
