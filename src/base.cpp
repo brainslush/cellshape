@@ -7,7 +7,7 @@
 base::base() :
         associatedVisualObj(nullptr),
         timeStamp(ofGetFrameNum()),
-        typeHash(0) {}
+        typeHash(0){}
 
 base::base(
         std::vector<Eigen::Vector3d> iPositions
@@ -15,7 +15,7 @@ base::base(
         associatedVisualObj(nullptr),
         timeStamp(ofGetFrameNum()),
         typeHash(0),
-        positions(iPositions) {}
+        positions(std::move(iPositions)) {}
 
 base::base(
         std::vector<Eigen::Vector3d> iPositions,
@@ -24,15 +24,15 @@ base::base(
         associatedVisualObj(nullptr),
         timeStamp(ofGetFrameNum()),
         typeHash(0),
-        positions(iPositions),
-        parameters(iParameters) {}
+        positions(std::move(iPositions)),
+        parameters(std::move(iParameters)) {}
 
 base::~base() {
     delete associatedVisualObj;
     associatedVisualObj = nullptr;
 }
 
-void base::set_gridCells(std::set<grid::cell *> iGridCells) { gridCells = iGridCells; }
+void base::set_gridCells(std::set<grid::cell *> iGridCells) { gridCells = std::move(iGridCells); }
 
 std::vector<Eigen::Vector3d> &base::get_positions() { return positions; }
 
@@ -66,9 +66,9 @@ void base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     /*do nothing*/
 }
 
-size_t &base::get_typeHash(base *it) {
+std::size_t &base::get_typeHash() {
     if (typeHash == 0) {
-        typeHash = typeid(*it).hash_code();
+        typeHash = typeid(*this).hash_code();
     }
     return typeHash;
 }

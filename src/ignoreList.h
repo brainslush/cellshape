@@ -60,7 +60,7 @@ namespace ignore {
             }
         };
 
-        static bool isIgnored(const size_t &idA, const size_t &idB);
+        static bool isIgnored(const std::size_t &idA, const std::size_t &idB);
     };
 }
 
