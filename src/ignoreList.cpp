@@ -20,8 +20,8 @@ bool n::isIgnored(const std::size_t &idA, const std::size_t &idB) {
     if (node != idMap.end()) {
         auto entries = ignore::n::obtainIgnoreEntries(node->second);
         if (entries) {
-            node = idMap.find(idB);
-            return entries->find(node->second) != entries->end();
+            auto nodeB = *(idMap.find(idB));
+            return entries->find(nodeB.second) != entries->end();
         }
         return false;
     }
