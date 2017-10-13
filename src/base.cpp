@@ -47,11 +47,11 @@ std::set<std::pair<base *, Eigen::Vector3d *>> &base::get_intersectors() { retur
 visual_base *base::get_visualObj() { return associatedVisualObj; }
 
 bool base::isIntersectorChecked(base *iRef) {
-    return intersectorsChecked.find(iRef) == intersectorsChecked.end();
+    return intersectorsChecked.find(iRef) != intersectorsChecked.end();
 };
 
 void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) {
-    intersectionVectors.push_back(iIntersectorVec);
+    intersectionVectors.push_back(std::move(iIntersectorVec));
     intersectors.insert(std::make_pair(iIntersector, &*intersectionVectors.end()));
     intersectorsChecked.insert(iIntersector);
 }
@@ -90,9 +90,7 @@ visual_base::visual_base(unsigned iType, base *iComponent) {
     associatedComponent = iComponent;
 }
 
-visual_base::~visual_base() {
-
-}
+visual_base::~visual_base() =default;
 
 ofFloatColor &visual_base::get_color() {
     return color;
@@ -152,8 +150,7 @@ void visual_base::draw(double iScale) {
 visual_line::visual_line(base *iComponent) : visual_base(1, iComponent) {
 }
 
-visual_line::~visual_line() {
-}
+visual_line::~visual_line() =default;
 
 void visual_line::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -171,8 +168,7 @@ void visual_line::draw(double iScale) {
 visual_ellipse::visual_ellipse(base *iComponent) : visual_base(2, iComponent) {
 }
 
-visual_ellipse::~visual_ellipse() {
-}
+visual_ellipse::~visual_ellipse() =default;
 
 void visual_ellipse::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -190,8 +186,7 @@ void visual_ellipse::draw(double iScale) {
 visual_rectangle::visual_rectangle(base *iComponent) : visual_base(3, iComponent) {
 }
 
-visual_rectangle::~visual_rectangle() {
-}
+visual_rectangle::~visual_rectangle() = default;
 
 void visual_rectangle::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -209,8 +204,7 @@ void visual_rectangle::draw(double iScale) {
 visual_triangle::visual_triangle(base *iComponent) : visual_base(4, iComponent) {
 }
 
-visual_triangle::~visual_triangle() {
-}
+visual_triangle::~visual_triangle() =default;
 
 void visual_triangle::draw(double iScale) {
     ofSetColor(get_fillColor());

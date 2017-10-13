@@ -15,9 +15,7 @@ ffFriction::ffFriction(mygui::gui *&iGui) :
 
 }
 
-functor::ffFriction::~ffFriction() {
-
-}
+functor::ffFriction::~ffFriction() = default;
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d> ffFriction::calc(
         Eigen::Vector3d &X,
@@ -39,7 +37,7 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> ffFriction::calc(
             auto &el = it.first;
             auto &pos = *it.second;
             // check if element is actually a filament
-            if (filament_base *element = dynamic_cast<filament_base *>(el)) {
+            if (auto *element = dynamic_cast<filament_base *>(el)) {
                 Eigen::Vector3d vNorm = element->get_rigidBody().get_v().normalized();
                 force += frictionCoeff * vNorm;
                 torque += frictionCoeff * (pos - com).cross(vNorm);
@@ -57,9 +55,7 @@ fmCollision::fmCollision(mygui::gui *&iGui) :
 
 }
 
-fmCollision::~fmCollision() {
-
-}
+fmCollision::~fmCollision() = default;
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d>
 fmCollision::calc(
@@ -85,7 +81,7 @@ fmCollision::calc(
         for (auto &it : intersectors) {
             auto &el = it.first;
             auto &pos = it.second;
-            if (membrane_part_base *element = dynamic_cast<membrane_part_base *>(el)) {
+            if (auto *element = dynamic_cast<membrane_part_base *>(el)) {
                 auto &Im = element->get_rigidBody().get_I();
                 auto &Mm = element->get_rigidBody().get_M();
                 auto &vm = element->get_rigidBody().get_v();
@@ -112,9 +108,7 @@ fViscosity::fViscosity(mygui::gui *&iGui) :
         factor(guiGroup->register_setting<double>("Factor", true, 0, 1, 0.1)) {
 }
 
-fViscosity::~fViscosity() {
-
-}
+fViscosity::~fViscosity() = default;
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d>
 fViscosity::calc(
@@ -142,9 +136,7 @@ membraneSpring::membraneSpring(mygui::gui *&iGui) :
 
 }
 
-membraneSpring::~membraneSpring() {
-
-}
+membraneSpring::~membraneSpring() = default;
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d>
 membraneSpring::calc(

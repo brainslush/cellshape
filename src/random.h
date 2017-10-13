@@ -25,31 +25,9 @@ public:
 
 class random_dist : public random_base {
 public:
-    /*
-     * boost/random/uniform_smallint.hpp
-     */
-    random_dist(
-            boost::random::mt19937 *iGen,
-            std::string iType,
-            long long iA,
-            long long iB);
+    random_dist();
 
-    /*
-     * boost/random/uniform_real_distribution.hpp
-     * boost/random/normal_distribution.hpp
-     * boost/random/lognormal_distribution.hpp
-     */
-    random_dist(
-            boost::random::mt19937 *iGen,
-            std::string iType,
-            double iA,
-            double iB);
-
-    /*
-     * boost/random/bernoulli_distribution.hpp
-     * boost/random/exponential_distribution.hpp
-     */
-    random_dist(
+    void create(
             boost::random::mt19937 *iGen,
             std::string iType,
             double iA);
@@ -57,36 +35,55 @@ public:
     /*
      * boost/random/uniform_01.hpp
      */
-    random_dist(
+    void create(
             boost::random::mt19937 *iGen,
             std::string iType);
+
+    template<typename T, typename U>
+    void create(
+            boost::random::mt19937 *iGen,
+            std::string iType,
+            T iA,
+            U iB
+    ) {
+        gen = iGen;
+        type = 0;
+        if (iType == "uniform_smallint") {
+            type = 10;
+            dist = new boost::random::uniform_smallint<>(iA, iB);
+        } else if (iType == "uniform_real_distribution") {
+            type = 20;
+            dist = new boost::random::uniform_real_distribution<>(iA, iB);
+        } else if (iType == "normal_distribution") {
+            type = 21;
+            dist = new boost::random::normal_distribution<>(iA, iB);
+        } else if (iType == "lognormal_distribution") {
+            type = 22;
+            dist = new boost::random::lognormal_distribution<>(iA, iB);
+        }
+    }
 
     template<typename T>
     T draw() {
         switch (type) {
             case 10:
                 return (*boost::get<boost::random::uniform_smallint<> *>(dist))(*gen);
-                break;
             case 20:
                 return (*boost::get<boost::random::uniform_real_distribution<> *>(dist))(*gen);
-                break;
             case 21:
                 return (*boost::get<boost::random::normal_distribution<> *>(dist))(*gen);
-                break;
             case 22:
                 return (*boost::get<boost::random::lognormal_distribution<> *>(dist))(*gen);
-                break;
             case 30:
                 return (*boost::get<boost::random::bernoulli_distribution<> *>(dist))(*gen);
-                break;
             case 31:
                 return (*boost::get<boost::random::exponential_distribution<> *>(dist))(*gen);
-                break;
             case 40:
                 return (*boost::get<boost::random::uniform_01<> *>(dist))(*gen);
-                break;
+            default: {
+                return 0;
+            }
         }
-        return 0;
     }
 
 protected:
@@ -113,14 +110,15 @@ public:
 
     void set_seed();
 
-    void set_seed(unsigned long long iSeed);
+    void set_seed(uint32_t iSeed);
 
     template<class ... A>
     random_dist *register_random(
             std::string iType,
             A... args
     ) {
-        random_dist *temp = new random_dist(&gen, iType, args...);
+        auto *temp = new random_dist();
+        temp->create(&gen, iType, args...);
         distributions.insert(temp);
         return temp;
     };

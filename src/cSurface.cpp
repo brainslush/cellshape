@@ -101,10 +101,10 @@ void simple_surface::create_facs() {
 
 void simple_surface::create_borders() {
     positions.clear();
-    positions.push_back(Eigen::Vector3d(0, 0, 0));
-    positions.push_back(Eigen::Vector3d(0, sideLength, 0));
-    positions.push_back(Eigen::Vector3d(sideLength, sideLength, 0));
-    positions.push_back(Eigen::Vector3d(sideLength, 0, 0));
+    positions.emplace_back(Eigen::Vector3d(0, 0, 0));
+    positions.emplace_back(Eigen::Vector3d(0, sideLength, 0));
+    positions.emplace_back(Eigen::Vector3d(sideLength, sideLength, 0));
+    positions.emplace_back(Eigen::Vector3d(sideLength, 0, 0));
     borders.push_back(new surface_border(globals, this, positions[0], positions[1]));
     borders.push_back(new surface_border(globals, this, positions[1], positions[2]));
     borders.push_back(new surface_border(globals, this, positions[2], positions[3]));

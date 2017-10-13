@@ -6,18 +6,18 @@ node *registrar::n::baseNode;
 
 node::node(size_t iId, std::string iName) :
         id(iId),
-        name(iName),
+        name(std::move(iName)),
         parentnode(this) {
 };
 
 node::node(size_t iId, std::string iName, node *iParent) :
         id(iId),
-        name(iName),
+        name(std::move(iName)),
         parentnode(iParent) {
 
 };
 
-node::~node() {};
+node::~node() =default;
 
 std::vector<node *> &node::get_children() {
     return children;
@@ -49,7 +49,7 @@ node *registrar::n::findNodeById(node *startNode, size_t id) {
             } else {
                 return queue.front();
             }
-        } while (queue.size() > 0);
+        } while (!queue.empty());
         std::cout << "Class not found!\n";
         return nullptr;
     } else {
@@ -104,7 +104,7 @@ std::set<node*> registrar::n::obtainChildrenNodes(size_t iId) {
             for (auto &it : childNodes) {
                 queue.push(it);
             }
-        } while (queue.size() > 0);
+        } while (!queue.empty());
         return children;
     }
     return {startnode};
@@ -123,7 +123,7 @@ std::set<size_t> registrar::n::obtainChildren(size_t iId) {
             for (auto &it : childNodes) {
                 queue.push(it);
             }
-        } while (queue.size() > 0);
+        } while (!queue.empty());
         return children;
     }
     return {iId};

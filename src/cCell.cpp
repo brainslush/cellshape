@@ -112,7 +112,7 @@ void cell::make_timeStep(double &dT) {
     // filament creator makes time step
     filamentF->make_timeStep(dT, this);
     // filaments make time step, is more complicated since they get
-    for (std::set<filament_base *>::iterator it = filaments.begin(); it != filaments.end();) {
+    for (auto it = filaments.begin(); it != filaments.end();) {
         if ((*it)->make_timeStep(dT)) {
             delete *it;
             filament_base *del = *it;
@@ -137,14 +137,12 @@ functor_cell_base::functor_cell_base(
         std::string iFunctorGroupName
 ) :
         globals(iGlobals),
-        guiGroup(globals.guiMain->register_group(iName)),
-        guiFunctorGroup(globals.guiC->register_gui(iFunctorGroupName)) {
+        guiGroup(globals.guiMain->register_group(std::move(iName))),
+        guiFunctorGroup(globals.guiC->register_gui(std::move(iFunctorGroupName))) {
 
 }
 
-functor_cell_base::~functor_cell_base() {
-
-}
+functor_cell_base::~functor_cell_base() =default;
 
 void functor_cell_base::register_functor(physic::functor *iFunctor) {
     functors.insert(iFunctor);
@@ -188,7 +186,7 @@ void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
 
 filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
     pair<Eigen::Vector3d, membrane_part *> pos = find_creationPosition(iCell);
-    actin *newActin = new actin(
+    auto *newActin = new actin(
             globals,
             iCell,
             pos.first,
@@ -245,15 +243,13 @@ functor_cell_membraneCreation::functor_cell_membraneCreation(sGlobalVars &iGloba
         resolution(guiGroup->register_setting<unsigned>("Resolution", false, 20, 200, 20)) {
 }
 
-functor_cell_membraneCreation::~functor_cell_membraneCreation() {
-
-}
+functor_cell_membraneCreation::~functor_cell_membraneCreation() =default;
 
 void functor_cell_membraneCreation::setup(cell &iCell) {
     guiGroup->forceVariableUpdate();
     // create new mebrane
     auto &membranes = iCell.get_membranes();
-    membrane_container *newMembrane = new membrane_container(globals, iCell);
+    auto *newMembrane = new membrane_container(globals, iCell);
     membranes.insert(newMembrane);
     // get some data for membrane parts creation
     auto &parts = newMembrane->get_parts();

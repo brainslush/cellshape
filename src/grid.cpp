@@ -13,8 +13,8 @@ border::border(
         double iY2
 ) : base() {
     positions.clear();
-    positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
-    positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
+    positions.emplace_back(Eigen::Vector3d(iX1, iY1, 0));
+    positions.emplace_back(Eigen::Vector3d(iX2, iY2, 0));
     associatedVisualObj = new visual_line(this);
     associatedVisualObj->set_color(0, 0, 0, 1);
     associatedVisualObj->set_fillColor(0, 0, 0, 1);
@@ -44,6 +44,7 @@ cell::cell(
         double iY2
 ) :
         base(),
+        isOccupied(false),
         showGrid(iShowGrid),
         showGridOccupation(iShowGridOccupation) {
     borders.clear();
@@ -52,10 +53,10 @@ cell::cell(
     borders.push_back(new border(iX2, iY2, iX2, iY1));
     borders.push_back(new border(iX2, iY1, iX1, iY1));
     positions.clear();
-    positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
-    positions.push_back(Eigen::Vector3d(iX1, iY2, 0));
-    positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
-    positions.push_back(Eigen::Vector3d(iX2, iY1, 0));
+    positions.emplace_back(Eigen::Vector3d(iX1, iY1, 0));
+    positions.emplace_back(Eigen::Vector3d(iX1, iY2, 0));
+    positions.emplace_back(Eigen::Vector3d(iX2, iY2, 0));
+    positions.emplace_back(Eigen::Vector3d(iX2, iY1, 0));
     associatedVisualObj = new visual_rectangle(this);
     associatedVisualObj->set_color(0, 0, 1, 1);
     associatedVisualObj->set_fillColor(0, 0, 1, 1);
@@ -100,8 +101,14 @@ std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRe
     // check if projection lies inside the circle
     if (projDiff.norm() < parCom[0]) {
         // check if any end lies inside the circle
-        if ((posRef[0] - posCom[0]).norm() <= parCom[0] || (posRef[1] - posCom[0]).norm() <= parCom[0]) {
+        auto diffA = posRef[0] - posCom[0];
+        auto diffB = posRef[1] - posCom[0];
+        if (diffA.norm() <= parCom[0] && diffB.norm() <= parCom[0]) {
             return {iCom, projDiff.normalized()};
+        } else if (diffA.norm() <= parCom[0]) {
+            return {iCom, diffA.normalized()};
+        } else if (diffB.norm() <= parCom[0]) {
+            return {iCom, diffB.normalized()};
         } else {
             // check if the end points and projection difference vectors are antiparralel
             if ((posRef[0] - proj).dot(posRef[1] - proj) < 0) {
@@ -157,7 +164,7 @@ cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
  */
 
 void cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
-    if (showGridOccupation && components.size() > 0) {
+    if (showGridOccupation && !components.empty()) {
         iVisualObjs.push_back(associatedVisualObj);
     }
     if (showGrid) {
@@ -230,26 +237,25 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
 }
 
 void cell::update_intersecting() {
-    for (auto &it : components) {
+    /*for (auto &it : components) {
         it->clear_intersectors();
-    }
+    }*/
     bool intersection = false;
     for (auto &itA : components) {
         for (auto &itB : components) {
             if (itA != itB) {
-                auto test = itA->get_typeHash();
-                auto test3 = itB->get_typeHash();
                 bool ignore = ignore::n::isIgnored(itA->get_typeHash(),itB->get_typeHash());
-                if (!ignore &&
-                    !itA->isIntersectorChecked(itB) &&
-                    !itB->isIntersectorChecked(itA)) {
+                if (
+                        !ignore &&
+                        !itA->isIntersectorChecked(itB) &&
+                        !itB->isIntersectorChecked(itA)) {
                     intersection = intersection || obtain_intersecting(itA, itB);
                 }
             }
         }
     }
     if (showGridOccupation) {
-        if (intersection) {
+        if (intersection ) {
             associatedVisualObj->set_color(1, 0, 1, 1);
             associatedVisualObj->set_fillColor(1, 0, 1, 1);
         } else {
@@ -267,6 +273,10 @@ void cell::remove_component(base *iComponent) {
 
 void cell::add_component(base *iComponent) {
     components.insert(iComponent);
+}
+
+void cell::reset() {
+
 }
 
 /***************************
@@ -347,16 +357,16 @@ void container::update_component(base *iComponent) {
             double yMax = std::max(posA(1), posB(1));
             double xMin = std::min(posA(0), posB(0));
             double xMax = std::max(posA(0), posB(0));
-            unsigned indexXMin = (unsigned)floor(xMin / cellLength);
-            unsigned indexXMax = (unsigned)floor(xMax / cellLength);
-            unsigned indexYMin = (unsigned)floor(yMin / cellLength);
-            unsigned indexYMax = (unsigned)floor(yMax / cellLength);
+            auto indexXMin = (unsigned)floor(xMin / cellLength);
+            auto indexXMax = (unsigned)floor(xMax / cellLength);
+            auto indexYMin = (unsigned)floor(yMin / cellLength);
+            auto indexYMax = (unsigned)floor(yMax / cellLength);
             // get cells
             if (abs(m) < 1) {
                 while (indexXMin <= indexXMax) {
                     // calculate y value
-                    unsigned indexTestT = (unsigned)floor(f0Red + m * indexXMin);
-                    unsigned indexTestB = (unsigned)boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
+                    auto indexTestT = (unsigned)floor(f0Red + m * indexXMin);
+                    auto indexTestB = (unsigned)boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
                                                                   indexYMin, indexYMax);
                     unsigned indexT =
                             std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestT);
@@ -374,8 +384,8 @@ void container::update_component(base *iComponent) {
                 while (indexYMin <= indexYMax) {
                     if (abs(m) < std::numeric_limits<double>::max()) {
                         // calculate x value
-                        unsigned indexTestL = (unsigned)floor((indexYMin - f0Red) / m);
-                        unsigned indexTestR = (unsigned)boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
+                        auto indexTestL = (unsigned)floor((indexYMin - f0Red) / m);
+                        auto indexTestR = (unsigned)boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
                                                                       indexXMin, indexXMax);
                         unsigned indexL =
                                 std::min(resolution - 1, indexTestL) * resolution + std::min(resolution - 1, indexYMin);
@@ -410,10 +420,10 @@ void container::update_component(base *iComponent) {
             double xMax = pos(0) + a;
             double yMin = pos(1) - b;
             double yMax = pos(1) + b;
-            unsigned indexXMin = (unsigned)floor(xMin / cellLength);
-            unsigned indexXMax = (unsigned)floor(xMax / cellLength);
-            unsigned indexYMin = (unsigned)floor(yMin / cellLength);
-            unsigned indexYMax = (unsigned)floor(yMax / cellLength);
+            auto indexXMin = (unsigned)floor(xMin / cellLength);
+            auto indexXMax = (unsigned)floor(xMax / cellLength);
+            auto indexYMin = (unsigned)floor(yMin / cellLength);
+            auto indexYMax = (unsigned)floor(yMax / cellLength);
             // get grid cells
             if (indexXMin != indexXMax) {
                 while (indexXMin <= indexXMax) {
@@ -460,12 +470,12 @@ void container::update_component(base *iComponent) {
             double yMin = std::min(posA(1), posB(1));
             double yMax = std::max(posA(1), posB(1));
             // get grid cells
-            unsigned xA = (unsigned)floor(xMin / cellLength);
-            unsigned xB = (unsigned)floor(xMax / cellLength);
-            unsigned yA = (unsigned)floor(yMin / cellLength);
-            unsigned yB = (unsigned)floor(yMax / cellLength);
+            auto xA = (unsigned)floor(xMin / cellLength);
+            auto xB = (unsigned)floor(xMax / cellLength);
+            auto yA = (unsigned)floor(yMin / cellLength);
+            auto yB = (unsigned)floor(yMax / cellLength);
             while (xMin < xMax) {
-                unsigned x = (unsigned)floor(xMin / cellLength);
+                auto x = (unsigned)floor(xMin / cellLength);
                 unsigned indexA = x * resolution + yA;
                 unsigned indexB = x * resolution + yB;
                 assignedCells.insert(cells[indexA]);
@@ -475,7 +485,7 @@ void container::update_component(base *iComponent) {
                 xMin += cellLength;
             }
             while (yMin < yMax) {
-                unsigned y = (unsigned)floor(yMin / cellLength);
+                auto y = (unsigned)floor(yMin / cellLength);
                 unsigned indexA = xA * resolution + y;
                 unsigned indexB = xB * resolution + y;
                 assignedCells.insert(cells[indexA]);
@@ -490,6 +500,7 @@ void container::update_component(base *iComponent) {
 
 void container::update_components() {
     for (auto &it : components) {
+        it->clear_intersectors();
         update_component(it);
     }
     for (auto &it : cells) {
