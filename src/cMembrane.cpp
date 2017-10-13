@@ -109,8 +109,8 @@ void membrane_container::update_length() {
 
 /* */
 void membrane_container::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {
-    for (unsigned long long i = 0; i < parts.size(); i++) {
-        parts[i]->obtain_visualObjs(oVisualComponents);
+    for (auto &it : parts) {
+        it->obtain_visualObjs(oVisualComponents);
     }
 }
 

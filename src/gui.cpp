@@ -42,7 +42,7 @@ void group::forceVariableUpdate() {
     }
 }
 
-gui::gui(std::string iName) {
+gui::gui(std::string& iName) {
     datGui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     datGui->addHeader(iName);
     datGui->addFooter();

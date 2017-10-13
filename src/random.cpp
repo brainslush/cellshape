@@ -3,48 +3,17 @@
 /***************************
 * random_base for std containers
 ***************************/
-random_base::random_base() {}
+random_base::random_base() = default;
 
-random_base::~random_base() {}
+random_base::~random_base() =default;
 
 /***************************
  * random_dist
  ***************************/
-random_dist::random_dist(
-        boost::random::mt19937 *iGen,
-        std::string iType,
-        long long iA,
-        long long iB) {
-    gen = iGen;
-    type = 0;
-    if (iType == "uniform_smallint") {
-        type = 10;
-        dist = new boost::random::uniform_smallint<>(iA, iB);
-    }
-}
 
-random_dist::random_dist(
-        boost::random::mt19937 *iGen,
-        std::string iType,
-        double iA,
-        double iB) {
-    gen = iGen;
-    type = 0;
-    if (iType == "uniform_real_distribution") {
-        type = 20;
-        dist = new boost::random::uniform_real_distribution<>(iA, iB);
-    }
-    if (iType == "normal_distribution") {
-        type = 21;
-        dist = new boost::random::normal_distribution<>(iA, iB);
-    }
-    if (iType == "lognormal_distribution") {
-        type = 22;
-        dist = new boost::random::lognormal_distribution<>(iA, iB);
-    }
-}
+random_dist::random_dist() {}
 
-random_dist::random_dist(
+void random_dist::create(
         boost::random::mt19937 *iGen,
         std::string iType,
         double iA) {
@@ -60,7 +29,7 @@ random_dist::random_dist(
     }
 }
 
-random_dist::random_dist(
+void random_dist::create(
         boost::random::mt19937 *iGen,
         std::string iType) {
     gen = iGen;
@@ -94,7 +63,7 @@ void random_container::set_seed() {
     seed = get_uptime();
 }
 
-void random_container::set_seed(unsigned long long iSeed) {
+void random_container::set_seed(uint32_t iSeed) {
     seed = iSeed;
     gen.seed(seed);
 }
@@ -109,7 +78,7 @@ unsigned long long random_container::get_uptime() {
 #if defined(BOOST_WINDOWS)
     return GetTickCount64();
 #elif defined(__linux__) || defined(__linux) || defined(linux)
-    unsigned long long uptime;
+    unsigned long long uptime = 0;
     double uptime_seconds;
     if (std::ifstream("/proc/uptime", std::ios::in) >> uptime_seconds) {
         uptime = static_cast<unsigned long long>(uptime_seconds) * 1000ULL;

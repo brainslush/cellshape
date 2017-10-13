@@ -22,7 +22,7 @@ RigidBody3d::RigidBody3d(
         double iEpsilon,
         std::set<functor *> *iFunctors
 ) :
-        X(iX),
+        X(std::move(iX)),
         q(iQ),
         M(iM),
         epsilon(iEpsilon),
@@ -44,10 +44,10 @@ RigidBody3d::RigidBody3d(
         double iEpsilon,
         std::set<functor *> *iFunctors
 ) :
-        X(iX),
-        v(iV),
+        X(std::move(iX)),
+        v(std::move(iV)),
         q(iQ),
-        L(iL),
+        L(std::move(iL)),
         I(iI.diagonal()),
         M(iM),
         epsilon(iEpsilon),
@@ -56,8 +56,7 @@ RigidBody3d::RigidBody3d(
     T = Eigen::Vector3d(0, 0, 0);
 }
 
-RigidBody3d::~RigidBody3d() {
-}
+RigidBody3d::~RigidBody3d() =default;
 
 Eigen::Vector3d &RigidBody3d::get_X() {
     return X;

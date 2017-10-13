@@ -21,7 +21,7 @@ fac::fac(
     parameters.push_back(iRadius);
     parameters.push_back(iRadius);
     positions.clear();
-    positions.push_back(Eigen::Vector3d(iX, iY, 0));
+    positions.emplace_back(Eigen::Vector3d(iX, iY, 0));
     associatedVisualObj = new visual_ellipse(this);
     associatedVisualObj->set_color(1.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(1.0, 0.0, 0.0);
@@ -46,7 +46,7 @@ void fac::set_radius(double iRadius) {
 
 void fac::set_position(double iX, double iY) {
     positions.clear();
-    positions.push_back(Eigen::Vector3d(iX, iY, 0));
+    positions.emplace_back(Eigen::Vector3d(iX, iY, 0));
 }
 
 

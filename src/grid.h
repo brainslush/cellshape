@@ -39,6 +39,8 @@ namespace grid {
 
         bool obtain_intersecting(base *iComponentA, base *iComponentB);
 
+        void reset();
+
         void update_intersecting();
 
         void remove_component(base *iComponent);
@@ -46,6 +48,7 @@ namespace grid {
         void add_component(base *iComponent);
 
     protected:
+        bool isOccupied;
         bool &showGrid;
         bool &showGridOccupation;
         visual_base *associatedVisualObj;

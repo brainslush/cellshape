@@ -214,7 +214,7 @@ namespace mygui {
 
     class gui {
     public:
-        gui(std::string iName);
+        gui(std::string& iName);
 
         virtual ~gui();
 
