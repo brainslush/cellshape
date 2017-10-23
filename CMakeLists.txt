@@ -30,7 +30,6 @@ set(SOURCE_FILES
         src/cMembrane.h
         src/cSurface.cpp
         src/cSurface.h
-        src/extIncludes.h
         src/globalVars.h
         src/grid.cpp
         src/grid.h
