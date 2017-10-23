@@ -1,3 +1,5 @@
+
+
 #pragma once
 
 #include <boost/variant.hpp>
@@ -13,13 +15,13 @@
 
 
 /*
- * Base function for all physical components.
+ * Base class for all physical components.
  * It is the base call for cells and substrates
  */
 
 class components_base : public base {
 public:
-    components_base(sGlobalVars &iGlobals);
+    explicit components_base(sGlobalVars &iGlobals);
 
     virtual ~components_base();
 
@@ -35,9 +37,9 @@ public:
 
     virtual void set_canColide(bool iCanColide);
 
-    virtual void add_responseForce(Eigen::Vector3d iForce);
+    virtual void add_responseForce(const Eigen::Vector3d &iForce);
 
-    virtual void add_responseTorque(Eigen::Vector3d iTorque);
+    virtual void add_responseTorque(const Eigen::Vector3d &iTorque);
 
     //virtual void make_timeStep(double &dT);
 
@@ -49,14 +51,16 @@ protected:
     sGlobalVars &globals;
 };
 
-
+/*
+ * cell base class which holds all
+ */
 
 class filament_base;
 
 // cell base classes
 class cell_base : public components_base {
 public:
-    cell_base(sGlobalVars &iGlobals);
+    explicit cell_base(sGlobalVars &iGlobals);
 
     virtual ~cell_base();
 
@@ -69,7 +73,9 @@ public:
 protected:
 };
 
-
+/*
+ * base class for all physical
+ */
 
 class cellcomponents_base : public components_base {
 public:
@@ -172,7 +178,7 @@ protected:
 // matrix components base class
 class matrixcomponents_base : public components_base {
 public:
-    matrixcomponents_base(sGlobalVars &iGlobals);
+    explicit matrixcomponents_base(sGlobalVars &iGlobals);
 
     virtual ~matrixcomponents_base();
 
@@ -182,7 +188,7 @@ protected:
 // fac base class
 class fac_base : public matrixcomponents_base {
 public:
-    fac_base(sGlobalVars &iGlobals);
+    explicit fac_base(sGlobalVars &iGlobals);
 
     virtual ~fac_base();
 };
@@ -190,7 +196,7 @@ public:
 // surface border base class
 class surface_border_base : public matrixcomponents_base {
 public:
-    surface_border_base(sGlobalVars &iGlobals);
+    explicit surface_border_base(sGlobalVars &iGlobals);
 
     virtual ~surface_border_base();
 };
@@ -198,7 +204,7 @@ public:
 // surface base class
 class surface_base : public matrixcomponents_base {
 public:
-    surface_base(sGlobalVars &iGlobals);
+    explicit surface_base(sGlobalVars &iGlobals);
 
     virtual ~surface_base();
 };

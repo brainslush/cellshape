@@ -5,13 +5,13 @@
 ***************************/
 random_base::random_base() = default;
 
-random_base::~random_base() =default;
+random_base::~random_base() = default;
 
 /***************************
  * random_dist
  ***************************/
 
-random_dist::random_dist() {}
+random_dist::random_dist() = default;
 
 void random_dist::create(
         boost::random::mt19937 *iGen,
@@ -55,12 +55,12 @@ random_container::~random_container() {
     }
 }
 
-unsigned long long &random_container::get_seed() {
+uint32_t &random_container::get_seed() {
     return seed;
 }
 
 void random_container::set_seed() {
-    seed = get_uptime();
+    seed = (uint32_t) get_uptime();
 }
 
 void random_container::set_seed(uint32_t iSeed) {

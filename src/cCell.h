@@ -92,7 +92,7 @@ protected:
 
 class functor_cell_filamentCreation : public functor_cell_base {
 public:
-    functor_cell_filamentCreation(
+    explicit functor_cell_filamentCreation(
             sGlobalVars &iGlobals
     );
 
@@ -125,7 +125,7 @@ protected:
 
 class functor_cell_membraneCreation : public functor_cell_base {
 public:
-    functor_cell_membraneCreation(sGlobalVars &iGlobals);
+    explicit functor_cell_membraneCreation(sGlobalVars &iGlobals);
 
     virtual ~functor_cell_membraneCreation();
 

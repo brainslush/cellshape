@@ -9,17 +9,25 @@
 #ifndef SRC_BASE_H_
 #define SRC_BASE_H_
 
+/*
+ * forward declarations
+ */
+
 namespace grid {
     class cell;
 }
 
 class visual_base;
 
+/*
+ * base class for all cell components
+ */
+
 class base {
 public:
     base();
 
-    base(std::vector<Eigen::Vector3d> iPositions);
+    explicit base(std::vector<Eigen::Vector3d> iPositions);
 
     base(std::vector<Eigen::Vector3d> iPositions, std::vector<double> iParameters);
 
@@ -101,7 +109,7 @@ protected:
 
 class visual_line : public visual_base {
 public:
-    visual_line(base *iComponent);
+    explicit visual_line(base *iComponent);
 
     virtual ~visual_line();
 
@@ -112,7 +120,7 @@ protected:
 
 class visual_ellipse : public visual_base {
 public:
-    visual_ellipse(base *iComponent);
+    explicit visual_ellipse(base *iComponent);
 
     virtual ~visual_ellipse();
 
@@ -123,7 +131,7 @@ protected:
 
 class visual_rectangle : public visual_base {
 public:
-    visual_rectangle(base *iComponent);
+    explicit visual_rectangle(base *iComponent);
 
     virtual ~visual_rectangle();
 
@@ -134,9 +142,9 @@ protected:
 
 class visual_triangle : public visual_base {
 public:
-    visual_triangle(base *iComponent);
+    explicit visual_triangle(base *iComponent);
 
-    virtual ~visual_triangle();
+    ~visual_triangle();
 
     virtual void draw(double iScale);
 

@@ -86,7 +86,7 @@ std::set<base *> &cell::get_components() {
  *  2: normal vector from line to circle center <Eigen::Vector3d>>
  */
 
-std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRef, base *iCom) {
+Eigen::Vector3d *cell::obtain_intersectingCircleLine(base *iRef, base *iCom) {
     // get data
     auto &posRef = iRef->get_positions();
     auto &posCom = iCom->get_positions();
@@ -96,7 +96,7 @@ std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRe
     // create parameterized line and project sphere center onto it
     Eigen::ParametrizedLine<double, 3> line(posRef[0], diff.normalized());
     // get projection of circle center onto the line
-    Eigen::Vector3d proj = line.projection(posCom[0]);
+    auto proj = line.projection(posCom[0]);
     Eigen::Vector3d projDiff(proj - posCom[0]);
     // check if projection lies inside the circle
     if (projDiff.norm() < parCom[0]) {
@@ -104,19 +104,19 @@ std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRe
         auto diffA = posRef[0] - posCom[0];
         auto diffB = posRef[1] - posCom[0];
         if (diffA.norm() <= parCom[0] && diffB.norm() <= parCom[0]) {
-            return {iCom, projDiff.normalized()};
+            return new Eigen::Vector3d(projDiff.normalized());
         } else if (diffA.norm() <= parCom[0]) {
-            return {iCom, diffA.normalized()};
+            return new Eigen::Vector3d(diffA.normalized());
         } else if (diffB.norm() <= parCom[0]) {
-            return {iCom, diffB.normalized()};
+            return new Eigen::Vector3d(diffB.normalized());
         } else {
             // check if the end points and projection difference vectors are antiparralel
             if ((posRef[0] - proj).dot(posRef[1] - proj) < 0) {
-                return {iCom, projDiff.normalized()};
+                return new Eigen::Vector3d(projDiff.normalized());
             }
         }
     }
-    return {iRef, posRef[0]};
+    return nullptr;
 }
 
 /*
@@ -134,29 +134,32 @@ std::pair<base *, Eigen::Vector3d> cell::obtain_intersectingCircleLine(base *iRe
  *   2:
  */
 
-std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>>
-cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
+Eigen::Vector3d *cell::obtain_intersectingLineLine(base *iRef, base *iCom) {
     auto &posRef = iRef->get_positions();
     auto &posCom = iCom->get_positions();
 
-    Eigen::Vector3d diffRef = posRef[0] - posRef[1];
-    Eigen::Vector3d diffCom = posCom[0] - posCom[1];
+    auto unitDiffRef = (posRef[1] - posRef[0]).normalized();
+    auto unitDiffCom = (posCom[1] - posCom[0]).normalized();
 
-    double det = diffRef(0) * diffCom(1) - diffRef(1) * diffCom(0);
+    auto rcs = unitDiffRef[0] * unitDiffCom[1] - unitDiffRef[1] * unitDiffCom[0];
 
-    if (abs(det) >= std::numeric_limits<double>::min()) {
-        double detR = 1 / det;
-        double a = posRef[0](0) * posRef[1](1) - posRef[1](0) * posRef[0](1);
-        double b = posCom[0](0) * posCom[1](1) - posCom[1](0) * posCom[0](1);
-        double x = (diffCom(0) * a - diffRef(0) * b) * detR;
-        double y = (diffCom(1) * a - diffRef(1) * b) * detR;
-        Eigen::Vector3d ret (x,y,0);
-        if (bmath::isInBounds(x,posRef[0](0),posRef[1](0))) return {iRef, {ret, ret}};
-        if (bmath::isInBounds(y,posRef[0](1),posRef[1](1))) return {iRef, {ret, ret}};
-        if (bmath::isInBounds(x,posCom[0](0),posCom[1](0))) return {iRef, {ret, ret}};
-        if (bmath::isInBounds(y,posCom[0](1),posCom[1](1))) return {iRef, {ret, ret}};
+    if (abs(rcs) >= std::numeric_limits<double>::min()) {
+        auto diffPos = posCom[0] - posRef[0];
+        auto t = (diffPos[0] * unitDiffCom[1] - diffPos[1] * unitDiffCom[0]) / rcs;
+        auto u = (diffPos[0] * unitDiffRef[1] - diffPos[1] * unitDiffRef[0]) / rcs;
+        bool test = false;
+        if (0 <= t <= 1 && 0 <= u <= 1) {
+            auto ret = new Eigen::Vector3d(posRef[0] + t * unitDiffRef);
+            auto a = bmath::isInBoundsC((*ret)[0], posRef[0][0], posRef[1][0]);
+            auto b = bmath::isInBoundsC((*ret)[1], posRef[0][1], posRef[1][1]);
+            auto c = bmath::isInBoundsC((*ret)[0], posCom[0][0], posCom[1][0]);
+            auto d = bmath::isInBoundsC((*ret)[1], posCom[0][1], posCom[1][1]);
+            if (a && b && c && d) {return ret;};
+        }
+        return nullptr;
     }
-    return {iCom,{posCom[0],posCom[0]}};
+    return nullptr;
+;
 }
 
 /*
@@ -181,22 +184,21 @@ void cell::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 
 bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
     bool ret = false;
-    std::pair<base *, Eigen::Vector3d> temp;
 
     // get data of reference and neighbor object object
-    unsigned &typeA = iComponentA->get_visualObj()->get_type();
-    unsigned &typeB = iComponentB->get_visualObj()->get_type();
-    std::vector<Eigen::Vector3d> &posA = iComponentA->get_positions();
-    std::vector<double> &parA = iComponentA->get_parameters();
-    std::vector<Eigen::Vector3d> &posB = iComponentB->get_positions();
-    std::vector<double> &parB = iComponentB->get_parameters();
+    auto &typeA = iComponentA->get_visualObj()->get_type();
+    auto &typeB = iComponentB->get_visualObj()->get_type();
+    auto &posA = iComponentA->get_positions();
+    auto &parA = iComponentA->get_parameters();
+    auto &posB = iComponentB->get_positions();
+    auto &parB = iComponentB->get_parameters();
 
     if (iComponentA != iComponentB) {
         // handle two circles
         if (typeA == typeB && typeA == 2) {
             // check whether the two circles overlap
             if ((posA[0] - posB[0]).norm() < parA[0] + parB[0]) {
-                Eigen::Vector3d v = posB[0] - posA[0];
+                auto v = posB[0] - posA[0];
                 v.normalize();
                 iComponentA->add_intersector(iComponentB, v);
                 iComponentB->add_intersector(iComponentA, -v);
@@ -205,36 +207,43 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
         }
             // handle circle and line like
         else if ((typeA == 1 || typeA == 3 || typeA == 4) && typeB == 2) {
-            temp = obtain_intersectingCircleLine(iComponentA, iComponentB);
-            if (temp.first != iComponentA) {
-                iComponentA->add_intersector(iComponentB, temp.second);
-                iComponentB->add_intersector(iComponentA, -temp.second);
+            auto temp = obtain_intersectingCircleLine(iComponentA, iComponentB);
+            if (temp) {
+                iComponentA->add_intersector(iComponentB, *temp);
+                iComponentB->add_intersector(iComponentA, -*temp);
                 ret = true;
             }
+            delete temp;
+            temp = nullptr;
         } else if ((typeB == 1 || typeB == 3 || typeB == 4) && typeA == 2) {
-            temp = obtain_intersectingCircleLine(iComponentB, iComponentA);
-            if (temp.first == iComponentA) {
-                iComponentA->add_intersector(iComponentB, temp.second);
-                iComponentB->add_intersector(iComponentA, temp.second);
+            auto temp = obtain_intersectingCircleLine(iComponentB, iComponentA);
+            if (temp) {
+                iComponentA->add_intersector(iComponentB, *temp);
+                iComponentB->add_intersector(iComponentA, *temp);
                 ret = true;
             }
+            delete temp;
+            temp = nullptr;
         }
             // handle line objects
         else if (
                 (typeA == 1 || typeA == 3 || typeA == 4)
                 && (typeB == 1 || typeB == 3 || typeB == 4)
                 ) {
-            std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>> temp2 = obtain_intersectingLineLine(
-                    iComponentA, iComponentB);
-            if (temp2.first == iComponentA) {
-                iComponentA->add_intersector(iComponentB, temp2.second.first);
-                iComponentB->add_intersector(iComponentA, temp2.second.second);
+            auto temp = obtain_intersectingLineLine(iComponentA, iComponentB);
+            if (temp) {
+                iComponentA->add_intersector(iComponentB, *temp);
+                iComponentB->add_intersector(iComponentA, *temp);
                 ret = true;
             }
+            delete temp;
+            temp = nullptr;
         }
     }
     return ret;
 }
+
+/*  */
 
 void cell::update_intersecting() {
     /*for (auto &it : components) {
@@ -244,18 +253,18 @@ void cell::update_intersecting() {
     for (auto &itA : components) {
         for (auto &itB : components) {
             if (itA != itB) {
-                bool ignore = ignore::n::isIgnored(itA->get_typeHash(),itB->get_typeHash());
+                bool ignore = ignore::n::isIgnored(itA->get_typeHash(), itB->get_typeHash());
                 if (
-                        !ignore &&
+                        !ignore /*&&
                         !itA->isIntersectorChecked(itB) &&
-                        !itB->isIntersectorChecked(itA)) {
+                        !itB->isIntersectorChecked(itA)*/) {
                     intersection = intersection || obtain_intersecting(itA, itB);
                 }
             }
         }
     }
     if (showGridOccupation) {
-        if (intersection ) {
+        if (intersection) {
             associatedVisualObj->set_color(1, 0, 1, 1);
             associatedVisualObj->set_fillColor(1, 0, 1, 1);
         } else {
@@ -265,11 +274,15 @@ void cell::update_intersecting() {
     }
 }
 
+/* removes a component of type base from the cell */
+
 void cell::remove_component(base *iComponent) {
     if (iComponent) {
         components.erase(iComponent);
     }
 }
+
+/* adds a component to the cell list*/
 
 void cell::add_component(base *iComponent) {
     components.insert(iComponent);
@@ -311,7 +324,7 @@ void container::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 void container::register_component(base *iComponent) {
     // removed check b/c this function is mostly called in headers and causes problems with virtuality
     //if (iComponent->get_visualObj()) {
-        components.insert(iComponent);
+    components.insert(iComponent);
     /*} else {
         std::cout << "Could not register object with ID: " << typeid(*iComponent).name()
                   << "\n Visual object is missing";
@@ -341,8 +354,8 @@ void container::update_component(base *iComponent) {
     switch (iComponent->get_visualObj()->get_type()) {
         // line
         case 1: {
-            const Eigen::Vector3d &posA = iComponent->get_positions()[0];
-            const Eigen::Vector3d &posB = iComponent->get_positions()[1];
+            auto &posA = iComponent->get_positions()[0];
+            auto &posB = iComponent->get_positions()[1];
 
             // get slope
             double m = std::numeric_limits<double>::infinity();
@@ -353,21 +366,21 @@ void container::update_component(base *iComponent) {
             double f0 = (posA(1) - m * posA(0));
             double f0Red = f0 / cellLength;
             // get mins and maxs
-            double yMin = std::min(posA(1), posB(1));
-            double yMax = std::max(posA(1), posB(1));
-            double xMin = std::min(posA(0), posB(0));
-            double xMax = std::max(posA(0), posB(0));
-            auto indexXMin = (unsigned)floor(xMin / cellLength);
-            auto indexXMax = (unsigned)floor(xMax / cellLength);
-            auto indexYMin = (unsigned)floor(yMin / cellLength);
-            auto indexYMax = (unsigned)floor(yMax / cellLength);
+            auto yMin = std::min(posA(1), posB(1));
+            auto yMax = std::max(posA(1), posB(1));
+            auto xMin = std::min(posA(0), posB(0));
+            auto xMax = std::max(posA(0), posB(0));
+            auto indexXMin = (unsigned) floor(xMin / cellLength);
+            auto indexXMax = (unsigned) floor(xMax / cellLength);
+            auto indexYMin = (unsigned) floor(yMin / cellLength);
+            auto indexYMax = (unsigned) floor(yMax / cellLength);
             // get cells
             if (abs(m) < 1) {
                 while (indexXMin <= indexXMax) {
                     // calculate y value
-                    auto indexTestT = (unsigned)floor(f0Red + m * indexXMin);
-                    auto indexTestB = (unsigned)boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
-                                                                  indexYMin, indexYMax);
+                    auto indexTestT = (unsigned) floor(f0Red + m * indexXMin);
+                    auto indexTestB = (unsigned) boost::algorithm::clamp(floor(f0Red + m * (indexXMin + 1)),
+                                                                         indexYMin, indexYMax);
                     unsigned indexT =
                             std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexTestT);
                     unsigned indexB =
@@ -384,9 +397,9 @@ void container::update_component(base *iComponent) {
                 while (indexYMin <= indexYMax) {
                     if (abs(m) < std::numeric_limits<double>::max()) {
                         // calculate x value
-                        auto indexTestL = (unsigned)floor((indexYMin - f0Red) / m);
-                        auto indexTestR = (unsigned)boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
-                                                                      indexXMin, indexXMax);
+                        auto indexTestL = (unsigned) floor((indexYMin - f0Red) / m);
+                        auto indexTestR = (unsigned) boost::algorithm::clamp(floor(((indexYMin + 1) - f0Red) / m),
+                                                                             indexXMin, indexXMax);
                         unsigned indexL =
                                 std::min(resolution - 1, indexTestL) * resolution + std::min(resolution - 1, indexYMin);
                         unsigned indexR =
@@ -412,18 +425,18 @@ void container::update_component(base *iComponent) {
             // ellipse
         case 2: {
             // get position and parameters
-            const Eigen::Vector3d &pos = iComponent->get_positions()[0];
-            const double &a = iComponent->get_parameters()[0];
-            const double &b = iComponent->get_parameters()[1];
+            auto &pos = iComponent->get_positions()[0];
+            auto &a = iComponent->get_parameters()[0];
+            auto &b = iComponent->get_parameters()[1];
             // get lowest and highest x and y
-            double xMin = pos(0) - a;
-            double xMax = pos(0) + a;
-            double yMin = pos(1) - b;
-            double yMax = pos(1) + b;
-            auto indexXMin = (unsigned)floor(xMin / cellLength);
-            auto indexXMax = (unsigned)floor(xMax / cellLength);
-            auto indexYMin = (unsigned)floor(yMin / cellLength);
-            auto indexYMax = (unsigned)floor(yMax / cellLength);
+            auto xMin = pos(0) - a;
+            auto xMax = pos(0) + a;
+            auto yMin = pos(1) - b;
+            auto yMax = pos(1) + b;
+            auto indexXMin = (unsigned) floor(xMin / cellLength);
+            auto indexXMax = (unsigned) floor(xMax / cellLength);
+            auto indexYMin = (unsigned) floor(yMin / cellLength);
+            auto indexYMax = (unsigned) floor(yMax / cellLength);
             // get grid cells
             if (indexXMin != indexXMax) {
                 while (indexXMin <= indexXMax) {
@@ -431,8 +444,10 @@ void container::update_component(base *iComponent) {
                     double xR = boost::algorithm::clamp(cellLength * (indexXMin + 1), xMin, xMax);
                     double yL = sqrt(b * b * (1 - pow((xL - pos(0)) / a, 2)));
                     double yR = sqrt(b * b * (1 - pow((xR - pos(0)) / a, 2)));
-                    indexYMin = (unsigned)std::min(floor((pos(1) - yL) / cellLength), floor((pos(1) - yR) / cellLength));
-                    indexYMax = (unsigned)std::max(floor((pos(1) + yL) / cellLength), floor((pos(1) + yR) / cellLength));
+                    indexYMin = (unsigned) std::min(floor((pos(1) - yL) / cellLength),
+                                                    floor((pos(1) - yR) / cellLength));
+                    indexYMax = (unsigned) std::max(floor((pos(1) + yL) / cellLength),
+                                                    floor((pos(1) + yR) / cellLength));
                     while (indexYMin <= indexYMax) {
                         unsigned index =
                                 std::min(resolution - 1, indexXMin) * resolution + std::min(resolution - 1, indexYMin);
@@ -462,20 +477,20 @@ void container::update_component(base *iComponent) {
             break;
         case 3: {
             // get position and parameters
-            Eigen::Vector3d &posA = iComponent->get_positions()[0];
-            Eigen::Vector3d &posB = iComponent->get_positions()[1];
+            auto &posA = iComponent->get_positions()[0];
+            auto &posB = iComponent->get_positions()[1];
             // get lowest and largest x and y
             double xMin = std::min(posA(0), posB(0));
             double xMax = std::max(posA(0), posB(0));
             double yMin = std::min(posA(1), posB(1));
             double yMax = std::max(posA(1), posB(1));
             // get grid cells
-            auto xA = (unsigned)floor(xMin / cellLength);
-            auto xB = (unsigned)floor(xMax / cellLength);
-            auto yA = (unsigned)floor(yMin / cellLength);
-            auto yB = (unsigned)floor(yMax / cellLength);
+            auto xA = (unsigned) floor(xMin / cellLength);
+            auto xB = (unsigned) floor(xMax / cellLength);
+            auto yA = (unsigned) floor(yMin / cellLength);
+            auto yB = (unsigned) floor(yMax / cellLength);
             while (xMin < xMax) {
-                auto x = (unsigned)floor(xMin / cellLength);
+                auto x = (unsigned) floor(xMin / cellLength);
                 unsigned indexA = x * resolution + yA;
                 unsigned indexB = x * resolution + yB;
                 assignedCells.insert(cells[indexA]);
@@ -485,7 +500,7 @@ void container::update_component(base *iComponent) {
                 xMin += cellLength;
             }
             while (yMin < yMax) {
-                auto y = (unsigned)floor(yMin / cellLength);
+                auto y = (unsigned) floor(yMin / cellLength);
                 unsigned indexA = xA * resolution + y;
                 unsigned indexB = xB * resolution + y;
                 assignedCells.insert(cells[indexA]);

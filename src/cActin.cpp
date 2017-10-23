@@ -1,9 +1,3 @@
-/*
- * Actin.cpp
- *
- *  Created on: May 29, 2017
- *      Author: siegbahn
- */
 
 #include "cActin.h"
 
@@ -18,7 +12,7 @@ actin::actin(
         std::set<physic::functor *> &iFunctors
 ) :
         filament_base(iGlobals, iCell),
-        tmVelocity(iTmVelocity),
+        tmVelocity(std::move(iTmVelocity)),
         birthTime(iGlobals.time),
         maxLength(iMaxLength),
         lifeTime(iLifeTime),
@@ -32,26 +26,23 @@ actin::actin(
     double mass = 0.1;
     double length = (positions[0] - positions[1]).norm();
     double I = 0.83333333 * mass * length * length;
-    Eigen::Matrix3d mI;
-    mI << I, 0, 0,
+    Eigen::Matrix3d _mI;
+    _mI << I, 0, 0,
             0, I, 0,
             0, 0, 0;
-    Eigen::Matrix3d mI2 = mI.inverse();
-    Eigen::Vector3d mI3 = mI2.diagonal();
+    auto _mI2 = _mI.inverse();
+    auto _mI3 = _mI2.diagonal();
     rigidBody = physic::RigidBody3d(
             Eigen::Vector3d(0, 0, 0),
             Eigen::Quaterniond(0, 0, 0, 1),
-            mI,
+            _mI,
             0.1,
             0.1,
             &iFunctors
     );
 }
 
-actin::~actin() {
-    // delete rigidBody;
-    // rigidBody = nullptr;
-}
+actin::~actin() = default;
 
 void actin::update_force() {
     /*if (!force.isUpdated()) {
@@ -77,7 +68,7 @@ bool actin::make_timeStep(double &dT) {
     if (birthTime + lifeTime < globals.time) {
         return true;
     } else {
-        double length = (positions[0] - positions[1]).norm();
+        auto length = (positions[0] - positions[1]).norm();
         if (length < maxLength) {
             positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
         } else {

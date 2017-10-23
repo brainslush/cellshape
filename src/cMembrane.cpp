@@ -84,13 +84,11 @@ void membrane_container::update_area() {
     double temp = 0;
     /* calculate 2D volume aka the area */
     for (auto &it : parts) {
-        Eigen::Vector3d &posA = it->get_positions()[0];
-        Eigen::Vector3d &posB = it->get_positions()[1];
+        auto &posA = it->get_positions()[0];
+        auto &posB = it->get_positions()[1];
         temp += -1 * posB(0) * posA(1) + posA(0) * posB(1);
     };
-    area = temp;
-    //area.set_updated(true);
-    //}
+    area = temp
 }
 
 /* calculate length */
@@ -98,13 +96,11 @@ void membrane_container::update_length() {
     //if (!length.isUpdated()) {
     double temp = 0;
     for (auto &it : parts) {
-        Eigen::Vector3d &posA = it->get_positions()[0];
-        Eigen::Vector3d &posB = it->get_positions()[1];
+        auto &posA = it->get_positions()[0];
+        auto &posB = it->get_positions()[1];
         temp += (posA - posB).norm();
     }
     length = temp;
-    //length.set_updated(true);
-    //}
 }
 
 /* */

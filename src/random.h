@@ -20,7 +20,7 @@ class random_base {
 public:
     random_base();
 
-    ~random_base();
+    virtual ~random_base();
 };
 
 class random_dist : public random_base {
@@ -42,7 +42,7 @@ public:
     template<typename T, typename U>
     void create(
             boost::random::mt19937 *iGen,
-            std::string iType,
+            const std::string &iType,
             T iA,
             U iB
     ) {
@@ -106,7 +106,7 @@ public:
 
     virtual ~random_container();
 
-    unsigned long long &get_seed();
+    uint32_t &get_seed();
 
     void set_seed();
 
@@ -126,7 +126,7 @@ public:
     void unregister_random(random_dist *iDist);
 
 protected:
-    unsigned long long seed;
+    uint32_t seed;
 
     unsigned long long get_uptime();
 

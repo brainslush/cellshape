@@ -1,8 +1,6 @@
 /*
- * Actin.h
+ * actin implementation for the cell
  *
- *  Created on: May 29, 2017
- *      Author: siegbahn
  */
 
 #pragma once
