@@ -14,7 +14,7 @@ group::group() {
 }
 
 group::group(std::string iName) {
-    folder = new ofxDatGuiFolder(iName);
+    folder = new ofxDatGuiFolder(std::move(iName));
 }
 
 group::~group() {
@@ -64,7 +64,7 @@ void gui::update() {
 }
 
 group *gui::register_group(std::string iName) {
-    group *newGroup = new group(iName);
+    auto newGroup = new group(std::move(iName));
     groups.insert(newGroup);
     datGui->addFolder(newGroup->get_folder());
     return newGroup;
@@ -76,9 +76,7 @@ void gui::unregister_group(group *iGroup) {
     iGroup = nullptr;
 }
 
-container::container() {
-
-}
+container::container() = default;
 
 container::~container() {
     for (auto it : guis) {
@@ -94,7 +92,7 @@ void container::update() {
 }
 
 gui *container::register_gui(std::string iName) {
-    gui *tmp = new gui(iName);
+    auto tmp = new gui(iName);
     guis.insert(tmp);
     return tmp;
 }

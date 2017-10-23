@@ -1,9 +1,7 @@
 #include "base.h"
 
-// register base class to registrar
 
 
-// base class defines
 base::base() :
         associatedVisualObj(nullptr),
         timeStamp(ofGetFrameNum()),

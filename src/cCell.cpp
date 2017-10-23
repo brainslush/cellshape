@@ -1,9 +1,4 @@
-/*
- * cCell.cpp
- *
- *  Created on: May 29, 2017
- *      Author: siegbahn
- */
+
 
 #include "cCell.h"
 
@@ -176,7 +171,7 @@ void functor_cell_filamentCreation::setup(cell &iCell) {
 }
 
 void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
-    long diff = maxCount - iCell->get_filaments().size();
+    auto diff = maxCount - iCell->get_filaments().size();
     if (diff > 0) {
         for (unsigned i = 0; i < diff; i++) {
             create_filament(*iCell);
@@ -185,7 +180,7 @@ void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
 }
 
 filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
-    pair<Eigen::Vector3d, membrane_part *> pos = find_creationPosition(iCell);
+    auto pos = find_creationPosition(iCell);
     auto *newActin = new actin(
             globals,
             iCell,
@@ -205,22 +200,22 @@ pair<Eigen::Vector3d, membrane_part *> functor_cell_filamentCreation::find_creat
     auto &membranes = iCell.get_membranes();
     auto &parts = (*membranes.begin())->get_parts();
     // determine new position along membrane
-    double length = (*membranes.begin())->get_length() * randomReal->draw<double>();
+    auto length = (*membranes.begin())->get_length() * randomReal->draw<double>();
     auto it = parts.begin();
-    double currLength = (*it)->get_length();
+    auto currLength = (*it)->get_length();
     while (currLength < length) {
         it++;
         currLength += (*it)->get_length();
     }
     length -= currLength;
     auto &pos = (*it)->get_positions();
-    Eigen::Vector3d ret = Eigen::Vector3d(pos[0] + length * (pos[0] - pos[1]).normalized());
-    return std::make_pair(ret, static_cast<membrane_part *>(*it));
+    auto ret = Eigen::Vector3d(pos[0] + length * (pos[0] - pos[1]).normalized());
+    return {ret, static_cast<membrane_part *>(*it)};
 }
 
 Eigen::Vector3d functor_cell_filamentCreation::find_tmVelocity(cell &iCell, membrane_part &iMembrane) {
-    double deg = PI * (randomReal->draw<double>() - 0.5);
-    double speed = maxSpeed * randomReal->draw<double>();
+    auto deg = PI * (randomReal->draw<double>() - 0.5);
+    auto speed = maxSpeed * randomReal->draw<double>();
     Eigen::AngleAxis<double> rot(deg, Eigen::Vector3d(0, 0, 1));
     return Eigen::Vector3d(speed * (rot * (-1 * iMembrane.get_normal())));
 }
@@ -258,7 +253,7 @@ void functor_cell_membraneCreation::setup(cell &iCell) {
     x = std::min(max(x, radius), (double) globals.settings.sideLength);
     y = std::min(max(y, radius), (double) globals.settings.sideLength);
     // create membrane parts in circular shape
-    double dAngle = 2 * PI / (double) resolution;
+    auto dAngle = 2 * PI / (double) resolution;
     for (unsigned long long i = 0; i < resolution; i++) {
         parts.push_back(new membrane_part(
                 globals,

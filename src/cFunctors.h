@@ -1,7 +1,3 @@
-//
-// Created by brainslush on 19.06.17.
-//
-
 /*
  * The functors are classes which are handed to the rigid body class of the cell elements.
  * As subclasses of the physic::functor class they calculate interactive forces and torques of the rigid bodies.
@@ -25,7 +21,7 @@ namespace functor {
 
     class ffFriction : public physic::functor {
     public:
-        ffFriction(mygui::gui *&iGui);
+        explicit ffFriction(mygui::gui *&iGui);
 
         virtual ~ffFriction();
 
@@ -51,7 +47,7 @@ namespace functor {
 
     class fmCollision : public physic::functor {
     public:
-        fmCollision(mygui::gui *&iGui);
+        explicit fmCollision(mygui::gui *&iGui);
 
         virtual ~fmCollision();
 
@@ -74,7 +70,7 @@ namespace functor {
 
     class fViscosity : public physic::functor {
     public:
-        fViscosity(mygui::gui *&iGui);
+        explicit fViscosity(mygui::gui *&iGui);
 
         virtual ~fViscosity();
 

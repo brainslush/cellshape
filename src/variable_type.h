@@ -7,9 +7,9 @@
 #define SRC_VARIABLETYPE_H_
 
 class variable_base {
-    variable_base() {};
+    variable_base() = default;
 
-    ~variable_base() {};
+    ~variable_base() = default;
 };
 
 template<class VT>

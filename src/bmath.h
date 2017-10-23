@@ -1,6 +1,6 @@
-//
-// Created by siegbahn on 29.07.17.
-//
+/*
+ * some self made math functions
+ */
 
 #pragma once
 

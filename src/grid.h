@@ -54,10 +54,9 @@ namespace grid {
         visual_base *associatedVisualObj;
         std::vector<border *> borders;
 
-        std::pair<base *, Eigen::Vector3d> obtain_intersectingCircleLine(base *iRef, base *iCom);
+        Eigen::Vector3d *obtain_intersectingCircleLine(base *iRef, base *iCom);
 
-        std::pair<base *, std::pair<Eigen::Vector3d, Eigen::Vector3d>>
-        obtain_intersectingLineLine(base *iRef, base *iCom);
+        Eigen::Vector3d *obtain_intersectingLineLine(base *iRef, base *iCom);
 
         std::set<base *> components;
     };

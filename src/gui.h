@@ -29,9 +29,9 @@ namespace mygui {
 
     class setting_base {
     public:
-        setting_base() {};
+        setting_base() = default;
 
-        virtual ~setting_base() {};
+        virtual ~setting_base() = default;
 
         virtual void update() {};
 
@@ -77,8 +77,7 @@ namespace mygui {
             }
         }
 
-        virtual ~setting() {
-        }
+        virtual ~setting() = default;
 
         virtual T *&get_pointer() {
             return valuePointer;
@@ -114,9 +113,9 @@ namespace mygui {
 
     class action_base {
     public:
-        action_base() {};
+        action_base() = default;
 
-        ~action_base() {};
+        virtual ~action_base() = default;
     protected:
 
     };
@@ -137,9 +136,7 @@ namespace mygui {
             control->onButtonEvent(eh);
         };
 
-        virtual ~action() {
-
-        };
+        virtual ~action() = default;
 
     protected:
         onButtonEvent eh;
@@ -151,7 +148,7 @@ namespace mygui {
     public:
         group();
 
-        group(std::string iName);
+        explicit group(std::string iName);
 
         virtual ~group();
 
@@ -167,7 +164,7 @@ namespace mygui {
                 std::function<T> iFunction
         ) {
             iLabel.insert(0, "> ");
-            action<T> *newAction = new action<T>(
+            auto newAction = new action<T>(
                     folder,
                     iLabel,
                     iFunction
@@ -181,7 +178,7 @@ namespace mygui {
                 A... iArgs
         ) {
             iLabel.insert(0, "> ");
-            setting<T> *newSetting = new setting<T>(
+            auto newSetting = new setting<T>(
                     folder,
                     iLabel,
                     iArgs...);
@@ -196,7 +193,7 @@ namespace mygui {
                 A... iArgs
         ) {
             iLabel.insert(0, "> ");
-            setting<T> *newSetting = new setting<T>(
+            auto newSetting = new setting<T>(
                     folder,
                     iLabel,
                     iUpdatePerFrame,
@@ -214,7 +211,7 @@ namespace mygui {
 
     class gui {
     public:
-        gui(std::string& iName);
+        explicit gui(std::string& iName);
 
         virtual ~gui();
 

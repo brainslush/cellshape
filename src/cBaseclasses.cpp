@@ -10,7 +10,7 @@ components_base::components_base(sGlobalVars &iGlobals) : base(), globals(iGloba
     canColide = true;
 }
 
-components_base::~components_base() {}
+components_base::~components_base() = default;
 
 bool &components_base::get_canMove() { return canMove; }
 
@@ -24,9 +24,9 @@ void components_base::set_canMove(bool iCanMove) { canMove = iCanMove; }
 
 void components_base::set_canColide(bool iCanColide) { canColide = iCanColide; }
 
-void components_base::add_responseForce(Eigen::Vector3d iForce) { responseForce += iForce; }
+void components_base::add_responseForce(const Eigen::Vector3d &iForce) { responseForce += iForce; }
 
-void components_base::add_responseTorque(Eigen::Vector3d iTorque) { responseTorque += iTorque; }
+void components_base::add_responseTorque(const Eigen::Vector3d &iTorque) { responseTorque += iTorque; }
 
 
 /*
@@ -43,7 +43,7 @@ cell_base::cell_base(sGlobalVars &iGlobals) : components_base(iGlobals) {
     canMove = true;
 }
 
-cell_base::~cell_base() {}
+cell_base::~cell_base() = default;
 
 /***************************
  * cellcomponents_base
@@ -57,7 +57,7 @@ cellcomponents_base::cellcomponents_base(
         cell(iCell) {
 }
 
-cellcomponents_base::~cellcomponents_base() {}
+cellcomponents_base::~cellcomponents_base() = default;
 
 physic::RigidBody3d &cellcomponents_base::get_rigidBody() { return rigidBody; }
 
@@ -154,9 +154,7 @@ volume_base::volume_base(
         cellcomponents_base(iGlobals, iCell) {
 };
 
-volume_base::~volume_base() {
-
-}
+volume_base::~volume_base() = default;
 
 void volume_base::make_timeStep(double &dT) {}
 
@@ -172,8 +170,8 @@ membrane_part_base::membrane_part_base(
 ) :
         cellcomponents_base(iGlobals, iCell) {
     positions.clear();
-    positions.push_back(Eigen::Vector3d(iX1, iY1, 0));
-    positions.push_back(Eigen::Vector3d(iX2, iY2, 0));
+    positions.emplace_back(Eigen::Vector3d(iX1, iY1, 0));
+    positions.emplace_back(Eigen::Vector3d(iX2, iY2, 0));
     associatedVisualObj = new visual_line(this);
     associatedVisualObj->set_color(0.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
@@ -181,9 +179,7 @@ membrane_part_base::membrane_part_base(
     restLength = get_restLength();
 }
 
-membrane_part_base::~membrane_part_base() {
-
-}
+membrane_part_base::~membrane_part_base() = default;
 
 std::pair<membrane_part_base *, membrane_part_base *> &membrane_part_base::get_neighbours() {
     return neighbours;
@@ -211,7 +207,7 @@ Eigen::Vector3d membrane_part_base::calc_dirVector(Eigen::Vector3d *iPoint) {
     } else if (iPoint == &positions[1]) {
         return (positions[1] - positions[0]).normalized();
     } else {
-        return Eigen::Vector3d(0,0,0);
+        return Eigen::Vector3d(0, 0, 0);
     }
 }
 
@@ -224,9 +220,7 @@ matrixcomponents_base::matrixcomponents_base(sGlobalVars &iGlobals) : components
     canMove = false;
 }
 
-matrixcomponents_base::~matrixcomponents_base() {
-
-}
+matrixcomponents_base::~matrixcomponents_base() = default;
 
 /***************************
  * Fac Base
@@ -236,9 +230,7 @@ fac_base::fac_base(sGlobalVars &iGlobals) : matrixcomponents_base(iGlobals) {
 
 }
 
-fac_base::~fac_base() {
-
-}
+fac_base::~fac_base() = default;
 
 /***************************
  * Surface Border Base
@@ -248,9 +240,7 @@ surface_border_base::surface_border_base(sGlobalVars &iGlobals) : matrixcomponen
 
 }
 
-surface_border_base::~surface_border_base() {
-
-}
+surface_border_base::~surface_border_base() = default;
 
 /***************************
  * Surface Base
@@ -260,6 +250,4 @@ surface_base::surface_base(sGlobalVars &iGlobals) : matrixcomponents_base(iGloba
 
 }
 
-surface_base::~surface_base() {
-
-}
+surface_base::~surface_base() = default;
