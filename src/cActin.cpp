@@ -23,21 +23,21 @@ actin::actin(
     positions.push_back(iStart);
     positions.push_back(iStart);
     // test variables, remove them later
-    double mass = 0.1;
-    double length = (positions[0] - positions[1]).norm();
-    double I = 0.83333333 * mass * length * length;
+    double _length = (positions[0] - positions[1]).norm();
+    double _mass = _length;
+    double _I = 0.83333333 * _mass * _length * _length;
     Eigen::Matrix3d _mI;
-    _mI << I, 0, 0,
-            0, I, 0,
-            0, 0, 0;
+    _mI << 0, 0, 0,
+            0, 0, 0,
+            0, 0, _I;
     auto _mI2 = _mI.inverse();
     auto _mI3 = _mI2.diagonal();
-    rigidBody = physic::RigidBody3d(
-            Eigen::Vector3d(0, 0, 0),
-            Eigen::Quaterniond(0, 0, 0, 1),
+    rigidBody = new physic::RigidBody3d(
+            this,
+            (positions[0] + positions[1]) / 2,
+            physic::angleVector2d(tmVelocity),
             _mI,
-            0.1,
-            0.1,
+            _mass,
             &iFunctors
     );
 }
@@ -58,9 +58,8 @@ void actin::update_force() {
     */
 }
 
-Eigen::Vector3d actin::get_force() {
-    update_force();
-    return force;
+Eigen::Vector3d &actin::get_tmVelocity() {
+    return tmVelocity;
 }
 
 bool actin::make_timeStep(double &dT) {
@@ -70,13 +69,40 @@ bool actin::make_timeStep(double &dT) {
     } else {
         auto length = (positions[0] - positions[1]).norm();
         if (length < maxLength) {
-            positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
+            positions[0] = positions[0] - globals.settings.deltaT * tmVelocity;
         } else {
-            positions[0] = positions[0] + globals.settings.deltaT * tmVelocity;
-            positions[1] = positions[1] + globals.settings.deltaT * tmVelocity;
+            positions[1] = positions[1] - globals.settings.deltaT * tmVelocity;
+            positions[0] = positions[0] - globals.settings.deltaT * tmVelocity;
         }
         if (length > std::numeric_limits<double>::min()) {
-            //rigidBody.do_timeStep(dT,this);
+            if (rigidBody) {
+                // set new values like mass, MoI, position
+                auto _length = (positions[1] - positions[0]).norm();
+                auto _M = _length;
+                double _I = 0.83333333 * _M * _length * _length;
+                Eigen::Matrix3d _mI;
+                _mI << 0, 0, 0,
+                        0, 0, 0,
+                        0, 0, _I;
+                rigidBody->set_mass(_M);
+                rigidBody->set_inertia(_mI);
+                rigidBody->set_position((positions[1] + positions[0]) / 2);
+                rigidBody->set_rotation(physic::angleVector2d(tmVelocity));
+                // do one simulation step
+                rigidBody->do_timeStep(dT);
+                // apply simulated data onto visual model
+                auto &_X = rigidBody->get_X();
+                auto &_R = rigidBody->get_R();
+                auto _l2 = 0.5 * (positions[1] - positions[0]).norm();
+                auto _cos = cos(_R);
+                auto _sin = sin(_R);
+                Eigen::Vector3d _X2(_l2 * _cos, _l2 * _sin, 0);
+                positions[1] = _X + _X2;
+                positions[0] = _X - _X2;
+                tmVelocity = tmVelocity.norm() * Eigen::Vector3d(_cos,_sin,0);
+            } else {
+                std::cout << "actin w/o RigidBody\n";
+            }
         }
         return false;
     }

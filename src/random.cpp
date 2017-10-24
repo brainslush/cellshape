@@ -69,8 +69,8 @@ void random_container::set_seed(uint32_t iSeed) {
 }
 
 void random_container::unregister_random(random_dist *iDist) {
-    delete iDist;
     distributions.erase(iDist);
+    delete iDist;
     iDist = nullptr;
 }
 
