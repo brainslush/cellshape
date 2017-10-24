@@ -49,7 +49,7 @@ set(SOURCE_FILES
         src/std.cpp
         src/std.h
         src/bmath.h
-        src/typeRegistrar.h src/ignoreList.h src/typeRegistrar.cpp src/ignoreList.cpp)
+        src/typeRegistrar.h src/ignoreList.h src/typeRegistrar.cpp src/ignoreList.cpp src/Eigen.h)
 
 add_executable(
         ${APP}
