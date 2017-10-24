@@ -7,19 +7,58 @@
 #include <iostream>
 #include <set>
 #include <eigen3/Eigen/Eigen>
-#include "std.h"
+#include "Eigen.h"
 
 #ifndef SRC_RIGIDBODY_H_
 #define SRC_RIGIDBODY_H_
 
 namespace physic {
+    using Vec3 = Eigen::Vector3d;
 
-    // ahead declaration
-    class RigidBody3d;
+    /*
+     * function to sum up quaternions
+     */
+
+    template<typename L, typename R>
+    auto qsum(L l, R r) {
+        Eigen::Quaterniond c;
+        c.coeffs() = l.coeffs() + r.coeffs();
+        return c;
+    };
+
+    /*
+     * function to get the difference between two quaternions
+     */
+
+    template<typename L, typename R>
+    auto qdiff(L l, R r) {
+        Eigen::Quaterniond c;
+        c.coeffs() = l.coeffs() - r.coeffs();
+        return c;
+    };
+
+    /*
+     * function to convert a rotation vector to quaternion
+     */
+    Eigen::Quaterniond vec2quat(const Vec3 &v);
+
+    /*
+     * function to calculate the angle between two vectors
+     */
+
+    double angleVector2d(const Vec3 &v);
+
+    double angleVector2d(
+            const double &x1,
+            const double &y1,
+            const double &x2,
+            const double &y2);
 
     /*
      * Functor for torque and force calculation
      * */
+
+    class RigidBody3d;
 
     class functor {
     public:
@@ -28,40 +67,37 @@ namespace physic {
 
         virtual ~functor() = default;
 
-        template<typename ... A>
-        std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
-                RigidBody3d &rigidBody3d,
-                A... Args
+        virtual std::pair<Vec3, Vec3> calc(
+                const Vec3 &X,
+                const Vec3 &v,
+                //const Eigen::Quaterniond &R,
+                const double &R,
+                const Vec3 &w,
+                RigidBody3d &rigidBody
         ) {
-            return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
+            return {Vec3(0, 0, 0), Vec3(0, 0, 0)};
         };
 
-        template<typename ... A>
-        Eigen::Vector3d calc_force(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
-                RigidBody3d &rigidBody3d,
-                A... Args
+        virtual Vec3 calc_force(
+                const Vec3 &X,
+                const Vec3 &v,
+                //const Eigen::Quaterniond &R,
+                const double &R,
+                const Vec3 &w,
+                RigidBody3d &rigidBody
         ) {
-            return Eigen::Vector3d(0, 0, 0);
+            return Vec3(0, 0, 0);
         };
 
-        template<typename ... A>
-        Eigen::Vector3d calc_torque(
-                Eigen::Vector3d &X,
-                Eigen::Vector3d &v,
-                Eigen::Quaterniond &R,
-                Eigen::Vector3d &L,
-                RigidBody3d &rigidBody3d,
-                A... Args
+        virtual Vec3 calc_torque(
+                const Vec3 &X,
+                const Vec3 &v,
+                //Eigen::Quaterniond &R,
+                const double &R,
+                const Vec3 &w,
+                RigidBody3d &rigidBody
         ) {
-            return Eigen::Vector3d(0, 0, 0);
+            return Vec3(0, 0, 0);
         };
     };
 
@@ -69,156 +105,203 @@ namespace physic {
      * Rigid body class which uses numerical integrators to calculate changes
      * */
 
+    class Base;
+
     class RigidBody3d {
-
     public:
-
-        RigidBody3d();
-
-        RigidBody3d(
-                Eigen::Vector3d iX,
-                Eigen::Quaterniond iQ, // rotation in lab frame
-                Eigen::Matrix3d iI,
-                double iM,
-                double iEpsilon,
-                std::set<functor *> *iFunctors
-        );
+        explicit RigidBody3d(Base *obj) :
+                object(obj),
+                functors(nullptr) {
+        };
 
         RigidBody3d(
-                Eigen::Vector3d iX,
-                Eigen::Vector3d iV,
-                Eigen::Quaterniond iQ, // rotation in lab frame
-                Eigen::Vector3d iL,
+                Base *obj,
+                Vec3 iX,
+                //Eigen::Quaterniond iQ, // rotation in lab frame
+                double iR,
                 Eigen::Matrix3d iI,
                 double iM,
-                double iEpsilon,
+                //double iEpsilon,
                 std::set<functor *> *iFunctors
-        );
+        ) :
+                object(obj),
+                X(std::move(iX)),
+                //q(iQ),
+                R(iR),
+                M(iM),
+                //epsilon(iEpsilon),
+                functors(iFunctors) {
+            I = iI.diagonal();
+            v = Vec3(0, 0, 0);
+            w = Vec3(0, 0, 0);
+            F = Vec3(0, 0, 0);
+            T = Vec3(0, 0, 0);
+        };
 
-        virtual ~RigidBody3d();
+        RigidBody3d(
+                Base *obj,
+                Vec3 iX,
+                Vec3 iV,
+                //Eigen::Quaterniond iQ, // rotation in lab frame
+                double iR,
+                Vec3 iw,
+                Eigen::Matrix3d iI,
+                double iM,
+                std::set<functor *> *iFunctors
+        ) :
+                object(obj),
+                X(std::move(iX)),
+                v(std::move(iV)),
+                //q(iQ),
+                R(iR),
+                w(std::move(iw)),
+                I(iI.diagonal()),
+                M(iM),
+                //epsilon(iEpsilon),
+                functors(iFunctors) {
+            F = Eigen::Vector3d(0, 0, 0);
+            T = Eigen::Vector3d(0, 0, 0);
+        };
 
-        virtual Eigen::Vector3d &get_X();
+        virtual ~RigidBody3d() = default;
 
-        virtual Eigen::Matrix3d get_R();
+        virtual Vec3 &get_X() {
+            return X;
+        };
 
-        virtual Eigen::Quaterniond &get_q();
+        virtual double &get_R() {
+            //return q.toRotationMatrix();
+            return R;
+        };
 
-        virtual Eigen::Vector3d &get_v();
+        /*
+        virtual Eigen::Quaterniond &get_q() {
+            return q;
+        };
+         */
 
-        virtual Eigen::Vector3d &get_L();
+        virtual Vec3 &get_v() {
+            return v;
+        };
 
-        virtual double &get_M();
+        virtual Vec3 &get_w() {
+            return w;
+        };
 
-        virtual Eigen::Vector3d &get_I();
+        virtual double &get_M() {
+            return M;
+        };
 
-        virtual void set_inertia(Eigen::Matrix3d iI);
+        virtual Vec3 &get_I() {
+            return I;
+        };
 
-        virtual void set_mass(double &iM);
+        virtual Vec3 &get_F() {
+            return F;
+        }
 
-        virtual void add_force(Eigen::Vector3d &iX, Eigen::Vector3d &iF);
+        virtual Vec3 &get_T() {
+            return T;
+        }
+
+        Base *get_object() {
+            return object;
+        };
+
+        virtual void set_object(Base *iObj) {
+            object = iObj;
+        };
+
+        virtual void set_position(const Vec3 &iX) {
+            X = iX;
+        }
+
+        virtual void set_rotation(const double &iR) {
+            R = iR;
+        }
+
+        virtual void set_inertia(const Eigen::Matrix3d &iI) {
+            I = iI.diagonal();
+        };
+
+        virtual void set_mass(const double &iM) {
+            M = iM;
+        };
+
+        virtual void set_velocity(const Vec3 &iV) {
+            v = iV;
+        }
+
+        /*
+        virtual void add_force(const Vec3 &iX, const Vec3 &iF) {
+            F += iF;
+            T += (iX - X).cross(iF);
+        };
+         */
 
         /*
          * Simulate single time step
          * */
 
-        template<typename ... A>
-        void do_timeStep(double &dT, A... Args) {
+        void do_timeStep(double &dT) {
             // update force and torque
-            auto _temp = sum_functors(X, v, q, L, *this, Args...);
+            auto _temp = sum_functors(X, v, R, w);
             F = _temp.first;
             T = _temp.second;
-            // do simulation via verlet
-            do_vverlet(dT, Args...);
+            // do simulation
+            do_rk4(dT);
+            // ceck that R doesn't exceed 2Pi
+            R = fmod(R, 2.0 * M_PI);
         }
 
     protected:
-        Eigen::Vector3d X; // position
-        Eigen::Quaterniond q; // quaternion
-        Eigen::Vector3d I; // moment of inertia diagonalized.
+        Vec3 X; // position
+        //Eigen::Quaterniond q; // quaternion
+        double R;
+        Vec3 I; // moment of inertia diagonalized.
         double M; // mass
-        double epsilon; // precision for rotation calculation
+        //double epsilon; // precision for rotation calculation
         std::set<functor *> *functors; // functors which calculate forces and torques
-        Eigen::Vector3d v; // velocity
-        Eigen::Vector3d L; // angular momentum
-        Eigen::Vector3d F; // forces
-        Eigen::Vector3d T; // torque
+        Vec3 v; // velocity
+        Vec3 w; // angular momentum
+        Vec3 F; // current force
+        Vec3 T; // current torque
+        Base *object;
 
-
-
-        template<typename L, typename R>
-        auto qsum(L l, R r) {
-            Eigen::Quaterniond c;
-            c.coeffs() = l.coeffs() + r.coeffs();
-            return c;
-        };
-
-        template<typename L, typename R>
-        auto qdiff(L l, R r) {
-            Eigen::Quaterniond c;
-            c.coeffs() = l.coeffs() - r.coeffs();
-            return c;
-        };
-
-        Eigen::Quaterniond qscale(const double &s, const Eigen::Quaterniond &q);
-
-        Eigen::Quaterniond vec2quat(const Eigen::Vector3d &v);
-
-        /*
-         * sum up both force and torque functors
-         * */
-        /*
-        template<typename ... A>
-        auto sum_functors(
-                Eigen::Vector3d &iX,
-                Eigen::Vector3d &iv,
-                Eigen::RotationBase<double,3> &iR,
-                Eigen::Vector3d &iL,
-                RigidBody3d &rigidBody,
-                A... Args
+        std::pair<Vec3, Vec3> sum_functors(
+                const Vec3 &iX,
+                const Vec3 &iv,
+                //const Eigen::Quaterniond &iR,
+                const double &iR,
+                const Vec3 &iL
         ) {
-            return sum_functors(
-                    iX,
-                    iv,
-                    Eigen::Quaternion(iR),
-                    iL
-            );
-        }*/
-
-        template<typename ... A>
-        auto sum_functors(
-                Eigen::Vector3d &iX,
-                Eigen::Vector3d &iv,
-                Eigen::Quaterniond &iR,
-                Eigen::Vector3d &iL,
-                RigidBody3d &rigidBody,
-                A... Args
-        ) {
-            std::pair < Eigen::Vector3d, Eigen::Vector3d > _ret;
+            Vec3 _f(0, 0, 0);
+            Vec3 _t(0, 0, 0);
             if (functors) {
                 for (auto &_it : *functors) {
-                    _ret += _it->calc(iX, iv, iR, iL, rigidBody, Args...);
+                    auto _c = _it->calc(iX, iv, iR, iL, *this);
+                    _f = _f + _c.first;
+                    _t = _t + _c.second;
                 }
             }
-            return _ret;
+            return {_f, _t};
         }
 
         /*
          * sum up force functors
          */
 
-        template<typename ... A>
         auto calc_force(
-                Eigen::Vector3d &iX,
-                Eigen::Vector3d &iv,
-                Eigen::Quaterniond &iR,
-                Eigen::Vector3d &iL,
-                RigidBody3d &rigidBody,
-                A... Args
+                const Vec3 &iX,
+                const Vec3 &iv,
+                //Eigen::Quaterniond &iR,
+                const double &iR,
+                const Vec3 &iL
         ) {
-            Eigen::Vector3d ret;
+            Vec3 ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc_force(iX, iv, iR, iL, rigidBody, Args...);
+                    ret += it->calc_force(iX, iv, iR, iL, *this);
                 }
             }
             return ret;
@@ -228,81 +311,88 @@ namespace physic {
          * sum up torque functors
          * */
 
-        template<typename ... A>
-        Eigen::Vector3d calc_torque(
-                Eigen::Vector3d &iX,
-                Eigen::Vector3d &iv,
-                Eigen::Quaterniond &iR,
-                Eigen::Vector3d &iL,
-                RigidBody3d &rigidBody,
-                A... Args
+        Vec3 calc_torque(
+                const Vec3 &iX,
+                const Vec3 &iv,
+                //Eigen::Quaterniond &iR,
+                const double &iR,
+                const Vec3 &iL
         ) {
-            Eigen::Vector3d ret;
+            Vec3 ret;
             if (functors) {
                 for (auto &it : *functors) {
-                    ret += it->calc_torque(iX, iv, iR, iL, rigidBody, Args...);
+                    ret += it->calc_torque(iX, iv, iR, iL, *this);
                 }
             }
             return ret;
         }
 
-        template<typename ... A>
-        void do_leapFrog(double &dT, A... Args) {
-            Eigen::Vector3d _a = F / M;
-            Eigen::Vector3d _X = X + dT * v + 0.5 * dT * dT * _a;
-            //Eigen::Vector3d _v =
+        void do_leapFrog(double &dT) {
+            Vec3 _a = F / M;
+            Vec3 _X = X + dT * v + 0.5 * dT * dT * _a;
+            //Vec3 _v =
         }
 
         /*
          * Numerical integration method based on the 4th order Runge-Kutta algorithm
          * */
 
-        template<typename ... A>
-        void do_rk4(double &dT, A... Args) {
+        void do_rk4(double &dT) {
 
-            auto _a1 = F / M;
             // make sure q is normalized
-            q.normalize();
+            //q.normalize();
             // get quaternion rotation as rotation matrix form
-            auto _R = q.toRotationMatrix();
+            //auto _R = q.toRotationMatrix();
             // calculate inverse of
-            auto _Ib = _R * I;
-            _Ib = _Ib.cwiseInverse();
+            //auto _Ib = _R * I;
+            Vec3 _Ii = I.cwiseInverse();
 
             // angular momentum in body frame
-            auto _Lb1 = _R * L;
+            //auto _wb1 = _R * w;
 
             // calculate first half time step
-            auto _v2 = v + 0.5 * dT * _a1;
-            auto _x = X + 0.5 * dT * _v2;
-            auto _L = L + 0.5 * dT * T;
-            auto _Lb2 = _R * _L;
-            auto _q = qsum(q, q * vec2quat(_Ib.cwiseProduct(0.5 * dT * _Lb2)));
+            Vec3 _a1 = F / M;
+            Vec3 _v2 = v + 0.5 * dT * _a1;
+            Vec3 _x2 = X + 0.5 * dT * _v2;
+            Vec3 _t1 = _Ii.cwiseProduct(T);
+            Vec3 _w2 = w + 0.5 * dT * _t1;
+            //auto _wb2 = _R * _w2;
+            //auto _q2 = qsum(q, qscale(0.25 * dT, q * vec2quat(_wb2)));
+            auto _R2 = R + 0.5 * dT * _w2(2);
 
-            auto _k2 = sum_functors(_x, _v2, _q, _L, *this, Args...);
+            auto _k2 = sum_functors(_x2, _v2, _R2, _w2);
 
             // calculate another half time step with new values
-            auto _v3 = v + 0.5 * dT * _k2.first;
-            _x = X + 0.5 * dT * _v3;
-            _L = L + 0.5 * dT * _k2.second;
-            auto _Lb3 = _R * _L;
-            _q = qsum(q, q * vec2quat(_Ib.cwiseProduct(0.5 * dT * _Lb3)));
+            Vec3 _a2 = _k2.first / M;
+            Vec3 _v3 = v + 0.5 * dT * _a2;
+            Vec3 _x3 = X + 0.5 * dT * _v3;
+            Vec3 _t2 = _Ii.cwiseProduct(_k2.second);
+            Vec3 _w3 = w + 0.5 * dT * _t2;
+            //auto _wb3 = _R * _w3;
+            //auto _q3 = qsum(q, qscale(0.25 * dT, q * vec2quat(_wb3)));
+            auto _R3 = R + 0.5 * dT * _w3(2);
 
-            auto _k3 = sum_functors(_x, _v3, _q, _L, *this, Args...);
+            auto _k3 = sum_functors(_x3, _v3, _R3, _w3);
 
             // and do it a third time with a full time step
-            auto _v4 = v + dT * _k3.first;
-            _x = X + dT * _v4;
-            auto _Lb4 = L + dT * _k3.second;
-            _q = qsum(q, q * vec2quat(_Ib.cwiseProduct(0.5 * dT * _Lb4)));
+            Vec3 _a3 = _k3.first / M;
+            Vec3 _v4 = v + dT * _a3;
+            Vec3 _x4 = X + dT * _v4;
+            Vec3 _t3 = _Ii.cwiseProduct(_k3.second);
+            Vec3 _w4 = w + dT * _t3;
+            //auto _wb4 = _R * _w4;
+            //auto _q4 = qsum(q, qscale(0.5 * dT, q * vec2quat(_wb4)));
+            auto _R4 = R + dT * _w4(2);
 
-            auto _k4 = sum_functors(_x, _v4, _q, _L, *this, Args...);
+            auto _k4 = sum_functors(_x4, _v4, _R4, _w4);
 
             // obtain new position and velocity, roation, angular momemntum
-            X = X + 1 / 6 * dT * (v + 2 * _v2 + 2 * _v3 + _v4);
-            v = v + 1 / 6 * dT * (_a1 + 2 * _k2.first + 2 * _k3.first + _k4.first);
-            q = qsum(q, q * vec2quat(1/6 * dT * _Ib.cwiseProduct(L + 2 * _Lb2 + 2 * _Lb3 + _Lb4)));
-            L = L + 1/6 * dT * (T + 2 * _k2.second + 2 * _k3.second + _k4.second);
+            X = X + dT / 6.0 * (v + 2 * _v2 + 2 * _v3 + _v4);
+            v = v + dT / 6.0 * (_a1 + 2 * _a2 + 2 * _a3 + _k4.first / M);
+            //q = qsum(q, qscale(dT / 12, q * vec2quat(_wb1 + 2 * _wb2 + 2 * _wb3 + _wb4)));
+            R = R + dT / 6.0 * (w(2) + 2 * _w2(2) + 2 * _w3(2) + _w4(2));
+            w = w + dT / 6.0 * (_t1 + 2 * _t2 + 2 * _t3 + _Ii.cwiseProduct(_k4.second));
+
         }
 
         /*
@@ -310,8 +400,8 @@ namespace physic {
          * the velocity verlet algorithm
          * */
 
-        template<typename ... A>
-        void do_vverlet(double &dT, A... Args) {
+        /*
+        void do_vverlet(double &dT) {
             auto _a = F / M;
             // translation part 1
             X = X + dT * v + 0.5 * dT * dT * _a; // calculating new position
@@ -320,9 +410,9 @@ namespace physic {
             // transforming quaterinon to rotation matrix increases speed
             auto _R = q.toRotationMatrix();
             std::cout << "This is R:\n" << _R << "\n";
-            std::cout << "This is L:\n" << L << "\n";
+            std::cout << "This is L:\n" << w << "\n";
             // angular momentum in body frame
-            auto _Lb = _R * L;
+            auto _Lb = _R * w;
             std::cout << "This is L in body frame:  \n" << _Lb << "\n";
             std::cout << "This is T:\n" << _Lb << "\n";
             // torque in body frame
@@ -339,11 +429,11 @@ namespace physic {
             // angular momentum in lab frame
             Eigen::Quaterniond _Lwt2;
             _Lwt2.w() = 0;
-            _Lwt2.vec() = L + 0.5 * dT * T;
+            _Lwt2.vec() = w + 0.5 * dT * T;
             // precision itterator
             auto _qk1t2 = _qkt2;
             Eigen::Quaterniond _qdk1t2;
-            Eigen::Vector3d _Lbk1t2;
+            Vec3 _Lbk1t2;
             do {
                 _qkt2 = _qk1t2;
                 _Lbk1t2 = (_qkt2 * _Lwt2 * _qkt2.inverse()).vec();
@@ -352,16 +442,41 @@ namespace physic {
             } while ((qdiff(_qk1t2, _qkt2)).norm() > epsilon);
             q = qsum(q, qscale(dT, _qdk1t2));
             // part 2 estimate L and v w/ an estimated T and a at t+dt
-            auto _Ldt = L + dT * T;
+            auto _Ldt = w + dT * T;
             auto _vdt = v + dT * _a;
 
-            _vdt = v + 0.5 * dT * (_a + calc_force(X, _vdt, q, _Ldt, *this, Args...)); // estimate vdt
-            _Ldt = L + 0.5 * dT * (T + calc_torque(X, _vdt, q, _Ldt, *this, Args...)); // estimate ldt
-            auto _newFT = sum_functors(X, _vdt, q, _Ldt, *this, Args...);
+            _vdt = v + 0.5 * dT * (_a + calc_force(X, _vdt, q, _Ldt)); // estimate vdt
+            _Ldt = w + 0.5 * dT * (T + calc_torque(X, _vdt, q, _Ldt)); // estimate ldt
+            auto _newFT = sum_functors(X, _vdt, q, _Ldt);
             v = v + 0.5 * dT * (_a + _newFT.first);
-            L = L + 0.5 * dT * (T + _newFT.second);
+            w = w + 0.5 * dT * (T + _newFT.second);
         }
+         */
     };
+
+
+    /*
+     * Base class for all physcial objects
+     */
+
+    class Base {
+    public:
+        Base() :
+                rigidBody(nullptr) {};
+
+        /*
+        Base(RigidBody3d *iRigidBody):
+                rigidBody(iRigidBody){}
+        */
+
+        virtual ~Base() = default;
+
+        virtual physic::RigidBody3d &get_rigidBody() { return *rigidBody; };
+
+    protected:
+        RigidBody3d *rigidBody;
+    };
+
 };
 
 #endif /* SRC_RIGIDBODY_H_ */

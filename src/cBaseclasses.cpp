@@ -54,12 +54,11 @@ cellcomponents_base::cellcomponents_base(
         cell_base &iCell
 ) :
         components_base(iGlobals),
+        physic::Base::Base(),
         cell(iCell) {
 }
 
 cellcomponents_base::~cellcomponents_base() = default;
-
-physic::RigidBody3d &cellcomponents_base::get_rigidBody() { return rigidBody; }
 
 /***************************
  * crosslinker base

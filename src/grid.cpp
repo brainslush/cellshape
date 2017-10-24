@@ -198,7 +198,7 @@ bool cell::obtain_intersecting(base *iComponentA, base *iComponentB) {
         if (typeA == typeB && typeA == 2) {
             // check whether the two circles overlap
             if ((posA[0] - posB[0]).norm() < parA[0] + parB[0]) {
-                auto v = posB[0] - posA[0];
+                Eigen::Vector3d v = posB[0] - posA[0];
                 v.normalize();
                 iComponentA->add_intersector(iComponentB, v);
                 iComponentB->add_intersector(iComponentA, -v);
@@ -255,9 +255,9 @@ void cell::update_intersecting() {
             if (itA != itB) {
                 bool ignore = ignore::n::isIgnored(itA->get_typeHash(), itB->get_typeHash());
                 if (
-                        !ignore /*&&
+                        !ignore &&
                         !itA->isIntersectorChecked(itB) &&
-                        !itB->isIntersectorChecked(itA)*/) {
+                        !itB->isIntersectorChecked(itA)) {
                     intersection = intersection || obtain_intersecting(itA, itB);
                 }
             }

@@ -107,22 +107,24 @@ void cell::make_timeStep(double &dT) {
     // filament creator makes time step
     filamentF->make_timeStep(dT, this);
     // filaments make time step, is more complicated since they get
-    for (auto it = filaments.begin(); it != filaments.end();) {
-        if ((*it)->make_timeStep(dT)) {
-            delete *it;
-            filament_base *del = *it;
-            del = nullptr;
-            it = filaments.erase(it);
-        } else {
-            it++;
+    std::vector<filament_base *> delf;
+    for (auto &it: filaments) {
+        if (it->make_timeStep(dT)) {
+            delf.push_back(it);
         }
     }
-
+    // membrane make a time step
     for (auto &it: membranes) {
         it->make_timeStep(dT);
     }
+    // volumes make a time step
     for (auto &it: volumes) {
         it->make_timeStep(dT);
+    }
+    for (auto &it : delf) {
+        filaments.erase(it);
+        delete it;
+        it = nullptr;
     }
 }
 
@@ -137,7 +139,7 @@ functor_cell_base::functor_cell_base(
 
 }
 
-functor_cell_base::~functor_cell_base() =default;
+functor_cell_base::~functor_cell_base() = default;
 
 void functor_cell_base::register_functor(physic::functor *iFunctor) {
     functors.insert(iFunctor);
@@ -238,7 +240,7 @@ functor_cell_membraneCreation::functor_cell_membraneCreation(sGlobalVars &iGloba
         resolution(guiGroup->register_setting<unsigned>("Resolution", false, 20, 200, 20)) {
 }
 
-functor_cell_membraneCreation::~functor_cell_membraneCreation() =default;
+functor_cell_membraneCreation::~functor_cell_membraneCreation() = default;
 
 void functor_cell_membraneCreation::setup(cell &iCell) {
     guiGroup->forceVariableUpdate();

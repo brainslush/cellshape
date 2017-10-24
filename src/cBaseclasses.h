@@ -77,17 +77,14 @@ protected:
  * base class for all physical
  */
 
-class cellcomponents_base : public components_base {
+class cellcomponents_base : public components_base, public physic::Base {
 public:
     cellcomponents_base(sGlobalVars &iGlobals, cell_base &iCell);
 
     virtual ~cellcomponents_base();
 
-    virtual physic::RigidBody3d &get_rigidBody();
-
 protected:
     cell_base &cell;
-    physic::RigidBody3d rigidBody;
     Eigen::Vector3d responseForces;
     Eigen::Vector3d responseTorque;
 };

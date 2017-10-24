@@ -19,21 +19,19 @@ membrane_part::membrane_part(
         double iX2, double iY2,
         std::set<physic::functor *> &iFunctors
 ) : membrane_part_base(iGlobals, iCell, iX1, iY1, iX2, iY2) {
-    double mass = 0.1;
-    double length = (positions[0] - positions[1]).norm();
-    double I = 0.83333333 * mass * length * length;
-    Eigen::Matrix3d mI;
-    mI << I, 0, 0,
-            0, I, 0,
+    double _mass = 0.1;
+    double _length = (positions[0] - positions[1]).norm();
+    double _I = 0.83333333 * _mass * _length * _length;
+    Eigen::Matrix3d _mI;
+    _mI << _I, 0, 0,
+            0, _I, 0,
             0, 0, 0;
-    Eigen::Matrix3d mI2 = mI.inverse();
-    Eigen::Vector3d mI3 = mI2.diagonal();
-    rigidBody = physic::RigidBody3d(
-            Eigen::Vector3d(0, 0, 0),
-            Eigen::Quaterniond(0, 0, 0, 1),
-            mI,
-            0.1,
-            0.1,
+    rigidBody = new physic::RigidBody3d(
+            this,
+            (positions[0] + positions[1]) / 2,
+            physic::angleVector2d(positions[1] - positions[0]),
+            _mI,
+            _mass,
             &iFunctors
     );
     normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
@@ -54,7 +52,11 @@ void membrane_part::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 }
 
 void membrane_part::make_timeStep(double &dT) {
-    rigidBody.do_timeStep(dT, this);
+    if (rigidBody) {
+        //rigidBody->do_timeStep(dT);
+    } else {
+        std::cout << "membrane_part w/o RigidBody\n";
+    }
 };
 
 
@@ -88,7 +90,7 @@ void membrane_container::update_area() {
         auto &posB = it->get_positions()[1];
         temp += -1 * posB(0) * posA(1) + posA(0) * posB(1);
     };
-    area = temp
+    area = temp;
 }
 
 /* calculate length */
