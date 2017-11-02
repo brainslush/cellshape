@@ -124,28 +124,26 @@ fmCollision::calc(
     }
 }
 
-fViscosity::fViscosity(mygui::gui *&iGui) :
-        guiGroup(iGui->register_group("Dampening")),
+
+fConstantForce::fConstantForce(mygui::gui *&iGui) :
+        guiGroup(iGui->register_group("Tension")),
         activated(guiGroup->register_setting<bool>("Active", true, true)),
-        factor(guiGroup->register_setting<double>("Factor", true, 0, 1, 0.1)) {
+        factor(guiGroup->register_setting<double>("Factor", true, 0, 10, 0.1)) {
+
 }
 
-fViscosity::~fViscosity() = default;
+fConstantForce::~fConstantForce() = default;
 
-std::pair<Eigen::Vector3d, Eigen::Vector3d>
-fViscosity::calc(
+std::pair<Vector3d, Vector3d>
+fConstantForce::calc(
         const Eigen::Vector3d &X,
         const Eigen::Vector3d &v,
         const double &R,
         const Eigen::Vector3d &L,
-        physic::RigidBody3d &rigidBody
+         stokes::Solver &solver
 ) {
-    if (activated) {
-        auto _F = -factor * rigidBody.get_M() * v;
-        auto _T = -factor * rigidBody.get_I().cwiseInverse().cwiseProduct(L);
-        return {_F, _T};
-    } else {
-        return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
-    }
+    auto _filament = dynamic_cast<filament_base *>(solver.get_object());
+    auto &_X = _filament->get_positions();
+    Eigen::Vector3d _F = (_X[1] - _X[0]).normalized() * factor;
+    return {_F, Eigen::Vector3d(0,0,0)};
 }
-

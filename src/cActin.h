@@ -26,8 +26,6 @@ public:
 
     virtual ~actin();
 
-    virtual void update_force();
-
     virtual Eigen::Vector3d &get_tmVelocity();
 
     virtual bool make_timeStep(double &dT);

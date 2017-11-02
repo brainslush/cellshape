@@ -8,9 +8,9 @@ actin::actin(
         Eigen::Vector3d iTmVelocity,
         double iMaxLength,
         double iLifeTime,
-        double iStallingForce,
-        std::set<physic::functor *> &iFunctors
+        double iStallingForce
 ) :
+        stokes::Base(),
         filament_base(iGlobals, iCell),
         tmVelocity(std::move(iTmVelocity)),
         birthTime(iGlobals.time),
@@ -24,7 +24,8 @@ actin::actin(
     positions.push_back(iStart);
     // test variables, remove them later
     double _length = (positions[0] - positions[1]).norm();
-    double _mass = _length;
+    /*
+     * double _mass = _length;
     double _I = 0.83333333 * _mass * _length * _length;
     Eigen::Matrix3d _mI;
     _mI << 0, 0, 0,
@@ -40,23 +41,14 @@ actin::actin(
             _mass,
             &iFunctors
     );
+     */
+    solver = new stokes::Solver (
+        this,
+        &iFunctors
+    );
 }
 
 actin::~actin() = default;
-
-void actin::update_force() {
-    /*if (!force.isUpdated()) {
-        if (tail) {
-            force += tail->get_force();
-        }
-        for (auto& it : connectedCrosslinkers) {
-            force += it->get_force();
-        }
-
-        force.set_updated(true);
-    }
-    */
-}
 
 Eigen::Vector3d &actin::get_tmVelocity() {
     return tmVelocity;
@@ -68,26 +60,23 @@ bool actin::make_timeStep(double &dT) {
         return true;
     } else {
         auto length = (positions[0] - positions[1]).norm();
-        if (length < maxLength) {
-            positions[0] = positions[0] - globals.settings.deltaT * tmVelocity;
-        } else {
-            positions[1] = positions[1] - globals.settings.deltaT * tmVelocity;
-            positions[0] = positions[0] - globals.settings.deltaT * tmVelocity;
-        }
+        positions[0] = positions[0] + globals.settings.deltaT * tmVelocity /2 ;
+        positions[1] = positions[1] - globals.settings.deltaT * tmVelocity / 2;
         if (length > std::numeric_limits<double>::min()) {
             if (rigidBody) {
                 // set new values like mass, MoI, position
                 auto _length = (positions[1] - positions[0]).norm();
-                auto _M = _length;
+                auto _M = 1;
                 double _I = 0.83333333 * _M * _length * _length;
                 Eigen::Matrix3d _mI;
                 _mI << 0, 0, 0,
                         0, 0, 0,
                         0, 0, _I;
-                rigidBody->set_mass(_M);
+                solver->set_mass(_M);
                 rigidBody->set_inertia(_mI);
                 rigidBody->set_position((positions[1] + positions[0]) / 2);
-                rigidBody->set_rotation(physic::angleVector2d(tmVelocity));
+                auto _R2 = physic::angleVector2d(tmVelocity);
+                rigidBody->set_rotation(_R2);
                 // do one simulation step
                 rigidBody->do_timeStep(dT);
                 // apply simulated data onto visual model
@@ -97,9 +86,11 @@ bool actin::make_timeStep(double &dT) {
                 auto _cos = cos(_R);
                 auto _sin = sin(_R);
                 Eigen::Vector3d _X2(_l2 * _cos, _l2 * _sin, 0);
-                positions[1] = _X + _X2;
-                positions[0] = _X - _X2;
-                tmVelocity = tmVelocity.norm() * Eigen::Vector3d(_cos,_sin,0);
+                Eigen::Vector3d _X3 = _X - _X2;
+                Eigen::Vector3d _X4 = _X + _X2;
+                positions[1] = _X3;
+                positions[0] = _X4;
+                //tmVelocity = tmVelocity.norm() * Eigen::Vector3d(_cos,_sin,0);
             } else {
                 std::cout << "actin w/o RigidBody\n";
             }

@@ -471,10 +471,11 @@ namespace physic {
 
         virtual ~Base() = default;
 
-        virtual physic::RigidBody3d &get_rigidBody() { return *rigidBody; };
+        virtual physic::RigidBody3d &get_solver() { return *solver; };
 
     protected:
-        RigidBody3d *rigidBody;
+        RigidBody3d *solver;
+        std::set<physic::functor *> &iFunctors;
     };
 
 };

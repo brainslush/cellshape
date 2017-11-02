@@ -117,9 +117,12 @@ protected:
 
     random_dist *randomReal;
     unsigned &maxCount;
-    double &maxSpeed;
+    double &maxTMV;
+    bool &constTMV;
     double &maxLength;
+    bool &infLength;
     double &maxLifeTime;
+    bool &infLifeTime;
     double &maxStallingForce;
 };
 
