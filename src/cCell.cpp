@@ -156,9 +156,12 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
         functor_cell_base(iGlobals, "Filaments", "Forces"),
         randomReal(globals.rndC->register_random("uniform_real_distribution", 0.1, 1)),
         maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
-        maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
-        maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
+        maxSpeed(guiGroup->register_setting<double>("TMV", true, 0, 0.1, 0.1)),
+        constSpeed(guiGroup->register_setting<bool>("Const. TMV", true)),
+        maxLength(guiGroup->register_setting<double>("Length", true, 1, 500, 100)),
+        infLength(guiGroup->register_setting<bool>("Inf Length", false)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
+        infLifeTime(guiGroup->register_setting<bool>("Inf Life Time", false)),
         maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)) {
 }
 
@@ -212,7 +215,7 @@ pair<Eigen::Vector3d, membrane_part *> functor_cell_filamentCreation::find_creat
     length -= currLength;
     auto &pos = (*it)->get_positions();
     auto ret = Eigen::Vector3d(pos[0] + length * (pos[0] - pos[1]).normalized());
-    return {ret, static_cast<membrane_part *>(*it)};
+    return {ret, dynamic_cast<membrane_part *>(*it)};
 }
 
 Eigen::Vector3d functor_cell_filamentCreation::find_tmVelocity(cell &iCell, membrane_part &iMembrane) {

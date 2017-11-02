@@ -8,7 +8,7 @@
 #include "grid.h"
 #include "RigidBody.h"
 #include "globalVars.h"
-
+#include "stokesSolver.h"
 
 #ifndef __H_CBASECLASSES
 #define __H_CBASECLASSES
@@ -77,7 +77,7 @@ protected:
  * base class for all physical
  */
 
-class cellcomponents_base : public components_base, public physic::Base {
+class cellcomponents_base : public components_base, public stokes::Base {
 public:
     cellcomponents_base(sGlobalVars &iGlobals, cell_base &iCell);
 
@@ -97,8 +97,6 @@ public:
     virtual ~crosslinker_base();
 
     virtual std::set<filament_base *> &get_connectedFilaments();
-
-    virtual Eigen::Vector3d &get_force(unsigned long long iTimeStamp);
 
     virtual void add_connectedFilament(filament_base *iFilament);
 
