@@ -54,7 +54,7 @@ cellcomponents_base::cellcomponents_base(
         cell_base &iCell
 ) :
         components_base(iGlobals),
-        physic::Base::Base(),
+        stokes::Base::Base(),
         cell(iCell) {
 }
 
@@ -81,14 +81,6 @@ crosslinker_base::~crosslinker_base() {
 
 std::set<filament_base *> &crosslinker_base::get_connectedFilaments() {
     return connectedFilaments;
-}
-
-Eigen::Vector3d &crosslinker_base::get_force(unsigned long long iTimeStamp) {
-    if (timeStamp != iTimeStamp) {
-        return force;
-    } else {
-        return force;
-    }
 }
 
 void crosslinker_base::add_connectedFilament(filament_base *iFilament) {
@@ -196,7 +188,7 @@ std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &membrane_part_base::get_sharedP
     return sharedPositions;
 }
 
-void membrane_part_base::set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours) {
+void membrane_part_base::set_neighbours(const std::pair<membrane_part_base *, membrane_part_base *> &iNeighbours) {
     neighbours = iNeighbours;
 }
 

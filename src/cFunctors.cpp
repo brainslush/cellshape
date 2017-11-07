@@ -12,6 +12,8 @@ using namespace functor;
  * filament filament friction
  */
 
+/*
+
 ffFriction::ffFriction(mygui::gui *&iGui) :
         functor(),
         guiGroup(iGui->register_group("F-F Friction")),
@@ -56,9 +58,13 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> ffFriction::calc(
     return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
 }
 
+ */
+
 /*
  * filament membrane collision
  */
+
+/*
 
 fmCollision::fmCollision(mygui::gui *&iGui) :
         functor(),
@@ -117,35 +123,38 @@ fmCollision::calc(
             }
         }
         return {force, torque};
-         */
+
         return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
     } else {
         return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
     }
 }
 
-fViscosity::fViscosity(mygui::gui *&iGui) :
-        guiGroup(iGui->register_group("Dampening")),
+
+*/
+
+/*
+ * Constant force pushing on the fillaments ends
+ */
+
+fConstantForce::fConstantForce(mygui::gui *&iGui) :
+        guiGroup(iGui->register_group("Constant Force")),
         activated(guiGroup->register_setting<bool>("Active", true, true)),
-        factor(guiGroup->register_setting<double>("Factor", true, 0, 1, 0.1)) {
+        factor(guiGroup->register_setting<double>("Factor", true, 0, 10, 0.1)) {
 }
 
-fViscosity::~fViscosity() = default;
+fConstantForce::~fConstantForce() = default;
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d>
-fViscosity::calc(
+fConstantForce::calc(
         const Eigen::Vector3d &X,
         const Eigen::Vector3d &v,
         const double &R,
         const Eigen::Vector3d &L,
-        physic::RigidBody3d &rigidBody
+        stokes::Solver &solver
 ) {
-    if (activated) {
-        auto _F = -factor * rigidBody.get_M() * v;
-        auto _T = -factor * rigidBody.get_I().cwiseInverse().cwiseProduct(L);
-        return {_F, _T};
-    } else {
-        return {Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
-    }
+    auto _filament = dynamic_cast<filament_base *>(solver.get_object());
+    auto &_X = _filament->get_positions();
+    Eigen::Vector3d _F = (_X[0] - _X[1]).normalized() * factor;
+    return {_F, Eigen::Vector3d(0,0,0)};
 }
-

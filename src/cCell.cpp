@@ -141,7 +141,7 @@ functor_cell_base::functor_cell_base(
 
 functor_cell_base::~functor_cell_base() = default;
 
-void functor_cell_base::register_functor(physic::functor *iFunctor) {
+void functor_cell_base::register_functor(stokes::functor *iFunctor) {
     functors.insert(iFunctor);
 }
 
@@ -149,18 +149,26 @@ mygui::gui *&functor_cell_base::get_guiFunctor() {
     return guiFunctorGroup;
 }
 
-/* Filament creation functors*/
+/*
+ * Filament creation functor
+ */
+
 functor_cell_filamentCreation::functor_cell_filamentCreation(
         sGlobalVars &iGlobals
 ) :
         functor_cell_base(iGlobals, "Filaments", "Forces"),
         randomReal(globals.rndC->register_random("uniform_real_distribution", 0.1, 1)),
         maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
-        maxSpeed(guiGroup->register_setting<double>("Speed", true, 0, 0.05, 0.01)),
-        maxLength(guiGroup->register_setting<double>("Length", true, 1, 200, 100)),
+        maxTMV(guiGroup->register_setting<double>("TMV", true, 0, 0.1, 0.1)),
+        constTMV(guiGroup->register_setting<bool>("Const. TMV", true, true)),
+        maxLength(guiGroup->register_setting<double>("Length", true, 1, 500, 100)),
+        infLength(guiGroup->register_setting<bool>("Inf Length", true, true)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
-        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)) {
-}
+        infLifeTime(guiGroup->register_setting<bool>("Inf Life Time", true, true)),
+        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
+        bound1StokesCoeff(guiGroup->register_setting<double>("Min Stokes C", true, 1.0, 1000.0, 1.0)),
+        bound2StokesCoeff(guiGroup->register_setting<double>("Max Stokes C", true, 1.0, 1000.0, 1.0)),
+        constStokesCoeff(guiGroup->register_setting<bool>("Const Stokes C", true, true)) {}
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
     globals.rndC->unregister_random(randomReal);
@@ -191,6 +199,7 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
             find_maxLength(iCell),
             find_lifeTime(iCell),
             find_stallingForce(iCell),
+            find_stokesCoeff(iCell),
             functors
     );
     iCell.register_filament(newActin);
@@ -212,26 +221,46 @@ pair<Eigen::Vector3d, membrane_part *> functor_cell_filamentCreation::find_creat
     length -= currLength;
     auto &pos = (*it)->get_positions();
     auto ret = Eigen::Vector3d(pos[0] + length * (pos[0] - pos[1]).normalized());
-    return {ret, static_cast<membrane_part *>(*it)};
+    return {ret, dynamic_cast<membrane_part *>(*it)};
 }
 
 Eigen::Vector3d functor_cell_filamentCreation::find_tmVelocity(cell &iCell, membrane_part &iMembrane) {
     auto deg = PI * (randomReal->draw<double>() - 0.5);
-    auto speed = maxSpeed * randomReal->draw<double>();
+    double tmv = 0;
+    if (constTMV) {
+        tmv = maxTMV;
+    } else {
+        tmv = maxTMV * randomReal->draw<double>();
+    }
     Eigen::AngleAxis<double> rot(deg, Eigen::Vector3d(0, 0, 1));
-    return Eigen::Vector3d(speed * (rot * (-1 * iMembrane.get_normal())));
+    return Eigen::Vector3d(tmv * (rot * (-1 * iMembrane.get_normal())));
 }
 
 double functor_cell_filamentCreation::find_maxLength(cell &iCell) {
+    if (infLength) {
+        return std::numeric_limits<double>::infinity();
+    }
     return maxLength * randomReal->draw<double>();
 }
 
 double functor_cell_filamentCreation::find_lifeTime(cell &iCell) {
+    if (infLifeTime) {
+        return std::numeric_limits<double>::infinity();
+    }
     return maxLifeTime * randomReal->draw<double>();
 }
 
 double functor_cell_filamentCreation::find_stallingForce(cell &iCell) {
     return maxStallingForce * randomReal->draw<double>();
+}
+
+double functor_cell_filamentCreation::find_stokesCoeff(cell &iCell) {
+    auto _min = std::min(bound1StokesCoeff, bound2StokesCoeff);
+    if (!constStokesCoeff) {
+        auto _max = std::max(bound1StokesCoeff, bound2StokesCoeff);
+        return _min + randomReal->draw<double>() * (_max - _min);
+    }
+    return _min;
 }
 
 functor_cell_membraneCreation::functor_cell_membraneCreation(sGlobalVars &iGlobals) :

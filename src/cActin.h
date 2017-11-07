@@ -16,17 +16,16 @@ public:
     actin(
             sGlobalVars &iGlobals,
             cell_base &iCell,
-            Eigen::Vector3d iStart,
-            Eigen::Vector3d iTmVelocity,
-            double iMaxLength,
-            double iLifeTime,
-            double iStallingForce,
-            std::set<physic::functor *> &iFunctors
+            const Eigen::Vector3d &iStart,
+            const Eigen::Vector3d &iTmVelocity,
+            const double &iMaxLength,
+            const double &iLifeTime,
+            const double &iStallingForce,
+            const double &iStokesCoeff,
+            std::set<stokes::functor *> &iFunctors
     );
 
     virtual ~actin();
-
-    virtual void update_force();
 
     virtual Eigen::Vector3d &get_tmVelocity();
 
@@ -39,6 +38,7 @@ protected:
     const double maxLength; // maximum length
     const double lifeTime; // dies after lifetime
     const double stallingForce; // force at which actin doesn't treadmills anymore
+    const double stokesCoeff;
 };
 
 #endif /* SRC_ACTIN_H_ */
