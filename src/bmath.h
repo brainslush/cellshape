@@ -27,6 +27,32 @@ namespace bmath {
             return !(v < b) && !(a < v);
         }
     }
+
+    /*
+     * return the angle in rads between two vectors
+     */
+
+    template <typename T>
+    T angleVector2d(
+            const T &x1,
+            const T &y1,
+            const T &x2,
+            const T &y2
+    ) {
+        T _dot = x1 * x2 + y1 * y2;
+        T _det = x2 * y1 - x1 * y2;
+        return atan2(_det, _dot);
+    }
+
+    template<typename T>
+    T angleVector2d(
+            const T &x1,
+            const T &x2
+    ) {
+        return angleVector2d((double)x1,(double)x2,1.0d,0.0d);
+    }
+
 };
+
 
 #endif //SRC_MATH_H_

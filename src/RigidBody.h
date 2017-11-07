@@ -40,19 +40,8 @@ namespace physic {
     /*
      * function to convert a rotation vector to quaternion
      */
+
     Eigen::Quaterniond vec2quat(const Vec3 &v);
-
-    /*
-     * function to calculate the angle between two vectors
-     */
-
-    double angleVector2d(const Vec3 &v);
-
-    double angleVector2d(
-            const double &x1,
-            const double &y1,
-            const double &x2,
-            const double &y2);
 
     /*
      * Functor for torque and force calculation
@@ -165,6 +154,10 @@ namespace physic {
 
         virtual ~RigidBody3d() = default;
 
+        /*
+         * getters
+         */
+
         virtual Vec3 &get_X() {
             return X;
         };
@@ -173,12 +166,6 @@ namespace physic {
             //return q.toRotationMatrix();
             return R;
         };
-
-        /*
-        virtual Eigen::Quaterniond &get_q() {
-            return q;
-        };
-         */
 
         virtual Vec3 &get_v() {
             return v;
@@ -208,36 +195,29 @@ namespace physic {
             return object;
         };
 
+        /*
+         * setters
+         */
+
         virtual void set_object(Base *iObj) {
             object = iObj;
         };
 
-        virtual void set_position(const Vec3 &iX) {
+        virtual void set_X(const Vec3 &iX) {
             X = iX;
         }
 
-        virtual void set_rotation(const double &iR) {
+        virtual void set_R(const double &iR) {
             R = iR;
         }
 
-        virtual void set_inertia(const Eigen::Matrix3d &iI) {
+        virtual void set_I(const Eigen::Matrix3d &iI) {
             I = iI.diagonal();
         };
 
-        virtual void set_mass(const double &iM) {
+        virtual void set_M(const double &iM) {
             M = iM;
         };
-
-        virtual void set_velocity(const Vec3 &iV) {
-            v = iV;
-        }
-
-        /*
-        virtual void add_force(const Vec3 &iX, const Vec3 &iF) {
-            F += iF;
-            T += (iX - X).cross(iF);
-        };
-         */
 
         /*
          * Simulate single time step
@@ -267,6 +247,10 @@ namespace physic {
         Vec3 F; // current force
         Vec3 T; // current torque
         Base *object;
+
+        /*
+         * helper functions
+         */
 
         std::pair<Vec3, Vec3> sum_functors(
                 const Vec3 &iX,
@@ -462,7 +446,13 @@ namespace physic {
     class Base {
     public:
         Base() :
-                rigidBody(nullptr) {};
+                solver(nullptr),
+                functors(nullptr)
+                {};
+
+        explicit Base(std::set<physic::functor *> *iFunctors) :
+                solver(nullptr),
+                functors(iFunctors) {};
 
         /*
         Base(RigidBody3d *iRigidBody):
@@ -475,7 +465,7 @@ namespace physic {
 
     protected:
         RigidBody3d *solver;
-        std::set<physic::functor *> &iFunctors;
+        std::set<physic::functor *> *functors;
     };
 
 };

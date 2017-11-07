@@ -17,10 +17,12 @@
 
 namespace functor {
 
+
     /*
      * This functor calculates the friction force between Actin filaments which can be direction dependent
      */
 
+    /*
     class ffFriction : public stokes::functor {
     public:
         explicit ffFriction(mygui::gui *&iGui);
@@ -41,11 +43,13 @@ namespace functor {
         double &frictionCoeff;
         double &angleCoeff;
     };
+     */
 
     /*
      * This functor models the membrane - filament interaction in form of inelastic collisions.
      */
 
+    /*
     class fmCollision : public physic::functor {
     public:
         explicit fmCollision(mygui::gui *&iGui);
@@ -64,8 +68,10 @@ namespace functor {
         bool &activated;
     };
 
+     */
+
     /*
-     * Introduces a damping force to reduce momentum effects in form of viscous force
+     * constant force
      */
 
 

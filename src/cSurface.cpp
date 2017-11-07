@@ -51,7 +51,7 @@ simple_surface::simple_surface(
     facRadius(guiGroup->register_setting<double>("FAC Radius", false, 0, 20, 10)),
     sideLength(iSideLength) {
     create_borders();
-    create_facs();
+    //create_facs();
 }
 
 simple_surface::~simple_surface() {
@@ -87,7 +87,7 @@ void simple_surface::reset() {
     facs.clear();
     guiGroup->forceVariableUpdate();
     create_borders();
-    create_facs();
+    //create_facs();
 }
 
 void simple_surface::create_facs() {

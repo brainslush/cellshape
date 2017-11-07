@@ -160,7 +160,7 @@ public:
 
     virtual std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &get_sharedPositions();
 
-    virtual void set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours);
+    virtual void set_neighbours(const std::pair<membrane_part_base *,membrane_part_base *> &iNeighbours);
 
     virtual Eigen::Vector3d calc_dirVector(Eigen::Vector3d *iPoint);
 

@@ -1,6 +1,11 @@
 #ifndef CELLFORMATION_STOKESSOLVER_H
 #define CELLFORMATION_STOKESSOLVER_H
 
+/*
+ * TODO:
+ * - add rotation to the simulation.
+ */
+
 
 /*
  * Handles stokes simmulaton
@@ -17,6 +22,11 @@ namespace stokes {
     using Vec3 = Eigen::Vector3d;
 
     class Solver;
+
+    /*
+     * functor class from which all force/torque functors inherit so that
+     * the solver can access them via pointers
+     */
 
     class functor {
     public:
@@ -38,14 +48,29 @@ namespace stokes {
 
     /*
      * Rigid body class which uses numerical integrators to calculate changes
-     * */
+     *
+     * Variables:
+     * X - position of COM
+     * R - rotation measured in rads
+     * c - constant of the stokes friction
+     * v - velocity of the COM
+     * w - angular velocity of the COM
+     * F - current force acting on the object
+     * T - current torque acting on the object
+     *
+     */
 
     class Base;
 
     class Solver {
     public:
-        explicit Solver(Base *obj) :
-                object(obj),
+
+        /*
+         * constructors
+         */
+
+        explicit Solver(Base *iObj) :
+                object(iObj),
                 functors(nullptr) {
             X = Vec3(0, 0, 0);
             R = 0.0;
@@ -55,6 +80,22 @@ namespace stokes {
             F = Vec3(0, 0, 0);
             T = Vec3(0, 0, 0);
         };
+
+        Solver(
+                Base *iObj,
+                std::set<functor *> *iFunctors
+        ) :
+                object(iObj),
+                functors(iFunctors)
+        {
+            X = Vec3(0, 0, 0);
+            R = 0.0;
+            c = 1.0;
+            v = Vec3(0, 0, 0);
+            w = Vec3(0, 0, 0);
+            F = Vec3(0, 0, 0);
+            T = Vec3(0, 0, 0);
+        }
 
         Solver(
                 Base *obj,
@@ -74,7 +115,16 @@ namespace stokes {
             T = Vec3(0, 0, 0);
         };
 
+        /*
+         * destructor
+         */
+
         virtual ~Solver() = default;
+
+        /*
+         * getters
+         */
+
 
         virtual Vec3 &get_X() {
             return X;
@@ -108,29 +158,29 @@ namespace stokes {
             return object;
         };
 
+        /*
+         * setters
+         */
+
         virtual void set_object(Base *iObj) {
             object = iObj;
         };
 
-        virtual void set_position(const Vec3 &iX) {
+        virtual void set_X(const Vec3 &iX) {
             X = iX;
         }
 
-        virtual void set_rotation(const double &iR) {
+        virtual void set_R(const double &iR) {
             R = iR;
         }
 
-        virtual void set_c1(const double &iC) {
+        virtual void set_c(const double &iC) {
             c = iC;
         };
 
-        virtual void set_velocity(const Vec3 &iV) {
-            v = iV;
-        }
-
         /*
          * Simulate single time step
-         * */
+         */
 
         void do_timeStep(double &dT) {
             // update force and torque
@@ -147,12 +197,17 @@ namespace stokes {
         Vec3 X; // position
         double R;
         double c;
-        std::set<functor *> *functors; // functors which calculate forces and torques
         Vec3 v; // velocity
         Vec3 w; // angular momentum
         Vec3 F; // current force
         Vec3 T; // current torque
         Base *object;
+        std::set<functor *> *functors; // functors which calculate forces and torques
+
+        /*
+         * helper function which sums up the forces and torques outputed by the
+         * functors
+         */
 
         std::pair<Vec3, Vec3> sum_functors(
                 const Vec3 &iX,
@@ -175,7 +230,7 @@ namespace stokes {
 
         /*
          * Numerical integration method based on the 4th order Runge-Kutta algorithm
-         * */
+         */
 
         void do_rk4(double &dT) {
 
@@ -228,7 +283,7 @@ namespace stokes {
         virtual stokes::Solver &Solver() { return *solver; };
 
     protected:
-        Solver *solver;
+        stokes::Solver *solver;
     };
 
 };
