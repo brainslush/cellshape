@@ -21,6 +21,11 @@ class functor_cell_filamentCreation;
 
 class functor_cell_membraneCreation;
 
+/*
+ * simple cell object which holds all necessary classes and uses functors
+ * to define the creation process of the filaments
+ */
+
 class cell : public cell_base {
 public:
 
@@ -68,7 +73,10 @@ protected:
     functor_cell_membraneCreation *membraneF;
 };
 
-// base class for cell functor
+/*
+ * base class for all cell functors
+ */
+
 class functor_cell_base {
 public:
     functor_cell_base(
@@ -79,16 +87,20 @@ public:
 
     virtual ~functor_cell_base();
 
-    virtual void register_functor(physic::functor *iFunctor);
+    virtual void register_functor(stokes::functor *iFunctor);
 
     virtual mygui::gui *&get_guiFunctor();
 
 protected:
     sGlobalVars &globals;
     mygui::group *guiGroup;
-    std::set<physic::functor *> functors;
+    std::set<stokes::functor *> functors;
     mygui::gui *guiFunctorGroup;
 };
+
+/*
+ * functor which handles filament creation
+ */
 
 class functor_cell_filamentCreation : public functor_cell_base {
 public:
@@ -115,6 +127,8 @@ protected:
 
     virtual double find_stallingForce(cell &iCell);
 
+    virtual double find_stokesCoeff(cell &iCell);
+
     random_dist *randomReal;
     unsigned &maxCount;
     double &maxTMV;
@@ -124,7 +138,14 @@ protected:
     double &maxLifeTime;
     bool &infLifeTime;
     double &maxStallingForce;
+    double &bound1StokesCoeff;
+    double &bound2StokesCoeff;
+    bool &constStokesCoeff;
 };
+
+/*
+ * functor which handles "membrane" creation
+ */
 
 class functor_cell_membraneCreation : public functor_cell_base {
 public:

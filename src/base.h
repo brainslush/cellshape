@@ -33,7 +33,7 @@ public:
 
     virtual ~base();
 
-    virtual void set_gridCells(std::set<grid::cell *> iGridCells);
+    virtual void set_gridCells(const std::set<grid::cell *> &iGridCells);
 
     virtual std::vector<Eigen::Vector3d> &get_positions();
 

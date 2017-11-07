@@ -30,7 +30,7 @@ base::~base() {
     associatedVisualObj = nullptr;
 }
 
-void base::set_gridCells(std::set<grid::cell *> iGridCells) { gridCells = std::move(iGridCells); }
+void base::set_gridCells(const std::set<grid::cell *> &iGridCells) { gridCells = std::move(iGridCells); }
 
 std::vector<Eigen::Vector3d> &base::get_positions() { return positions; }
 

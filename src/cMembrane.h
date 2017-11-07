@@ -22,7 +22,7 @@ public:
             cell_base &iCell,
             double iX1, double iY1,
             double iX2, double iY2,
-            std::set<physic::functor *> &iFunctors
+            std::set<stokes::functor *> &iFunctors
     );
 
     virtual ~membrane_part();

@@ -17,8 +17,9 @@ membrane_part::membrane_part(
         cell_base &iCell,
         double iX1, double iY1,
         double iX2, double iY2,
-        std::set<physic::functor *> &iFunctors
+        std::set<stokes::functor *> &iFunctors
 ) : membrane_part_base(iGlobals, iCell, iX1, iY1, iX2, iY2) {
+    /*
     double _mass = 0.1;
     double _length = (positions[0] - positions[1]).norm();
     double _I = 0.83333333 * _mass * _length * _length;
@@ -34,7 +35,9 @@ membrane_part::membrane_part(
             _mass,
             &iFunctors
     );
+    */
     normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
+
 };
 
 membrane_part::~membrane_part() {
@@ -52,7 +55,7 @@ void membrane_part::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 }
 
 void membrane_part::make_timeStep(double &dT) {
-    if (rigidBody) {
+    if (solver) {
         //rigidBody->do_timeStep(dT);
     } else {
         std::cout << "membrane_part w/o RigidBody\n";

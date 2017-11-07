@@ -86,8 +86,8 @@ void ofApp::setup() {
     // register filament  force/torque functors
     //filamentF->register_functor(new functor::fmCollision(filamentF->get_guiFunctor()));
     //filamentF->register_functor(new functor::ffFriction(filamentF->get_guiFunctor()));
-    filamentF->register_functor(new functor::fViscosity(filamentF->get_guiFunctor()));
-    filamentF->register_functor(new functor::fSimpleTension(filamentF->get_guiFunctor()));
+    //filamentF->register_functor(new functor::fViscosity(filamentF->get_guiFunctor()));
+    filamentF->register_functor(new functor::fConstantForce(filamentF->get_guiFunctor()));
     // create actual cell
     ccell = new cell(globals, membraneF, filamentF);
 }

@@ -54,7 +54,7 @@ cellcomponents_base::cellcomponents_base(
         cell_base &iCell
 ) :
         components_base(iGlobals),
-        physic::Base::Base(),
+        stokes::Base::Base(),
         cell(iCell) {
 }
 
@@ -188,7 +188,7 @@ std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &membrane_part_base::get_sharedP
     return sharedPositions;
 }
 
-void membrane_part_base::set_neighbours(std::pair<membrane_part_base *, membrane_part_base *> iNeighbours) {
+void membrane_part_base::set_neighbours(const std::pair<membrane_part_base *, membrane_part_base *> &iNeighbours) {
     neighbours = iNeighbours;
 }
 
