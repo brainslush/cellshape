@@ -49,7 +49,16 @@ set(SOURCE_FILES
         src/std.cpp
         src/std.h
         src/bmath.h
-        src/typeRegistrar.h src/ignoreList.h src/typeRegistrar.cpp src/ignoreList.cpp src/Eigen.h src/stokesSolver.cpp src/stokesSolver.h)
+        src/typeRegistrar.h
+        src/ignoreList.h
+        src/typeRegistrar.cpp
+        src/ignoreList.cpp
+        src/Eigen.h
+        src/stokesSolver.cpp
+        src/stokesSolver.h
+        src/cLinker.cpp
+        src/cLinker.h
+)
 
 add_executable(
         ${APP}
