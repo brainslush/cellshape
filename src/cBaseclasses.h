@@ -168,7 +168,13 @@ public:
 
     virtual std::set<linker_base *> &get_connectedLinkers();
 
+    virtual void add_connectedLinker(linker_base *iLinker);
+
+    virtual void remove_connectedLinker(linker_base *iLinker);
+
     virtual void set_neighbours(const std::pair<membrane_part_base *,membrane_part_base *> &iNeighbours);
+
+    virtual void set_sharedPositions(const std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &iSharedPos);
 
     virtual Eigen::Vector3d calc_dirVector(Eigen::Vector3d *iPoint);
 

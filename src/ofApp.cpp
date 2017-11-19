@@ -81,7 +81,8 @@ void ofApp::setup() {
     // create surface
     surface = new simple_surface(globals, globals.settings.sideLength);
     // create cell components
-    membraneF = new functor_cell_arcMembraneCreation(globals); // membrane creation functor for cell
+    //membraneF = new functor_cell_arcMembraneCreation(globals); // membrane creation functor for cell
+    membraneF = new functor_cell_membraneCreation(globals);
     filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
     // register membrane force/torque functors
     //membraneF->register_functor(new functor::membraneSpring(membraneF->get_guiFunctor()));
@@ -96,7 +97,9 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-    //std::cout << "surface_border :: " << typeid(surface_border).name();
+    std::stringstream strm;
+    strm << "fps: " << round(ofGetFrameRate());
+    ofSetWindowTitle(strm.str());
     // calculate scale factor when window is resized
     scale = std::min(ofGetHeight() / (double) globals.settings.sideLength,
                      ofGetWidth() / (double) globals.settings.sideLength);

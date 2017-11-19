@@ -93,20 +93,33 @@ void cell::unregister_filament(std::set<filament_base *>::iterator iIt) {
 
 void cell::reset() {
     for (auto it: filaments) {
-        delete it;
-        it = nullptr;
+        if (it) {
+            delete it;
+            it = nullptr;
+        }
     }
     filaments.clear();
     for (auto it: membranes) {
-        delete it;
-        it = nullptr;
+        if (it) {
+            delete it;
+            it = nullptr;
+        }
     }
     membranes.clear();
     for (auto it: volumes) {
-        delete it;
-        it = nullptr;
+        if (it) {
+            delete it;
+            it = nullptr;
+        }
     }
     volumes.clear();
+    for (auto it: linkers) {
+        if (it) {
+            delete it;
+            it = nullptr;
+        }
+    }
+    linkers.clear();
     // rebuild
     guiGroup->forceVariableUpdate();
     membraneF->setup(*this);
@@ -188,6 +201,7 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
         functor_cell_base(iGlobals, "Filaments", "Forces"),
         randomReal(globals.rndC->register_random("uniform_real_distribution", 0.1, 1)),
         maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 100)),
+        randomAngle(guiGroup->register_setting<bool>("Random Angle", true, false)),
         maxTMV(guiGroup->register_setting<double>("TMV", true, 0, 0.1, 0.1)),
         constTMV(guiGroup->register_setting<bool>("Const. TMV", true, true)),
         maxLength(guiGroup->register_setting<double>("Length", true, 1, 500, 100)),
@@ -232,6 +246,7 @@ void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
 
 filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
     auto _par = find_creationParameters(iCell);
+    membrane_part_base *_membrane = std::get<0>(_par);
     auto _con = new mf_linker(globals, iCell);
     auto *_newActin = new actin(
             globals,
@@ -245,6 +260,7 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
             functors
     );
     _newActin->add_connectedLinker(_con);
+    _membrane->add_connectedLinker(_con);
     _con->add_connectedComponent(_newActin);
     iCell.register_filament(_newActin);
     iCell.register_linker(_con);
@@ -293,16 +309,22 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
         // calculate creation position
         auto _spawnPos = Eigen::Vector3d(_pos[0] + _length * (_pos[0] - _pos[1]).normalized());
         // calculate tm velocity vector
-        auto _normal = _el->get_normal();
-        auto _deg = PI * (randomReal->draw<double>() - 0.5);
+        auto &_normal = _el->get_normal();
+        // determine tread milling velocity
         double _tmv = 0;
         if (constTMV) {
             _tmv = maxTMV;
         } else {
             _tmv = maxTMV * randomReal->draw<double>();
         }
+        // determine spawn angle
+        double _deg = 0;
+        if (randomAngle) {
+            _deg = PI * (randomReal->draw<double>() - 0.5);
+        }
         Eigen::AngleAxis<double> _rot(_deg, Eigen::Vector3d(0, 0, 1));
-        return {(*_it), _spawnPos, Eigen::Vector3d(_tmv * (_rot * (-1 * _normal)))};
+        auto _tmvV = Eigen::Vector3d(_tmv * (_rot * (-1 * _normal)));
+        return {(*_it), _spawnPos, _tmvV};
     } else {
         return {(*_it), Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
     }

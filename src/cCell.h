@@ -135,6 +135,7 @@ protected:
 
     random_dist *randomReal;
     unsigned &maxCount;
+    bool& randomAngle;
     double &maxTMV;
     bool &constTMV;
     double &maxLength;
