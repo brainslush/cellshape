@@ -37,6 +37,8 @@ public:
 
 protected:
     Eigen::Vector3d normal;
+
+    virtual void update_normal();
 };
 
 class arc_membrane_part : public membrane_part_base {

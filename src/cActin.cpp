@@ -31,27 +31,6 @@ actin::actin(
             &iFunctors
     );
     solver->set_c(stokesCoeff);
-
-    // test variables, remove them later
-    /*
-    double _length = (positions[0] - positions[1]).norm();
-    double _mass = _length;
-    double _I = 0.83333333 * _mass * _length * _length;
-    Eigen::Matrix3d _mI;
-    _mI << 0, 0, 0,
-            0, 0, 0,
-            0, 0, _I;
-    auto _mI2 = _mI.inverse();
-    auto _mI3 = _mI2.diagonal();
-    rigidBody = new physic::RigidBody3d(
-            this,
-            (positions[0] + positions[1]) / 2,
-            physic::angleVector2d(tmVelocity),
-            _mI,
-            _mass,
-            &iFunctors
-    );
-     */
 }
 
 actin::~actin() = default;

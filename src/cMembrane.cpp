@@ -19,7 +19,7 @@ membrane_part::membrane_part(
         double iX2, double iY2,
         std::set<stokes::functor *> &iFunctors
 ) : membrane_part_base(iGlobals, iCell, iX1, iY1, iX2, iY2) {
-    normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
+    update_normal();
 };
 
 membrane_part::~membrane_part() {
@@ -46,11 +46,15 @@ void membrane_part::make_timeStep(const double &dT) {
 
 double membrane_part::get_length() {
     return (get_positions()[0] - get_positions()[1]).norm();
+}
+
+void membrane_part::update_normal() {
+    normal = (Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0])).normalized();
 };
 
 
 /***************************
- * membrane base
+ * membrane container
  ***************************/
 
 // circular membrane
@@ -114,10 +118,68 @@ std::vector<membrane_part_base *> &membrane_container::get_parts() {
     return parts;
 }
 
-/* variableUpdate feature of the membrane */
+/*
+ * do time step, handles mostly the removal of obselete membrane parts
+ */
 void membrane_container::make_timeStep(const double &dT) {
+    // run through all membrane parts
+    auto _it = parts.begin();
+    while (_it != parts.end()) {
+        // check for linkers
+        auto &_linkers = (*_it)->get_connectedLinkers();
+        if (_linkers.size() < 2) {
+            membrane_part_base *_neigh = (*_it)->get_neighbours().first;
+            if (_neigh->get_connectedLinkers().size() < 2) {
 
+                /*
+                // get position
+                auto _posAP = (*_it)->get_sharedPositions()[0];
+                auto _posBP = (*_it)->get_sharedPositions()[1];
+                auto _posAN = _neigh->get_sharedPositions()[0];
+                auto _posBN = _neigh->get_sharedPositions()[1];
+                Eigen::Vector3d *_sharedPos, _posA, _posB;
+                membrane_part_base *_neighA, _neighB;
+                if (_posAP == _posAN) {
+                    _sharedPos = _posAP;
+                    _posA = _posBP;
+                    _posB = _posBN;
+                } else if (_posAP == _posBN) {
+                    _sharedPos = _posAP;
+                    _posA = _posBP;
+                    _posB = _posAN;
+                } else if (_posBP == _posAN) {
+                    _sharedPos = _posBP;
+                    _posA = _posAP;
+                    _posB = _posBN;
+                } else if (_posBP == _posBN) {
+                    _sharedPos = _posBP;
+                    _posA = _posAP;
+                    _posB = _posAN;
+                } else {
+                    _sharedPos = nullptr;
+                }
+
+                if (_sharedPos) {
+                    delete _sharedPos;
+                    _sharedPos = nullptr;
+                    // set neighbour data
+                }*/
+                _neigh->set_neighbours({_neigh->get_neighbours().first, (*_it)->get_neighbours().second});
+                _neigh->set_sharedPositions({_neigh->get_sharedPositions().first, (*_it)->get_sharedPositions().second});
+
+                // erase this element
+                _it = parts.erase(_it);
+            }
+        } else if (_linkers.size() > 2) {
+            std::cout << "Warning : Membrane part has more than two linkers!\n";
+        }
+        _it++;
+    }
 }
+
+/***************************
+ * arc membrane
+ ***************************/
 
 arc_membrane_part::arc_membrane_part(
         sGlobalVars &iGlobals,
@@ -147,7 +209,7 @@ arc_membrane_part::~arc_membrane_part() {
 }
 
 Eigen::Vector3d arc_membrane_part::get_normal(const double &deg) {
-    return Eigen::Vector3d(cos(deg),sin(deg),0);
+    return Eigen::Vector3d(cos(deg), sin(deg), 0);
 }
 
 void arc_membrane_part::make_timeStep(const double &dT) {

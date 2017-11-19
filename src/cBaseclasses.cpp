@@ -211,6 +211,18 @@ std::set<linker_base *> &membrane_part_base::get_connectedLinkers() {
     return connectedLinkers;
 }
 
+void membrane_part_base::add_connectedLinker(linker_base *iLinker) {
+    connectedLinkers.insert(iLinker);
+}
+
+void membrane_part_base::remove_connectedLinker(linker_base *iLinker) {
+    connectedLinkers.erase(iLinker);
+}
+
+void membrane_part_base::set_sharedPositions(const std::pair<Vector3d *, Vector3d *> &iSharedPos) {
+    sharedPositions = iSharedPos;
+}
+
 /***************************
  * Matrix Compoents Base
  ***************************/
