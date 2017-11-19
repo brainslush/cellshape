@@ -1,11 +1,10 @@
 #include "base.h"
 
 
-
 base::base() :
         associatedVisualObj(nullptr),
         timeStamp(ofGetFrameNum()),
-        typeHash(0){}
+        typeHash(0) {}
 
 base::base(
         std::vector<Eigen::Vector3d> iPositions
@@ -88,7 +87,7 @@ visual_base::visual_base(unsigned iType, base *iComponent) {
     associatedComponent = iComponent;
 }
 
-visual_base::~visual_base() =default;
+visual_base::~visual_base() = default;
 
 ofFloatColor &visual_base::get_color() {
     return color;
@@ -148,7 +147,7 @@ void visual_base::draw(double iScale) {
 visual_line::visual_line(base *iComponent) : visual_base(1, iComponent) {
 }
 
-visual_line::~visual_line() =default;
+visual_line::~visual_line() = default;
 
 void visual_line::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -166,7 +165,7 @@ void visual_line::draw(double iScale) {
 visual_ellipse::visual_ellipse(base *iComponent) : visual_base(2, iComponent) {
 }
 
-visual_ellipse::~visual_ellipse() =default;
+visual_ellipse::~visual_ellipse() = default;
 
 void visual_ellipse::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -202,7 +201,7 @@ void visual_rectangle::draw(double iScale) {
 visual_triangle::visual_triangle(base *iComponent) : visual_base(4, iComponent) {
 }
 
-visual_triangle::~visual_triangle() =default;
+visual_triangle::~visual_triangle() = default;
 
 void visual_triangle::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -214,4 +213,44 @@ void visual_triangle::draw(double iScale) {
             (float) (iScale * get_positions()[2](0)),
             (float) (iScale * get_positions()[2](1))
     );
+}
+
+/*
+ * visual_acrCircle
+ */
+
+visual_arcCircle::visual_arcCircle(base *iComponent) : visual_base(5, iComponent) {
+
+}
+
+visual_arcCircle::~visual_arcCircle() = default;
+
+void visual_arcCircle::draw(double iScale) {
+    double &_x = get_positions()[0](0);
+    double &_y = get_positions()[0](1);
+    double &_R = get_parameters()[0];
+    double &_angleB = get_parameters()[1];
+    double &_angleE = get_parameters()[2];
+
+    auto _step = 2 * M_PI / 360;
+    double _xp = _x + _R * cos(_angleB);
+    double _yp = _y + _R * sin(_angleB);
+    ofPoint pos((float) (iScale * _xp), (float) (iScale * _yp));
+    ofPolyline curve({pos});
+    double _angle1 = _angleB;
+    double _angle2 = _angleE;
+    while (_angle1 > _angle2) {
+        _angle2 += 2 * M_PI;
+    }
+    while (_angle1 + _step <= _angle2) {
+        _angle1 += _step;
+        _xp = _x + _R * cos(_angle1);
+        _yp = _y + _R * sin(_angle1);
+        curve.lineTo((float) (iScale * _xp), (float) (iScale * _yp));
+    }
+    _xp = _x + _R * cos(_angleE);
+    _yp = _y + _R * sin(_angleE);
+    curve.lineTo((float) (iScale * _xp), (float) (iScale * _yp));
+    ofSetColor(get_fillColor());
+    curve.draw();
 }

@@ -13,6 +13,7 @@
 #include "random.h"
 #include "cMembrane.h"
 #include "cActin.h"
+#include "cLinker.h"
 
 #ifndef SRC_CCELL_H_
 #define SRC_CCELL_H_
@@ -53,9 +54,13 @@ public:
 
     virtual void register_filament(filament_base *iFilament);
 
+    virtual void register_linker(linker_base *iLinker);
+
     virtual void unregister_filament(filament_base *iFilament);
 
     virtual void unregister_filament(std::set<filament_base *>::iterator iIt);
+
+    virtual void unregister_filament(linker_base *iLinker);
 
     virtual void reset();
 
@@ -69,6 +74,7 @@ protected:
     std::set<membrane_container *> membranes;
     std::set<filament_base *> filaments;
     std::set<volume_base *> volumes;
+    std::set<linker_base *> linkers;
     functor_cell_filamentCreation *filamentF;
     functor_cell_membraneCreation *membraneF;
 };
@@ -117,9 +123,7 @@ public:
 protected:
     virtual filament_base *create_filament(cell &iCell);
 
-    virtual pair<Eigen::Vector3d, membrane_part *> find_creationPosition(cell &iCell);
-
-    virtual Eigen::Vector3d find_tmVelocity(cell &iCell, membrane_part &iMembrane);
+    virtual std::tuple<membrane_part_base *, Eigen::Vector3d, Eigen::Vector3d> find_creationParameters(cell &iCell);
 
     virtual double find_maxLength(cell &iCell);
 
@@ -158,6 +162,19 @@ public:
 protected:
     double &radius;
     unsigned &resolution;
+};
+
+/*
+ * functor which handles creation of membrane made of arc circles
+ */
+
+class functor_cell_arcMembraneCreation : public functor_cell_membraneCreation {
+public:
+    explicit functor_cell_arcMembraneCreation(sGlobalVars &iGlobals);
+
+    virtual ~functor_cell_arcMembraneCreation();
+
+    virtual void setup(cell &iCell);
 };
 
 #endif /* SRC_CCELL_H_ */

@@ -54,6 +54,8 @@ namespace grid {
         visual_base *associatedVisualObj;
         std::vector<border *> borders;
 
+        Eigen::Vector3d *obtain_intersectingArcCircleLine(base *iRef, base *iCom);
+
         Eigen::Vector3d *obtain_intersectingCircleLine(base *iRef, base *iCom);
 
         Eigen::Vector3d *obtain_intersectingLineLine(base *iRef, base *iCom);

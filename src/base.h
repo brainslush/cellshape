@@ -129,6 +129,17 @@ public:
 protected:
 };
 
+class visual_arcCircle : public visual_base {
+public:
+    explicit visual_arcCircle(base *iComponent);
+
+    virtual ~visual_arcCircle();
+
+    virtual void draw(double iScale);
+
+protected:
+};
+
 class visual_rectangle : public visual_base {
 public:
     explicit visual_rectangle(base *iComponent);
