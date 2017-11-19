@@ -19,29 +19,11 @@ membrane_part::membrane_part(
         double iX2, double iY2,
         std::set<stokes::functor *> &iFunctors
 ) : membrane_part_base(iGlobals, iCell, iX1, iY1, iX2, iY2) {
-    /*
-    double _mass = 0.1;
-    double _length = (positions[0] - positions[1]).norm();
-    double _I = 0.83333333 * _mass * _length * _length;
-    Eigen::Matrix3d _mI;
-    _mI << _I, 0, 0,
-            0, _I, 0,
-            0, 0, 0;
-    rigidBody = new physic::RigidBody3d(
-            this,
-            (positions[0] + positions[1]) / 2,
-            physic::angleVector2d(positions[1] - positions[0]),
-            _mI,
-            _mass,
-            &iFunctors
-    );
-    */
     normal = Eigen::Vector3d(0, 0, -1).cross(positions[1] - positions[0]);
-
 };
 
 membrane_part::~membrane_part() {
-    globals.grid->unregister_component(this);
+    //globals.grid->unregister_component(this);
     delete associatedVisualObj;
     associatedVisualObj = nullptr;
 };
@@ -54,12 +36,16 @@ void membrane_part::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
 
-void membrane_part::make_timeStep(double &dT) {
+void membrane_part::make_timeStep(const double &dT) {
     if (solver) {
         //rigidBody->do_timeStep(dT);
     } else {
         std::cout << "membrane_part w/o RigidBody\n";
     }
+}
+
+double membrane_part::get_length() {
+    return (get_positions()[0] - get_positions()[1]).norm();
 };
 
 
@@ -99,13 +85,11 @@ void membrane_container::update_area() {
 /* calculate length */
 void membrane_container::update_length() {
     //if (!length.isUpdated()) {
-    double temp = 0;
-    for (auto &it : parts) {
-        auto &posA = it->get_positions()[0];
-        auto &posB = it->get_positions()[1];
-        temp += (posA - posB).norm();
+    length = 0;
+    for (auto &_it : parts) {
+        auto _l = _it->get_length();
+        length += _l;
     }
-    length = temp;
 }
 
 /* */
@@ -131,6 +115,50 @@ std::vector<membrane_part_base *> &membrane_container::get_parts() {
 }
 
 /* variableUpdate feature of the membrane */
-void membrane_container::make_timeStep(double &dT) {
+void membrane_container::make_timeStep(const double &dT) {
 
+}
+
+arc_membrane_part::arc_membrane_part(
+        sGlobalVars &iGlobals,
+        cell_base &iCell,
+        double iX1,
+        double iY1,
+        double R,
+        double angleB,
+        double angleE,
+        std::set<stokes::functor *> &iFunctors
+) :
+        membrane_part_base(iGlobals, iCell) {
+    positions.clear();
+    parameters.clear();
+    positions.emplace_back(Eigen::Vector3d(iX1, iY1, 0));
+    parameters.emplace_back(R);
+    parameters.emplace_back(angleB);
+    parameters.emplace_back(angleE);
+    associatedVisualObj = new visual_arcCircle(this);
+    associatedVisualObj->set_color(0.0, 0.0, 0.0);
+    associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
+    //globals.grid->register_component(this);
+}
+
+arc_membrane_part::~arc_membrane_part() {
+
+}
+
+Eigen::Vector3d arc_membrane_part::get_normal(const double &deg) {
+    return Eigen::Vector3d(cos(deg),sin(deg),0);
+}
+
+void arc_membrane_part::make_timeStep(const double &dT) {
+
+}
+
+double arc_membrane_part::get_length() {
+    auto _diff = std::abs(get_parameters()[2] - get_parameters()[1]);
+    return get_parameters()[0] * (_diff);
+}
+
+void arc_membrane_part::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
+    iVisualObjs.push_back(associatedVisualObj);
 }

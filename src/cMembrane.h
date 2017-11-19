@@ -29,12 +29,39 @@ public:
 
     virtual Eigen::Vector3d &get_normal();
 
+    virtual double get_length();
+
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void make_timeStep(double &dT);
+    virtual void make_timeStep(const double &dT);
 
 protected:
     Eigen::Vector3d normal;
+};
+
+class arc_membrane_part : public membrane_part_base {
+public:
+    arc_membrane_part(
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
+            double iX1, double iY1,
+            double R,
+            double angleB,
+            double angleE,
+            std::set<stokes::functor *> &iFunctors
+    );
+
+    virtual ~arc_membrane_part();
+
+    virtual Eigen::Vector3d get_normal(const double &deg);
+
+    virtual double get_length();
+
+    virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+
+    virtual void make_timeStep(const double &dT);
+
+protected:
 };
 
 // membrane container which organizes membrane parts and its creation
@@ -55,7 +82,7 @@ public:
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &oVisualComponents);
 
-    virtual void make_timeStep(double &dT);
+    virtual void make_timeStep(const double &dT);
 
 protected:
     double area;

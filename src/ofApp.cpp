@@ -24,8 +24,8 @@ ofApp::ofApp() {
     registrar::n::registerType(typeid(cell_base), typeid(cell));
     // cellcomponents base registration
     registrar::n::registerType(typeid(components_base), typeid(cellcomponents_base));
-    // crosslinker registration
-    registrar::n::registerType(typeid(cellcomponents_base), typeid(crosslinker_base));
+    // linker registration
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(linker_base));
     // fillament registration
     registrar::n::registerType(typeid(cellcomponents_base), typeid(filament_base));
     registrar::n::registerType(typeid(filament_base), typeid(actin));
@@ -63,8 +63,10 @@ ofApp::~ofApp() {
 
 void ofApp::setup() {
     // openframeworks settings
-    ofSetFrameRate(10);
+    ofSetFrameRate(40);
     ofBackground(50, 50, 50);
+    ofSetCoordHandedness(OF_RIGHT_HANDED);
+
     // set settings
     globals.settings.deltaT = 1;
     globals.settings.sideLength = 500;
@@ -79,7 +81,7 @@ void ofApp::setup() {
     // create surface
     surface = new simple_surface(globals, globals.settings.sideLength);
     // create cell components
-    membraneF = new functor_cell_membraneCreation(globals); // membrane creation functor for cell
+    membraneF = new functor_cell_arcMembraneCreation(globals); // membrane creation functor for cell
     filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
     // register membrane force/torque functors
     //membraneF->register_functor(new functor::membraneSpring(membraneF->get_guiFunctor()));

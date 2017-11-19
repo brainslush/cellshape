@@ -89,22 +89,23 @@ protected:
     Eigen::Vector3d responseTorque;
 };
 
-// crosslinkers
-class crosslinker_base : public cellcomponents_base {
+// linkers
+class linker_base : public cellcomponents_base {
 public:
-    crosslinker_base(sGlobalVars &iGlobals, cell_base &iCell);
+    linker_base(sGlobalVars &iGlobals, cell_base &iCell);
 
-    virtual ~crosslinker_base();
+    virtual ~linker_base();
 
-    virtual std::set<filament_base *> &get_connectedFilaments();
+    virtual std::set<cellcomponents_base *> &get_connectedComponents();
 
-    virtual void add_connectedFilament(filament_base *iFilament);
+    virtual void add_connectedComponent(cellcomponents_base *iComponent);
 
-    virtual void remove_connectedFilament(filament_base *iFilament);
+    virtual void remove_connectedComponent(cellcomponents_base *iComponent);
+
+    virtual void make_timeStep(const double& dT);
 
 protected:
-    std::set<filament_base *> connectedFilaments;
-    Eigen::Vector3d force;
+    std::set<cellcomponents_base *> connectedComponents;
 };
 
 // filaments
@@ -116,16 +117,18 @@ public:
 
     virtual void set_positions(double iX1, double iY1, double iX2, double iY2);
 
-    virtual void add_connectedCrosslinker(crosslinker_base *iCrosslinker);
+    virtual std::set<linker_base *> &get_connectedLinkers();
 
-    virtual void remove_connectedCrosslinker(crosslinker_base *iCrosslinker);
+    virtual void add_connectedLinker(linker_base *iLinker);
+
+    virtual void remove_connectedLinker(linker_base *iLinker);
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
     virtual bool make_timeStep(double &dT);
 
 protected:
-    std::set<crosslinker_base *> connectedCrosslinkers;
+    std::set<linker_base *> connectedLinkers;
 };
 
 // volume
@@ -150,15 +153,20 @@ public:
             double iX2, double iY2
     );
 
+    membrane_part_base(
+            sGlobalVars &iGlobals,
+            cell_base &iCell
+    );
+
     virtual ~membrane_part_base();
 
     virtual std::pair<membrane_part_base *, membrane_part_base *> &get_neighbours();
 
     virtual double get_length();
 
-    virtual double &get_restLength();
-
     virtual std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &get_sharedPositions();
+
+    virtual std::set<linker_base *> &get_connectedLinkers();
 
     virtual void set_neighbours(const std::pair<membrane_part_base *,membrane_part_base *> &iNeighbours);
 
@@ -167,7 +175,7 @@ public:
 protected:
     std::pair<membrane_part_base *, membrane_part_base *> neighbours;
     std::pair<Eigen::Vector3d *, Eigen::Vector3d *> sharedPositions;
-    double restLength;
+    std::set<linker_base *> connectedLinkers;
 };
 
 // matrix components base class

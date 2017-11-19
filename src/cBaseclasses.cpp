@@ -28,13 +28,6 @@ void components_base::add_responseForce(const Eigen::Vector3d &iForce) { respons
 
 void components_base::add_responseTorque(const Eigen::Vector3d &iTorque) { responseTorque += iTorque; }
 
-
-/*
-void components_base::make_timeStep(double &dT) {
-    // do nothing
-}
-*/
-
 /***************************
  * Cell Base
  ***************************/
@@ -61,34 +54,37 @@ cellcomponents_base::cellcomponents_base(
 cellcomponents_base::~cellcomponents_base() = default;
 
 /***************************
- * crosslinker base
+ * Linker base
  ***************************/
 
-crosslinker_base::crosslinker_base(
+linker_base::linker_base(
         sGlobalVars &iGlobals,
         cell_base &iCell
 ) :
         cellcomponents_base(iGlobals, iCell) {
     canColide = false;
     canMove = true;
-    force = Eigen::Vector3d(0, 0, 0);
     globals.grid->register_component(this);
 };
 
-crosslinker_base::~crosslinker_base() {
+linker_base::~linker_base() {
     globals.grid->unregister_component(this);
 };
 
-std::set<filament_base *> &crosslinker_base::get_connectedFilaments() {
-    return connectedFilaments;
+std::set<cellcomponents_base *> &linker_base::get_connectedComponents() {
+    return connectedComponents;
 }
 
-void crosslinker_base::add_connectedFilament(filament_base *iFilament) {
-    connectedFilaments.insert(iFilament);
+void linker_base::add_connectedComponent(cellcomponents_base *iComponent) {
+    connectedComponents.insert(iComponent);
 };
 
-void crosslinker_base::remove_connectedFilament(filament_base *iFilament) {
-    connectedFilaments.erase(iFilament);
+void linker_base::remove_connectedComponent(cellcomponents_base *iComponent) {
+    connectedComponents.erase(iComponent);
+}
+
+void linker_base::make_timeStep(const double &dT) {
+    // do nothing
 };
 
 /***************************
@@ -118,12 +114,12 @@ void filament_base::set_positions(double iX1, double iY1, double iX2, double iY2
     positions[1](1) = iY2;
 }
 
-void filament_base::add_connectedCrosslinker(crosslinker_base *iCrosslinker) {
-    connectedCrosslinkers.insert(iCrosslinker);
+void filament_base::add_connectedLinker(linker_base *iLinker) {
+    connectedLinkers.insert(iLinker);
 }
 
-void filament_base::remove_connectedCrosslinker(crosslinker_base *iCrosslinker) {
-    connectedCrosslinkers.erase(iCrosslinker);
+void filament_base::remove_connectedLinker(linker_base *iLinker) {
+    connectedLinkers.erase(iLinker);
 }
 
 void filament_base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
@@ -132,6 +128,10 @@ void filament_base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
 
 bool filament_base::make_timeStep(double &iTime) {
     return false;
+}
+
+std::set<linker_base *> &filament_base::get_connectedLinkers() {
+    return connectedLinkers;
 };
 
 /***************************
@@ -167,10 +167,11 @@ membrane_part_base::membrane_part_base(
     associatedVisualObj->set_color(0.0, 0.0, 0.0);
     associatedVisualObj->set_fillColor(0.0, 0.0, 0.0);
     globals.grid->register_component(this);
-    restLength = get_restLength();
 }
 
-membrane_part_base::~membrane_part_base() = default;
+membrane_part_base::~membrane_part_base() {
+    globals.grid->unregister_component(this);
+};
 
 std::pair<membrane_part_base *, membrane_part_base *> &membrane_part_base::get_neighbours() {
     return neighbours;
@@ -178,10 +179,6 @@ std::pair<membrane_part_base *, membrane_part_base *> &membrane_part_base::get_n
 
 double membrane_part_base::get_length() {
     return (positions[1] - positions[0]).norm();
-}
-
-double &membrane_part_base::get_restLength() {
-    return restLength;
 }
 
 std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &membrane_part_base::get_sharedPositions() {
@@ -200,6 +197,18 @@ Eigen::Vector3d membrane_part_base::calc_dirVector(Eigen::Vector3d *iPoint) {
     } else {
         return Eigen::Vector3d(0, 0, 0);
     }
+}
+
+membrane_part_base::membrane_part_base(
+        sGlobalVars &iGlobals,
+        cell_base &iCell
+) :
+        cellcomponents_base(iGlobals, iCell) {
+
+}
+
+std::set<linker_base *> &membrane_part_base::get_connectedLinkers() {
+    return connectedLinkers;
 }
 
 /***************************
