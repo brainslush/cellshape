@@ -3,7 +3,6 @@
 #include <set>
 #include <vector>
 #include <eigen3/Eigen/Eigen>
-#include <eigen3/Eigen/StdVector>
 #include "ofMain.h"
 
 #ifndef SRC_BASE_H_

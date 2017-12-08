@@ -63,9 +63,9 @@ cell::cell(
 }
 
 cell::~cell() {
-    for (auto &it : borders) {
-        delete it;
-        it = nullptr;
+    for (auto _it : borders) {
+        delete _it;
+        _it = nullptr;
     }
 }
 
@@ -396,9 +396,9 @@ container::container(mygui::gui *&iGuiBase, double iSideLength) :
 }
 
 container::~container() {
-    for (auto &it : cells) {
-        delete it;
-        it = nullptr;
+    for (auto _it : cells) {
+        delete _it;
+        _it = nullptr;
     }
 }
 
@@ -696,9 +696,9 @@ void container::update_components() {
 }
 
 void container::reset() {
-    for (auto &it : cells) {
-        delete it;
-        it = nullptr;
+    for (auto _it : cells) {
+        delete _it;
+        _it = nullptr;
     }
     cells.clear();
     guiGroup->forceVariableUpdate();

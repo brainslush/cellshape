@@ -51,6 +51,7 @@ protected:
     sGlobalVars globals;
     functor_cell_filamentCreation *filamentF;
     functor_cell_membraneCreation *membraneF;
+    functor_cell_linkerCreation *linkerF;
     simple_surface *surface;
     cell *ccell;
 
