@@ -84,6 +84,7 @@ void ofApp::setup() {
     //membraneF = new functor_cell_arcMembraneCreation(globals); // membrane creation functor for cell
     membraneF = new functor_cell_membraneCreation(globals);
     filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
+    linkerF = new functor_cell_linkerCreation(globals);
     // register membrane force/torque functors
     //membraneF->register_functor(new functor::membraneSpring(membraneF->get_guiFunctor()));
     // register filament  force/torque functors
@@ -92,7 +93,7 @@ void ofApp::setup() {
     //filamentF->register_functor(new functor::fViscosity(filamentF->get_guiFunctor()));
     filamentF->register_functor(new functor::fConstantForce(filamentF->get_guiFunctor()));
     // create actual cell
-    ccell = new cell(globals, membraneF, filamentF);
+    ccell = new cell(globals, membraneF, filamentF, linkerF);
 }
 
 //--------------------------------------------------------------

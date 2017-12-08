@@ -55,34 +55,34 @@ simple_surface::simple_surface(
 }
 
 simple_surface::~simple_surface() {
-    for (auto &it : borders) {
-        delete it;
-        it = nullptr;
+    for (auto _it : borders) {
+        delete _it;
+        _it = nullptr;
     }
-    for (auto &it : facs) {
-        delete it;
-        it = nullptr;
+    for (auto _it : facs) {
+        delete _it;
+        _it = nullptr;
     }
 }
 
 void simple_surface::obtain_visualObjs(std::vector<visual_base *> &oVisualComponents) {
-    for (auto &it : borders) {
-        it->obtain_visualObjs(oVisualComponents);
+    for (auto &_it : borders) {
+        _it->obtain_visualObjs(oVisualComponents);
     }
-    for (auto &it : facs) {
-        it->obtain_visualObjs(oVisualComponents);
+    for (auto &_it : facs) {
+        _it->obtain_visualObjs(oVisualComponents);
     }
 }
 
 void simple_surface::reset() {
-    for (auto &it: borders) {
-        delete it;
-        it = nullptr;
+    for (auto _it: borders) {
+        delete _it;
+        _it = nullptr;
     }
     borders.clear();
-    for (auto &it: facs) {
-        delete it;
-        it = nullptr;
+    for (auto _it: facs) {
+        delete _it;
+        _it = nullptr;
     }
     facs.clear();
     guiGroup->forceVariableUpdate();
@@ -91,11 +91,11 @@ void simple_surface::reset() {
 }
 
 void simple_surface::create_facs() {
-    double redSideLength = sideLength - 2 * facRadius;
-    for (unsigned long long i = 0; i < facCount; i++) {
-        double rndPosX = positions[0](0) + facRadius + randomReal->draw<double>() * redSideLength;
-        double rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * redSideLength;
-        facs.push_back(new fac(globals, facRadius, rndPosX, rndPosY));
+    double _redSideLength = sideLength - 2 * facRadius;
+    for (unsigned long long _i = 0; _i < facCount; _i++) {
+        double _rndPosX = positions[0](0) + facRadius + randomReal->draw<double>() * _redSideLength;
+        double _rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * _redSideLength;
+        facs.push_back(new fac(globals, facRadius, _rndPosX, _rndPosY));
     }
 }
 
