@@ -35,9 +35,9 @@ public:
 
     virtual ~membrane_part();
 
-    virtual void set_sharedPositions(const std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &iSharedPos);
+    //virtual void set_sharedPositions(const std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &iSharedPos);
 
-    virtual std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &get_sharedPositions();
+    //virtual std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &get_sharedPositions();
 
     virtual Eigen::Vector3d &get_normal();
 
@@ -49,7 +49,7 @@ public:
 
 protected:
     Eigen::Vector3d normal;
-    std::pair<Eigen::Vector3d *, Eigen::Vector3d *> sharedPositions;
+    //std::pair<Eigen::Vector3d *, Eigen::Vector3d *> sharedPositions;
 
     virtual void update_normal();
 };
@@ -77,6 +77,46 @@ public:
     virtual void make_timeStep(const double &dT);
 
 protected:
+};
+
+class hyperbolic_membrane_part : public membrane_part_base {
+public:
+    hyperbolic_membrane_part(
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
+            const Eigen::Vector3d &iPos,
+            double iD,
+            double iA, double iB,
+            double iT1, double iT2,
+            double iDir,
+            std::set<stokes::functor *> &iFunctors
+    );
+
+    virtual ~hyperbolic_membrane_part();
+
+    virtual double get_length();
+
+    virtual Eigen::Vector3d get_normal(double iS);
+
+    virtual Eigen::Vector3d get_normal(unsigned iId);
+
+    virtual std::pair<unsigned, double> get_segmentId(double iS);
+
+    virtual const Eigen::Vector3d &get_segment(double iS);
+
+    virtual const Eigen::Vector3d &get_segment(unsigned iId);
+
+    virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+
+    virtual void make_timeStep(const double &dT);
+protected:
+    void update_curveSegments();
+
+    std::vector<Eigen::Vector3d> curveSegments;
+    std::vector<double> curveSegmentLenghts;
+    bool updatedCurveSegements;
+    bool updatedLength;
+    double length;
 };
 
 #endif /* SRC_CMEMBRANE_H_ */

@@ -53,8 +53,8 @@ protected:
 
     random_dist *randomReal;
     mygui::group *guiGroup;
-    unsigned &facCount;
-    double &facRadius;
+    //unsigned &facCount;
+    //double &facRadius;
     double sideLength;
     std::vector<surface_border *> borders;
     std::vector<fac *> facs;

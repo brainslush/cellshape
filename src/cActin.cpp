@@ -33,7 +33,9 @@ actin::actin(
     solver->set_c(stokesCoeff);
 }
 
-actin::~actin() = default;
+actin::~actin() {
+    cell.unregister_filament(this);
+}
 
 Eigen::Vector3d &actin::get_tmVelocity() {
     return tmVelocity;

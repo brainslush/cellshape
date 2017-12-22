@@ -46,9 +46,9 @@ simple_surface::simple_surface(
         double iSideLength
 ) : surface_base(iGlobals),
     randomReal(globals.rndC->register_random("uniform_01")),
-    guiGroup(globals.guiMain->register_group("Surface")),
-    facCount(guiGroup->register_setting<unsigned>("FAC Count", false, 0, 100, 20)),
-    facRadius(guiGroup->register_setting<double>("FAC Radius", false, 0, 20, 10)),
+    //guiGroup(globals.guiMain->register_group("")),
+    //facCount(guiGroup->register_setting<unsigned>("FAC Count", false, 0, 100, 20)),
+    //facRadius(guiGroup->register_setting<double>("FAC Radius", false, 0, 20, 10)),
     sideLength(iSideLength) {
     create_borders();
     //create_facs();
@@ -85,18 +85,19 @@ void simple_surface::reset() {
         _it = nullptr;
     }
     facs.clear();
-    guiGroup->forceVariableUpdate();
+    //guiGroup->forceVariableUpdate();
     create_borders();
     //create_facs();
 }
 
 void simple_surface::create_facs() {
-    double _redSideLength = sideLength - 2 * facRadius;
+    /*double _redSideLength = sideLength - 2 * facRadius;
     for (unsigned long long _i = 0; _i < facCount; _i++) {
         double _rndPosX = positions[0](0) + facRadius + randomReal->draw<double>() * _redSideLength;
         double _rndPosY = positions[0](1) + facRadius + randomReal->draw<double>() * _redSideLength;
         facs.push_back(new fac(globals, facRadius, _rndPosX, _rndPosY));
     }
+     */
 }
 
 void simple_surface::create_borders() {

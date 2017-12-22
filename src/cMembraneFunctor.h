@@ -26,11 +26,10 @@ public:
 
     virtual void setup(cell &iCell);
 
-    virtual membrane_part_base *split(
+    virtual membrane_linker_base *split(
             cell_base *iCell,
             membrane_part_base *iMembrane,
-            const Eigen::Vector3d &iPos,
-            linker_base *iLinker
+            const Eigen::Vector3d &iPos
     );
 
     virtual void merge(
@@ -47,13 +46,16 @@ public:
 
     virtual double get_length(cell_base *iCell);
 
+    virtual const unsigned &get_resolution() { return resolution; };
+
+    virtual void update_positions(cell_base *iCell);
+
     virtual void make_timeStep(double &dT, cell *iCell);
 
 protected:
     virtual void update_length(cell_base *iCell);
 
     double length;
-    double &radius;
     unsigned &resolution;
 };
 
@@ -70,5 +72,30 @@ public:
     virtual void setup(cell &iCell);
 };
 
+class functor_cell_hyperbolicMembraneCreation : public functor_cell_membraneCreation {
+public:
+    explicit functor_cell_hyperbolicMembraneCreation(sGlobalVars &iGlobals);
+
+    virtual ~functor_cell_hyperbolicMembraneCreation();
+
+    virtual void setup(cell &iCell);
+
+    virtual void update_positions(cell_base *iCell);
+
+    virtual void make_timeStep(double &dT, cell *iCell);
+protected:
+    virtual std::vector<membrane_linker_base *> membranepeaks(cell &iCell);
+    virtual void update_variables();
+    double &epsilon;
+    double &bp;
+    double cutoff;
+    double alpha;
+    double alpha2;
+    double beta;
+    double beta2;
+    double cotbp;
+    double oldEpsilon;
+    double oldBp;
+};
 
 #endif //CELLFORMATION_CMEMBRANEFUNCTOR_H

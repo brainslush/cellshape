@@ -36,10 +36,17 @@ functor_cell_filamentCreation::~functor_cell_filamentCreation() {
  */
 
 void functor_cell_filamentCreation::setup(cell &iCell) {
+    filamentSetupOrder.clear();
     for (unsigned long long i = 0; i < maxCount; i++) {
         create_filament(iCell);
     }
-    iCell.get_membraneFunctor()->merge(&iCell);
+    std::sort(filamentSetupOrder.begin(), filamentSetupOrder.end() /*bmath::sortpairbysec*/);
+    if (auto _mfunctor = dynamic_cast<functor_cell_hyperbolicMembraneCreation *>(iCell.get_membraneFunctor())) {
+        _mfunctor->setup(iCell);
+    } else {
+        iCell.get_membraneFunctor()->merge(&iCell);
+        iCell.get_membraneFunctor()->update_positions(&iCell);
+    }
 }
 
 /*
@@ -65,13 +72,8 @@ void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
     // remove obselete filaments & linkers
     for (auto _filament : _delf) {
         // remove linkers
-        auto &_linkers = _filament->get_connectedLinkers();
-        for (auto _linker : _linkers) {
-            if (dynamic_cast<mf_linker *>(_linker)) {
-                iCell->get_linkerFunctor()->delete_linker(iCell, _linker);
-            }
-        }
-        iCell->unregister_filament(_filament);
+        _filament->get_connectedMembraneLinker()->clear_filament();
+        _filament->set_connectedMembraneLinker(nullptr);
         delete _filament;
         _filament = nullptr;
     }
@@ -86,12 +88,6 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
     auto _membrane = std::get<0>(_par);
     auto &_pos = std::get<1>(_par);
 
-    // create new linker
-    auto _linker = dynamic_cast<mf_linker *>(iCell.get_linkerFunctor()->create_linker(&iCell, {}));
-
-    // create new membrane
-    iCell.get_membraneFunctor()->split(&iCell, _membrane, _pos, _linker);
-
     // create new filament
     auto *_newActin = new actin(
             globals,
@@ -104,12 +100,20 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
             find_stokesCoeff(iCell),
             functors
     );
-    // register linker at the actin
-    _newActin->add_connectedLinker(_linker);
-    // register actin at the linker
-    _linker->set_referencePos(&_newActin->get_positions()[1]);
-    _linker->set_connectedFillament(_newActin);
-    // register actin at the cell
+
+    // check if membrane was made
+    if (_membrane) {
+        // create new membrane
+        auto _linker = iCell.get_membraneFunctor()->split(&iCell, _membrane, _pos);
+        // register linker at the actin
+        _newActin->set_connectedMembraneLinker(_linker);
+        // register actin at the linker
+        _linker->set_referencePosition(&_newActin->get_positions()[1]);
+        _linker->set_connectedFilament(_newActin);
+        // register actin at the cell
+    } else {
+        filamentSetupOrder.back().second = _newActin;
+    }
     iCell.register_filament(_newActin);
     return _newActin;
 }
@@ -117,47 +121,100 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
 
 /*
  * finds creation position along the membrane
+ * returns the new membrane and the position
  */
 
 std::tuple<membrane_part_base *, Eigen::Vector3d, Eigen::Vector3d>
 functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
     // get membrane and membrane parts
     auto _membrane = iCell.get_membrane();
-    // determine new position along membrane
-    auto _length = iCell.get_membraneFunctor()->get_length(&iCell);
-    _length *= randomReal->draw<double>();
-    auto _it = _membrane->begin();
-    auto _currLength = _it->get_length();
-    while (_currLength < _length && _it != _membrane->end()) {
-        _it = _it->itnext();
-        _currLength += _it->get_length();
-    }
-    auto &_pos = _it->get_positions();
-    _length -= _currLength;
-    if (auto _el = dynamic_cast<arc_membrane_part *>(_it)) {
-        // calculate creation position
-        double &_x = _pos[0](0);
-        double &_y = _pos[0](1);
-        auto &_R = _el->get_parameters()[0];
-        auto &_angleB = _el->get_parameters()[1];
-        auto &_angleE = _el->get_parameters()[2];
-        auto _angle = _angleE + _length / _R;
-        auto _spawnPos = Eigen::Vector3d(_x + _R * cos(_angle), _y + _R * sin(_angle), 0);
-        // calculate tm velocity vector
-        auto _normal = _el->get_normal(_angle);
-        double _tmv = 0;
-        if (constTMV) {
-            _tmv = maxTMV;
-        } else {
-            _tmv = maxTMV * randomReal->draw<double>();
+    // handle case where the membrane is created after the filaments for simplicity
+    if (_membrane) {
+        // determine new position along membrane
+        auto _length = iCell.get_membraneFunctor()->get_length(&iCell);
+        _length *= randomReal->draw<double>();
+        auto _it = _membrane->begin();
+        auto _currLength = _it->get_length();
+        while (_currLength < _length && _it != _membrane->end()) {
+            _it = _it->itnext();
+            _currLength += _it->get_length();
         }
-        return {_it, _spawnPos, _tmv * _normal};
-    } else if (auto _el = dynamic_cast<membrane_part *>(_it)) {
-        // calculate creation position
-        auto _spawnPos = Eigen::Vector3d(_pos[0] + _length * (_pos[0] - _pos[1]).normalized());
-        // calculate tm velocity vector
-        auto &_normal = _el->get_normal();
-        // determine tread milling velocity
+        auto &_pos = _it->get_positions();
+        _length -= _currLength;
+        if (auto _el = dynamic_cast<arc_membrane_part *>(_it)) {
+            // calculate creation position
+            double &_x = _pos[0](0);
+            double &_y = _pos[0](1);
+            auto &_R = _el->get_parameters()[0];
+            auto &_angleB = _el->get_parameters()[1];
+            auto &_angleE = _el->get_parameters()[2];
+            auto _angle = _angleE + _length / _R;
+            auto _spawnPos = Eigen::Vector3d(_x + _R * cos(_angle), _y + _R * sin(_angle), 0);
+            // calculate tm velocity vector
+            auto _normal = _el->get_normal(_angle);
+            double _tmv = 0;
+            if (constTMV) {
+                _tmv = maxTMV;
+            } else {
+                _tmv = maxTMV * randomReal->draw<double>();
+            }
+            return {_it, _spawnPos, _tmv * _normal};
+        } else if (auto _el = dynamic_cast<membrane_part *>(_it)) {
+            // calculate creation position
+            auto _spawnPos = Eigen::Vector3d(_pos[0] + _length * (_pos[0] - _pos[1]).normalized());
+            // calculate tm velocity vector
+            auto &_normal = _el->get_normal();
+            // determine tread milling velocity
+            double _tmv = 0;
+            if (constTMV) {
+                _tmv = maxTMV;
+            } else {
+                _tmv = maxTMV * randomReal->draw<double>();
+            }
+            // determine spawn angle
+            double _deg = 0;
+            if (randomAngle) {
+                _deg = PI * (randomReal->draw<double>() - 0.5);
+            }
+            Eigen::AngleAxis<double> _rot(_deg, Eigen::Vector3d(0, 0, 1));
+            auto _tmvV = Eigen::Vector3d(_tmv * (_rot * (-1 * _normal)));
+            return {_it, _spawnPos, _tmvV};
+        } else if (auto _el = dynamic_cast<hyperbolic_membrane_part *>(_it)) {
+            // get hyperbola segment
+            auto _idl = _el->get_segmentId(_currLength);
+            auto _seg0 = _el->get_segment(_idl.first);
+            auto _seg1 = _el->get_segment(_idl.first + 1);
+            // calculate creation position
+            auto _spawnPos = Eigen::Vector3d(_seg0 + _length * (_pos[0] - _pos[1]).normalized());
+            // calculate tm velocity vector
+            auto _normal = _el->get_normal(_idl.first);
+            // determine tread milling velocity
+            double _tmv = 0;
+            if (constTMV) {
+                _tmv = maxTMV;
+            } else {
+                _tmv = maxTMV * randomReal->draw<double>();
+            }
+            // determine spawn angle
+            double _deg = 0;
+            if (randomAngle) {
+                _deg = PI * (randomReal->draw<double>() - 0.5);
+            }
+            Eigen::AngleAxis<double> _rot(_deg, Eigen::Vector3d(0, 0, 1));
+            auto _tmvV = Eigen::Vector3d(_tmv * (_rot * (-1 * _normal)));
+            return {_it, _spawnPos, _tmvV};
+        } else {
+            return {_it, Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
+        }
+    } else {
+        auto _membraneFunctor = iCell.get_membraneFunctor();
+        // determine spawn position
+        auto _spawnPos = Eigen::Vector3d(iCell.get_x(), iCell.get_y(), 0);
+        auto &_radius = _membraneFunctor->get_radius();
+        auto _posAngle = M_PI_2 * randomReal->draw<double>();
+        auto _radial = Eigen::Vector3d(_radius * cos(_posAngle), _radius * sin(_posAngle), 0);
+        _spawnPos += _radial;
+        // determine threadmiling velocity
         double _tmv = 0;
         if (constTMV) {
             _tmv = maxTMV;
@@ -170,10 +227,10 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
             _deg = PI * (randomReal->draw<double>() - 0.5);
         }
         Eigen::AngleAxis<double> _rot(_deg, Eigen::Vector3d(0, 0, 1));
+        auto _normal = -_radial.normalized();
         auto _tmvV = Eigen::Vector3d(_tmv * (_rot * (-1 * _normal)));
-        return {_it, _spawnPos, _tmvV};
-    } else {
-        return {_it, Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0)};
+        filamentSetupOrder.emplace_back(make_pair(_posAngle, nullptr));
+        return {nullptr, _spawnPos, _tmvV};
     }
 }
 
