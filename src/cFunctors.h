@@ -92,6 +92,7 @@ namespace functor {
         mygui::group *guiGroup;
         bool &activated;
         double &factor;
+        bool &isAngle;
     };
 
 

@@ -28,6 +28,8 @@ public:
 
     virtual void setup(cell &iCell);
 
+    virtual const std::vector<std::pair<double, actin *>> &get_filamentSetupOrder() {return filamentSetupOrder;};
+
     virtual void make_timeStep(double &dT, cell *iCell);
 
 protected:
@@ -56,6 +58,7 @@ protected:
     double &bound1StokesCoeff;
     double &bound2StokesCoeff;
     bool &constStokesCoeff;
+    std::vector<std::pair<double, actin *>> filamentSetupOrder;
 };
 
 #endif //CELLFORMATION_CFILAMENTFUNCTOR_H

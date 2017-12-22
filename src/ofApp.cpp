@@ -82,7 +82,8 @@ void ofApp::setup() {
     surface = new simple_surface(globals, globals.settings.sideLength);
     // create cell components
     //membraneF = new functor_cell_arcMembraneCreation(globals); // membrane creation functor for cell
-    membraneF = new functor_cell_membraneCreation(globals);
+    //membraneF = new functor_cell_membraneCreation(globals);
+    membraneF = new functor_cell_hyperbolicMembraneCreation(globals);
     filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
     linkerF = new functor_cell_linkerCreation(globals);
     // register membrane force/torque functors

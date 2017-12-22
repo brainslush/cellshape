@@ -11,6 +11,7 @@
 #ifndef CELLFORMATION_CLINKERFUNCTOR_H
 #define CELLFORMATION_CLINKERFUNCTOR_H
 
+
 class cell;
 
 class functor_cell_linkerCreation : public functor_linker_base {

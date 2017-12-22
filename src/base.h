@@ -139,6 +139,15 @@ public:
 protected:
 };
 
+class visual_hyperbola : public visual_base {
+public:
+    explicit visual_hyperbola(base *iComponent);
+
+    virtual ~visual_hyperbola();
+
+    virtual void draw(double iScale);
+};
+
 class visual_rectangle : public visual_base {
 public:
     explicit visual_rectangle(base *iComponent);

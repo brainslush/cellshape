@@ -140,7 +140,9 @@ fmCollision::calc(
 fConstantForce::fConstantForce(mygui::gui *&iGui) :
         guiGroup(iGui->register_group("Constant Force")),
         activated(guiGroup->register_setting<bool>("Active", true, true)),
-        factor(guiGroup->register_setting<double>("Factor", true, 0, 10, 0.1)) {
+        factor(guiGroup->register_setting<double>("Factor", true, 0, 1, 0.01)),
+        isAngle(guiGroup->register_setting<bool>("Angle Dependency", true, false))
+    {
 }
 
 fConstantForce::~fConstantForce() = default;
@@ -155,6 +157,28 @@ fConstantForce::calc(
 ) {
     auto _filament = dynamic_cast<filament_base *>(solver.get_object());
     auto &_X = _filament->get_positions();
-    Eigen::Vector3d _F = (_X[0] - _X[1]).normalized() * factor;
-    return {_F, Eigen::Vector3d(0,0,0)};
+    Eigen::Vector3d _dirVF = (_X[0] - _X[1]).normalized();
+    auto _factorA = 1.0d;
+    auto _factorB = 1.0d;
+    /*if (isAngle) {
+        auto &_prevMemPos = _filament->get_connectedMembraneLinker()->prevMembrane()->get_positions();
+        auto &_nextMemPos = _filament->get_connectedMembraneLinker()->nextMembrane()->get_positions();
+        Eigen::Vector3d _dirVP = _prevMemPos[0] - _prevMemPos[1];
+        Eigen::Vector3d _dirVN = _nextMemPos[1] - _nextMemPos[0];
+        auto _angleF = bmath::angleVector2d(Eigen::Vector3d(1,0,0), _dirVF);
+        auto _angleP = bmath::angleVector2d(Eigen::Vector3d(1,0,0), _dirVP);
+        auto _angleN = bmath::angleVector2d(Eigen::Vector3d(1,0,0), _dirVN);
+
+        _factorA =  * cos(_angleA);
+        _factorB = factor * sin(_angleB);
+        if (_angleA > 0.5d * M_PI) {
+            _factorA = 0;
+        }
+        if (_angleB > 0.5d * M_PI) {
+            _factorB = 0;
+        }
+    }*/
+
+    Eigen::Vector3d _F(_dirVF * 0.5 * factor * (_factorA + _factorB));
+    return {_F, Eigen::Vector3d(0, 0, 0)};
 }
