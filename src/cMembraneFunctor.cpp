@@ -27,18 +27,19 @@ void functor_cell_membraneCreation::setup(cell &iCell) {
     // get some data for membrane parts creation
     auto _x = iCell.get_x();
     auto _y = iCell.get_y();
-    _x = min(max(_x, radius), (double) globals.settings.sideLength);
-    _y = min(max(_y, radius), (double) globals.settings.sideLength);
+    auto _realRadius = get_realRadius();
+    _x = min(max(_x, _realRadius), (double) globals.settings->sideLength);
+    _y = min(max(_y, _realRadius), (double) globals.settings->sideLength);
     // create membrane parts in circular shape
     auto _dAngle = 2 * PI / (double) resolution;
     for (unsigned long long _i = 0; _i < resolution; _i++) {
         _membrane->insert_after(_membrane->back(), new membrane_part(
                 globals,
                 iCell,
-                radius * cos(_i * _dAngle) + _x,
-                radius * sin(_i * _dAngle) + _y,
-                radius * cos((_i + 1) * _dAngle) + _x,
-                radius * sin((_i + 1) * _dAngle) + _y,
+                _realRadius * cos(_i * _dAngle) + _x,
+                _realRadius * sin(_i * _dAngle) + _y,
+                _realRadius * cos((_i + 1) * _dAngle) + _x,
+                _realRadius * sin((_i + 1) * _dAngle) + _y,
                 functors
         ));
     };
@@ -250,8 +251,9 @@ void functor_cell_arcMembraneCreation::setup(cell &iCell) {
     // get some data for membrane parts creation
     auto _x = iCell.get_x();
     auto _y = iCell.get_y();
-    _x = std::min(max(_x, radius), (double) globals.settings.sideLength);
-    _y = std::min(max(_y, radius), (double) globals.settings.sideLength);
+    auto _realRadius = get_realRadius();
+    _x = std::min(max(_x, _realRadius), (double) globals.settings->sideLength);
+    _y = std::min(max(_y, _realRadius), (double) globals.settings->sideLength);
     // create membrane parts
     auto _dAngle = 2 * PI / (double) resolution;
     auto _oAngle = asin(1.5d * sin(0.5d * _dAngle)) - 0.5d * _dAngle;
@@ -262,9 +264,9 @@ void functor_cell_arcMembraneCreation::setup(cell &iCell) {
         auto _newMembrane = new arc_membrane_part(
                 globals,
                 iCell,
-                3 * radius * cos(_cAngle) + _x,
-                3 * radius * sin(_cAngle) + _y,
-                2 * radius,
+                3 * _realRadius * cos(_cAngle) + _x,
+                3 * _realRadius * sin(_cAngle) + _y,
+                2 * _realRadius,
                 _bAngle,
                 _eAngle,
                 functors

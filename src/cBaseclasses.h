@@ -24,6 +24,8 @@ public:
 
     virtual ~components_base();
 
+    virtual const sGlobalVars &get_globals() { return globals; };
+
 protected:
     sGlobalVars &globals;
 };
@@ -249,6 +251,10 @@ public:
 
     virtual membrane_part_base *prevMembrane() { return vPrevMembrane; }
 
+    virtual membrane_linker_base *nextLinker();
+
+    virtual membrane_linker_base *prevLinker();
+
     virtual filament_base *connectedFillament() { return vConnectedFilament; };
 
     virtual Eigen::Vector3d *referencePos() { return vReferencePos; };
@@ -411,6 +417,8 @@ public:
     virtual double get_length(cell_base *iCell);
 
     virtual const double &get_radius() { return radius; };
+
+    virtual double get_realRadius() { return radius * globals.settings->referenceLength; };
 
     virtual void update_positions(cell_base *iCell);
 

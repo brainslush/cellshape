@@ -41,7 +41,9 @@ protected:
 
     virtual double find_lifeTime(cell &iCell);
 
-    virtual double find_stallingForce(cell &iCell);
+    virtual double find_tmv(cell &iCell);
+
+    //virtual double find_stallingForce(cell &iCell);
 
     virtual double find_stokesCoeff(cell &iCell);
 
@@ -54,10 +56,11 @@ protected:
     bool &infLength;
     double &maxLifeTime;
     bool &infLifeTime;
-    double &maxStallingForce;
-    double &bound1StokesCoeff;
-    double &bound2StokesCoeff;
-    bool &constStokesCoeff;
+    //double &maxStallingForce;
+    //double &bound1StokesCoeff;
+    //double &bound2StokesCoeff;
+    //bool &constStokesCoeff;
+    double& stokesCoeff;
     std::vector<std::pair<double, actin *>> filamentSetupOrder;
 };
 

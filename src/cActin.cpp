@@ -8,16 +8,18 @@ actin::actin(
         const Eigen::Vector3d &iTmVelocity,
         const double &iMaxLength,
         const double &iLifeTime,
-        const double &iStallingForce,
+        //const double &iStallingForce,
         const double &iStokesCoeff,
         std::set<stokes::functor *> &iFunctors
 ) :
         filament_base(iGlobals, iCell),
-        tmVelocity(std::move(iTmVelocity)),
+        tmv(std::move(iTmVelocity)),
+        realTMV(tmv * globals.settings->referenceLength),
         birthTime(iGlobals.time),
         maxLength(iMaxLength),
+        realMaxLength(maxLength * globals.settings->referenceLength),
         lifeTime(iLifeTime),
-        stallingForce(iStallingForce),
+        //stallingForce(iStallingForce),
         stokesCoeff(iStokesCoeff)
 {
     associatedVisualObj->set_color(0, 0, 1, 1);
@@ -37,27 +39,24 @@ actin::~actin() {
     cell.unregister_filament(this);
 }
 
-Eigen::Vector3d &actin::get_tmVelocity() {
-    return tmVelocity;
-}
-
 bool actin::make_timeStep(double &dT) {
     // destroy if it exceeds life time
+    auto _l = 0.0d;
     if (birthTime + lifeTime < globals.time) {
-        positions[0] = positions[0] - globals.settings.deltaT * tmVelocity /2 ;
-        positions[1] = positions[1] + globals.settings.deltaT * tmVelocity / 2;
-        auto _l = (positions[1] - positions[0]).norm();
-        if (_l <= tmVelocity.norm()) {
+        positions[0] = positions[0] - globals.settings->deltaT * realTMV /2 ;
+        positions[1] = positions[1] + globals.settings->deltaT * realTMV / 2;
+        _l = (positions[1] - positions[0]).norm();
+        if (_l <= realTMV.norm()) {
             return true;
         }
     } else {
-        auto _l = (positions[1] - positions[0]).norm();
-        if (_l < maxLength) {
-            positions[0] = positions[0] + globals.settings.deltaT * tmVelocity /2 ;
-            positions[1] = positions[1] - globals.settings.deltaT * tmVelocity / 2;
+        _l = (positions[1] - positions[0]).norm();
+        if (_l < realMaxLength) {
+            positions[0] = positions[0] + globals.settings->deltaT * realTMV /2 ;
+            positions[1] = positions[1] - globals.settings->deltaT * realTMV / 2;
         }
     }
-    auto _l = (positions[1] - positions[0]).norm();
+    _l = (positions[1] - positions[0]).norm();
     if (_l > std::numeric_limits<double>::min()) {
         if (solver) {
             // set new values like mass, MoI, position
@@ -65,6 +64,7 @@ bool actin::make_timeStep(double &dT) {
             Eigen::Vector3d _dirV = (positions[1] - positions[0]).normalized();
             auto _R2 = bmath::angleVector2d(_dirV(0),_dirV(1));
             solver->set_R(_R2);
+            solver->set_c(stokesCoeff * _l);
             // do one simulation step
             solver->do_timeStep(dT);
             // apply simulated data onto visual model

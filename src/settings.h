@@ -10,10 +10,16 @@
 #ifndef SRC_SETTINGS_H_
 #define SRC_SETTINGS_H_
 
-struct sSettings {
+class sSettings {
+public:
     double deltaT;
-    double rotationEpsilon;
+    double &referenceLength;
     unsigned long sideLength;
+
+    sSettings(double &refL) :
+            referenceLength(refL) {
+    }
+    ~sSettings() = default;
 };
 
 #endif /* SRC_SETTINGS_H_ */
