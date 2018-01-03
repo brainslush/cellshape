@@ -498,7 +498,7 @@ surface_base::~surface_base() = default;
 functor_membrane_base::functor_membrane_base(
         sGlobalVars &iGlobals
 ) : functor_cell_base(iGlobals, "Membrane", "Settings"),
-    radius(guiGroup->register_setting<double>("Radius", false, 0, 200, 100)) {
+    radius(guiGroup->register_setting<double>("Radius", false, 0.1, 4, 1)) {
 }
 
 functor_membrane_base::functor_membrane_base(
@@ -506,7 +506,7 @@ functor_membrane_base::functor_membrane_base(
         std::string iName,
         std::string iFunctorGroupName
 ) : functor_cell_base(iGlobals, iName, iFunctorGroupName),
-    radius(guiGroup->register_setting<double>("Radius", false, 0, 200, 100)) {
+    radius(guiGroup->register_setting<double>("Radius", false, 0.1, 4, 1)) {
 }
 
 functor_membrane_base::~functor_membrane_base() = default;
@@ -601,12 +601,18 @@ membrane_linker_base::~membrane_linker_base() {
     associatedVisualObj = nullptr;
 }
 
+membrane_linker_base *membrane_linker_base::nextLinker() {
+    return vNextMembrane->nextLinker();
+}
+
+membrane_linker_base *membrane_linker_base::prevLinker() {
+    return vPrevMembrane->prevLinker();
+}
+
 void membrane_linker_base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
 
 void membrane_linker_base::make_timeStep(const double &dT) {
     positions[0] = *vReferencePos;
-    // *vNextMembranePosition = *vReferencePos;
-    // *vPrevMembranePosition = *vReferencePos;
 }

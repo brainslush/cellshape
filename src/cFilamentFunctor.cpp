@@ -13,19 +13,20 @@ functor_cell_filamentCreation::functor_cell_filamentCreation(
         sGlobalVars &iGlobals
 ) :
         functor_filament_base(iGlobals, "Filaments", "Forces"),
-        randomReal(globals.rndC->register_random("uniform_real_distribution", 0.1, 1)),
-        maxCount(guiGroup->register_setting<unsigned>("Count", true, 1, 1000, 5)),
+        randomReal(globals.rndC->register_random("uniform_real_distribution", 0, 1)),
+        maxCount(guiGroup->register_setting<unsigned>("Count", true, 10, 100, 40)),
         randomAngle(guiGroup->register_setting<bool>("Random Angle", true, false)),
-        maxTMV(guiGroup->register_setting<double>("TMV", true, 0, 0.1, 0.1)),
+        maxTMV(guiGroup->register_setting<double>("TMV", true, 0, 0.1, 0.01)),
         constTMV(guiGroup->register_setting<bool>("Const. TMV", true, true)),
-        maxLength(guiGroup->register_setting<double>("Length", true, 1, 500, 100)),
+        maxLength(guiGroup->register_setting<double>("Length", true, 0.01, 1, 0.5)),
         infLength(guiGroup->register_setting<bool>("Inf Length", true, true)),
         maxLifeTime(guiGroup->register_setting<double>("Life Time", true, 0, 1000, 500)),
         infLifeTime(guiGroup->register_setting<bool>("Inf Life Time", true, true)),
-        maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
-        bound1StokesCoeff(guiGroup->register_setting<double>("Min Stokes C", true, 1.0, 1000.0, 1.0)),
-        bound2StokesCoeff(guiGroup->register_setting<double>("Max Stokes C", true, 1.0, 1000.0, 1.0)),
-        constStokesCoeff(guiGroup->register_setting<bool>("Const Stokes C", true, true)) {}
+        //maxStallingForce(guiGroup->register_setting<double>("Stalling Force", true, 0, 20, 10)),
+        stokesCoeff(guiGroup->register_setting<double>("Min Stokes C", true, 0.1, 10.0, 1.0)) {}
+        //bound1StokesCoeff(guiGroup->register_setting<double>("Min Stokes C", true, 1.0, 1000.0, 1.0))
+        //bound2StokesCoeff(guiGroup->register_setting<double>("Max Stokes C", true, 1.0, 1000.0, 1.0)),
+        //constStokesCoeff(guiGroup->register_setting<bool>("Const Stokes C", true, true)) {}
 
 functor_cell_filamentCreation::~functor_cell_filamentCreation() {
     globals.rndC->unregister_random(randomReal);
@@ -96,7 +97,7 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
             std::get<2>(_par),
             find_maxLength(iCell),
             find_lifeTime(iCell),
-            find_stallingForce(iCell),
+            //find_stallingForce(iCell),
             find_stokesCoeff(iCell),
             functors
     );
@@ -128,6 +129,8 @@ std::tuple<membrane_part_base *, Eigen::Vector3d, Eigen::Vector3d>
 functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
     // get membrane and membrane parts
     auto _membrane = iCell.get_membrane();
+    // determine threadmiling velocity
+    auto _tmv = find_tmv(iCell);
     // handle case where the membrane is created after the filaments for simplicity
     if (_membrane) {
         // determine new position along membrane
@@ -135,12 +138,21 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
         _length *= randomReal->draw<double>();
         auto _it = _membrane->begin();
         auto _currLength = _it->get_length();
-        while (_currLength < _length && _it != _membrane->end()) {
-            _it = _it->itnext();
-            _currLength += _it->get_length();
+        auto _itLength = _it->get_length();
+        while (_currLength + _itLength < _length && _it != _membrane->end()) {
+            _currLength += _itLength;
+            _it = _it->next();
+            _itLength = _it->get_length();
+        }
+        if (_it == _membrane->end()) {
+            std::cout << "Error(membrane split): reached membrane container end\n";
         }
         auto &_pos = _it->get_positions();
         _length -= _currLength;
+        if (_length < 0) {
+            std::cout << "Error(membrane split): negative length\n";
+        }
+        // create filament
         if (auto _el = dynamic_cast<arc_membrane_part *>(_it)) {
             // calculate creation position
             double &_x = _pos[0](0);
@@ -152,25 +164,12 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
             auto _spawnPos = Eigen::Vector3d(_x + _R * cos(_angle), _y + _R * sin(_angle), 0);
             // calculate tm velocity vector
             auto _normal = _el->get_normal(_angle);
-            double _tmv = 0;
-            if (constTMV) {
-                _tmv = maxTMV;
-            } else {
-                _tmv = maxTMV * randomReal->draw<double>();
-            }
             return {_it, _spawnPos, _tmv * _normal};
         } else if (auto _el = dynamic_cast<membrane_part *>(_it)) {
             // calculate creation position
-            auto _spawnPos = Eigen::Vector3d(_pos[0] + _length * (_pos[0] - _pos[1]).normalized());
+            auto _spawnPos = Eigen::Vector3d(_pos[0] + _length * (_pos[1] - _pos[0]).normalized());
             // calculate tm velocity vector
             auto &_normal = _el->get_normal();
-            // determine tread milling velocity
-            double _tmv = 0;
-            if (constTMV) {
-                _tmv = maxTMV;
-            } else {
-                _tmv = maxTMV * randomReal->draw<double>();
-            }
             // determine spawn angle
             double _deg = 0;
             if (randomAngle) {
@@ -186,15 +185,8 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
             auto _seg1 = _el->get_segment(_idl.first + 1);
             // calculate creation position
             auto _spawnPos = Eigen::Vector3d(_seg0 + _length * (_pos[0] - _pos[1]).normalized());
-            // calculate tm velocity vector
+            // velocity vector
             auto _normal = _el->get_normal(_idl.first);
-            // determine tread milling velocity
-            double _tmv = 0;
-            if (constTMV) {
-                _tmv = maxTMV;
-            } else {
-                _tmv = maxTMV * randomReal->draw<double>();
-            }
             // determine spawn angle
             double _deg = 0;
             if (randomAngle) {
@@ -210,17 +202,10 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
         auto _membraneFunctor = iCell.get_membraneFunctor();
         // determine spawn position
         auto _spawnPos = Eigen::Vector3d(iCell.get_x(), iCell.get_y(), 0);
-        auto &_radius = _membraneFunctor->get_radius();
+        auto _realRadius = _membraneFunctor->get_realRadius();
         auto _posAngle = M_PI_2 * randomReal->draw<double>();
-        auto _radial = Eigen::Vector3d(_radius * cos(_posAngle), _radius * sin(_posAngle), 0);
+        auto _radial = Eigen::Vector3d(_realRadius * cos(_posAngle), _realRadius * sin(_posAngle), 0);
         _spawnPos += _radial;
-        // determine threadmiling velocity
-        double _tmv = 0;
-        if (constTMV) {
-            _tmv = maxTMV;
-        } else {
-            _tmv = maxTMV * randomReal->draw<double>();
-        }
         // determine spawn angle
         double _deg = 0;
         if (randomAngle) {
@@ -238,25 +223,35 @@ double functor_cell_filamentCreation::find_maxLength(cell &iCell) {
     if (infLength) {
         return std::numeric_limits<double>::infinity();
     }
-    return maxLength * randomReal->draw<double>();
+    return maxLength * (randomReal->draw<double>() * 0.9 + 0.1);
 }
 
 double functor_cell_filamentCreation::find_lifeTime(cell &iCell) {
     if (infLifeTime) {
         return std::numeric_limits<double>::infinity();
     }
-    return maxLifeTime * randomReal->draw<double>();
+    return maxLifeTime * (randomReal->draw<double>() * 0.9 + 0.1);
 }
 
-double functor_cell_filamentCreation::find_stallingForce(cell &iCell) {
+double functor_cell_filamentCreation::find_tmv(cell &iCell) {
+    if (constTMV) {
+        return maxTMV;
+    } else {
+        return maxTMV * (randomReal->draw<double>() * 0.9 + 0.1);
+    }
+}
+
+/*double functor_cell_filamentCreation::find_stallingForce(cell &iCell) {
     return maxStallingForce * randomReal->draw<double>();
 }
+*/
 
 double functor_cell_filamentCreation::find_stokesCoeff(cell &iCell) {
-    auto _min = std::min(bound1StokesCoeff, bound2StokesCoeff);
+    /*auto _min = std::min(bound1StokesCoeff, bound2StokesCoeff);
     if (!constStokesCoeff) {
         auto _max = std::max(bound1StokesCoeff, bound2StokesCoeff);
         return _min + randomReal->draw<double>() * (_max - _min);
     }
-    return _min;
+    return _min;*/
+    return stokesCoeff;
 }
