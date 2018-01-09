@@ -59,12 +59,13 @@ bool actin::make_timeStep(double &dT) {
     _l = (positions[1] - positions[0]).norm();
     if (_l > std::numeric_limits<double>::min()) {
         if (solver) {
-            // set new values like mass, MoI, position
+            // set new values
             solver->set_X((positions[1] + positions[0]) / 2);
             Eigen::Vector3d _dirV = (positions[1] - positions[0]).normalized();
             auto _R2 = bmath::angleVector2d(_dirV(0),_dirV(1));
             solver->set_R(_R2);
-            solver->set_c(stokesCoeff * _l);
+            //solver->set_c(stokesCoeff / _l);
+            solver->set_c(stokesCoeff);
             // do one simulation step
             solver->do_timeStep(dT);
             // apply simulated data onto visual model

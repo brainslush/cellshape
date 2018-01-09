@@ -45,7 +45,7 @@ protected:
 
     //virtual double find_stallingForce(cell &iCell);
 
-    virtual double find_stokesCoeff(cell &iCell);
+    //virtual const double &find_stokesCoeff(cell &iCell);
 
     random_dist *randomReal;
     unsigned &maxCount;

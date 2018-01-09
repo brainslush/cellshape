@@ -98,7 +98,8 @@ filament_base *functor_cell_filamentCreation::create_filament(cell &iCell) {
             find_maxLength(iCell),
             find_lifeTime(iCell),
             //find_stallingForce(iCell),
-            find_stokesCoeff(iCell),
+            //find_stokesCoeff(iCell),
+            stokesCoeff,
             functors
     );
 
@@ -246,12 +247,14 @@ double functor_cell_filamentCreation::find_tmv(cell &iCell) {
 }
 */
 
-double functor_cell_filamentCreation::find_stokesCoeff(cell &iCell) {
-    /*auto _min = std::min(bound1StokesCoeff, bound2StokesCoeff);
+/*
+const double &functor_cell_filamentCreation::find_stokesCoeff(cell &iCell) {
+    auto _min = std::min(bound1StokesCoeff, bound2StokesCoeff);
     if (!constStokesCoeff) {
         auto _max = std::max(bound1StokesCoeff, bound2StokesCoeff);
         return _min + randomReal->draw<double>() * (_max - _min);
     }
-    return _min;*/
+    return _min;
     return stokesCoeff;
 }
+*/
