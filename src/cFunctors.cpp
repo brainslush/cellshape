@@ -216,3 +216,37 @@ fConstantForce::calc(
     }
     return {Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,0,0)};
 }
+
+fAct::fAct(mygui::gui *&iGui) :
+        guiGroup(iGui->register_group("Actin Force")),
+        activated(guiGroup->register_setting<bool>("Active", true, true)),
+        factor(guiGroup->register_setting<double>("Factor", true, 0, 10, 0.1)) {
+
+}
+
+fAct::~fAct() {
+
+}
+
+std::pair<Eigen::Vector3d, Eigen::Vector3d>
+fAct::calc(const Eigen::Vector3d &X, const Eigen::Vector3d &v, const double &R, const Eigen::Vector3d &L,
+           stokes::Solver &solver) {
+    if (activated) {
+        auto _filament = dynamic_cast<filament_base *>(solver.get_object());
+        auto &_X = _filament->get_intersectors();
+        int num_intx = 0;
+        for (auto &i : _X) {
+
+            if (dynamic_cast<filament_base *>(i.first)) {
+                num_intx++;
+            }
+        }
+
+        Eigen::Vector3d _F = -1 * num_intx * factor * v;
+
+
+        return {_F, Eigen::Vector3d(0, 0, 0)};
+    }
+    return{Eigen::Vector3d(0, 0, 0),Eigen::Vector3d(0, 0, 0)};
+
+}

@@ -94,6 +94,8 @@ void ofApp::setup() {
     //filamentF->register_functor(new functor::ffFriction(filamentF->get_guiFunctor()));
     //filamentF->register_functor(new functor::fViscosity(filamentF->get_guiFunctor()));
     filamentF->register_functor(new functor::fConstantForce(filamentF->get_guiFunctor()));
+    filamentF->register_functor(new functor::fAct(filamentF->get_guiFunctor()));
+
     // create actual cell
     ccell = new cell(globals, membraneF, filamentF, linkerF);
 }

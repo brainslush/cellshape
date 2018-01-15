@@ -98,7 +98,30 @@ namespace functor {
         bool &isActinLDep;
     };
 
+    class fAct : public stokes::functor{
+    public:
+        explicit fAct(mygui::gui *&iGui);
+
+        virtual ~fAct();
+
+        virtual std::pair<Eigen::Vector3d, Eigen::Vector3d> calc(
+                const Eigen::Vector3d &X,
+                const Eigen::Vector3d &v,
+                const double &R,
+                const Eigen::Vector3d &L,
+                stokes::Solver &solver
+        );
+    protected:
+        mygui::group *guiGroup;
+        bool &activated;
+        double &factor;
+
+
+    };
+
 
 };
+
+
 
 #endif // SRC_CFUNCTORS_H_
