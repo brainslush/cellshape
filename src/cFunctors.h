@@ -11,6 +11,7 @@
 #include "gui.h"
 #include "cBaseclasses.h"
 #include "cActin.h"
+#include "cFilamentFunctor.h";
 
 #ifndef SRC_CFUNCTORS_H_
 #define SRC_CFUNCTORS_H_
@@ -93,6 +94,8 @@ namespace functor {
         bool &activated;
         double &factor;
         bool &isAngleDep;
+        bool &isRubberBand;
+        bool &isActinLDep;
     };
 
 

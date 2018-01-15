@@ -8,6 +8,8 @@
 #ifndef SRC_BASE_H_
 #define SRC_BASE_H_
 
+#define DEBUG_ 2
+
 /*
  * forward declarations
  */
@@ -52,7 +54,11 @@ public:
 
     virtual void add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec);
 
+    virtual void add_intersectorChecked(base *iChecked);
+
     virtual void clear_intersectors();
+
+    virtual void clear_intersectorsChecked();
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 

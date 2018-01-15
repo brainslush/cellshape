@@ -56,7 +56,7 @@ void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) 
 void base::clear_intersectors() {
     intersectors.clear();
     intersectionVectors.clear();
-    intersectorsChecked.clear();
+    clear_intersectorsChecked();
 }
 
 void base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
@@ -68,6 +68,14 @@ std::size_t &base::get_typeHash() {
         typeHash = typeid(*this).hash_code();
     }
     return typeHash;
+}
+
+void base::add_intersectorChecked(base *iChecked) {
+    intersectorsChecked.insert(iChecked);
+}
+
+void base::clear_intersectorsChecked() {
+    intersectorsChecked.clear();
 }
 
 /***************************

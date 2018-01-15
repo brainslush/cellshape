@@ -12,6 +12,7 @@
 functor_cell_membraneCreation::functor_cell_membraneCreation(sGlobalVars &iGlobals) :
         functor_membrane_base(iGlobals),
         resolution(guiGroup->register_setting<unsigned>("Resolution", false, 4, 200, 20)) {
+    updateLength = true;
 }
 
 functor_cell_membraneCreation::~functor_cell_membraneCreation() = default;
@@ -48,6 +49,7 @@ void functor_cell_membraneCreation::setup(cell &iCell) {
         auto _el = dynamic_cast<membrane_part *>(_it);
         _it = _it->itnext();
     }
+    updateLength = true;
 }
 
 /*
@@ -112,7 +114,7 @@ membrane_linker_base *functor_cell_membraneCreation::split(
 
     // set new parameters of this membrane part
     //_membranePart->get_sharedPositions().first = &(_newMembranePart->get_positions()[1]);
-
+    updateLength = true;
     return _newMembranePart->nextLinker();
 }
 
@@ -133,6 +135,7 @@ membrane_part_base *functor_cell_membraneCreation::mergeChainFront(
         std::cout << "Can't merge, only one element";
         return nullptr;
     }
+
 }
 
 /*
@@ -179,7 +182,7 @@ membrane_part_base *functor_cell_membraneCreation::mergeChain(
         _itm = iCell->get_membrane()->delete_part(_itm);
         iCell->get_membrane()->check_integrity("after one deletion");
     }
-
+    updateLength = true;
     return _itm;
 }
 
@@ -200,6 +203,7 @@ void functor_cell_membraneCreation::make_timeStep(double &dT, cell *iCell) {
     // membrane make a time step
     merge(iCell);
     update_positions(iCell);
+    updateLength = true;
 }
 
 
@@ -215,10 +219,13 @@ void functor_cell_membraneCreation::update_length(cell_base *iCell) {
         length += (_pos[1] - _pos[0]).norm();
         _it = _it->itnext();
     }
+    updateLength = false;
 }
 
 double functor_cell_membraneCreation::get_length(cell_base *iCell) {
-    update_length(iCell);
+    if (updateLength) {
+        update_length(iCell);
+    }
     return length;
 }
 

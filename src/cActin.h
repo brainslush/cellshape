@@ -27,6 +27,8 @@ public:
 
     virtual ~actin();
 
+    virtual double get_length();
+
     virtual bool make_timeStep(double &dT);
 
 protected:
@@ -39,6 +41,7 @@ protected:
     const double lifeTime; // dies after lifetime
     //const double stallingForce; // force at which actin doesn't treadmills anymore
     const double &stokesCoeff;
+    double length;
 };
 
 #endif /* SRC_ACTIN_H_ */

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <boost/variant.hpp>
 #include "base.h"
 #include "random.h"
 #include "grid.h"
@@ -117,6 +116,8 @@ public:
 
     virtual std::set<linker_base *> &get_connectedLinkers();
 
+    virtual cell_base &get_cell();
+
     virtual void add_connectedLinker(linker_base *iComponent);
 
     void remove_connectedLinker(linker_base *iComponent);
@@ -170,6 +171,8 @@ public:
     virtual void set_connectedMembraneLinker(membrane_linker_base *iLinker);
 
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+
+    virtual double get_length();
 
     virtual bool make_timeStep(double &dT);
 

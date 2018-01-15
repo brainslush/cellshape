@@ -39,6 +39,10 @@ actin::~actin() {
     cell.unregister_filament(this);
 }
 
+double actin::get_length() {
+    return length;
+}
+
 bool actin::make_timeStep(double &dT) {
     // destroy if it exceeds life time
     auto _l = 0.0d;
@@ -57,6 +61,7 @@ bool actin::make_timeStep(double &dT) {
         }
     }
     _l = (positions[1] - positions[0]).norm();
+    length = _l;
     if (_l > std::numeric_limits<double>::min()) {
         if (solver) {
             // set new values

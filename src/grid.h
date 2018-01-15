@@ -4,6 +4,8 @@
 #include "gui.h"
 #include "bmath.h"
 #include "ignoreList.h"
+//#include "lineSweep.h"
+#include "lazySweep.h"
 
 #ifndef SRC_GRID_H_
 #define SRC_GRID_H_
@@ -20,6 +22,18 @@ namespace grid {
         border(double iX1, double iY1, double iX2, double iY2);
 
         ~border();
+
+        void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+
+    protected:
+        visual_base *associatedVisualObj;
+    };
+
+    class intersectIndicator : base {
+    public:
+        intersectIndicator(const Eigen::Vector3d &iPos);
+
+        ~intersectIndicator();
 
         void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
@@ -84,10 +98,17 @@ namespace grid {
     protected:
         void create_cells();
 
+        void lineSweep();
+
+        void typeCheck();
+
         mygui::gui *&guiBase;
         double sideLength;
+        bool doLineSweep;
         std::vector<cell *> cells;
+        std::vector<intersectIndicator *> intersectIndicators;
         std::set<base *> components;
+        std::vector<base *> typeCheckQueue;
         mygui::group *guiGroup;
         bool &showGrid;
         bool &showGridOccupation;

@@ -78,6 +78,7 @@ void functor_cell_filamentCreation::make_timeStep(double &dT, cell *iCell) {
         delete _filament;
         _filament = nullptr;
     }
+    update_totalLength(*iCell);
 }
 
 /*
@@ -138,7 +139,7 @@ functor_cell_filamentCreation::find_creationParameters(cell &iCell) {
         auto _length = iCell.get_membraneFunctor()->get_length(&iCell);
         _length *= randomReal->draw<double>();
         auto _it = _membrane->begin();
-        auto _currLength = _it->get_length();
+        auto _currLength = 0.0d; //_it->get_length();
         auto _itLength = _it->get_length();
         while (_currLength + _itLength < _length && _it != _membrane->end()) {
             _currLength += _itLength;
@@ -239,6 +240,17 @@ double functor_cell_filamentCreation::find_tmv(cell &iCell) {
         return maxTMV;
     } else {
         return maxTMV * (randomReal->draw<double>() * 0.9 + 0.1);
+    }
+}
+
+double functor_cell_filamentCreation::get_totalLength() {
+    return totalLength;
+}
+
+void functor_cell_filamentCreation::update_totalLength(cell &iCell) {
+    totalLength = 0;
+    for (auto &_it : iCell.get_filaments()) {
+        totalLength += _it->get_length();
     }
 }
 
