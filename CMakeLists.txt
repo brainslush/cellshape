@@ -58,7 +58,16 @@ set(SOURCE_FILES
         src/stokesSolver.h
         src/cLinker.cpp
         src/cLinker.h
-        src/cMembraneFunctor.cpp src/cMembraneFunctor.h src/cFilamentFunctor.cpp src/cFilamentFunctor.h src/cLinkerFunctor.cpp src/cLinkerFunctor.h)
+        src/cMembraneFunctor.cpp
+        src/cMembraneFunctor.h
+        src/cFilamentFunctor.cpp
+        src/cFilamentFunctor.h
+        src/cLinkerFunctor.cpp
+        src/cLinkerFunctor.h
+        #src/lineSweep.cpp
+        #src/lineSweep.h
+        src/lazySweep.cpp
+        src/lazySweep.h)
 
 add_executable(
         ${APP}
