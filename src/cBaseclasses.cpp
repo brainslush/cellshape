@@ -46,8 +46,7 @@ mygui::gui *&functor_cell_base::get_guiFunctor() {
 
 cell_base::cell_base(sGlobalVars &iGlobals) :
         components_base(iGlobals),
-        membrane(nullptr)
-{
+        membrane(nullptr) {
 }
 
 cell_base::~cell_base() = default;
@@ -77,6 +76,10 @@ void cellcomponents_base::add_connectedLinker(linker_base *iComponent) {
 
 void cellcomponents_base::remove_connectedLinker(linker_base *iComponent) {
     connectedLinkers.erase(iComponent);
+}
+
+cell_base &cellcomponents_base::get_cell() {
+    return cell;
 }
 
 /***************************
@@ -153,6 +156,10 @@ membrane_linker_base *filament_base::get_connectedMembraneLinker() {
 
 void filament_base::set_connectedMembraneLinker(membrane_linker_base *iLinker) {
     connectedMembraneLinker = iLinker;
+}
+
+double filament_base::get_length() {
+    return 0;
 };
 
 /***************************
@@ -350,73 +357,83 @@ membrane_part_base *membrane_container::delete_part(membrane_part_base *iPart) {
 }
 
 void membrane_container::check_integrity(const std::string &iModule) {
-    std::cout << "========================\n";
-    std::cout << "Module: " << iModule << "\n";
-    std::cout << "Start integrity check:\n";
-    if (vSize == 0) {
-        std::cout << "chain lenght is zero\n";
-        return void();
-    }
-    if (vBack->itnext() != vEnd) {
-        std::cout << "distached End\n";
-        return void();
-    }
-    std::vector<membrane_part_base *> _loop;
-    std::set<membrane_part_base *> _loopCheck;
-    auto _it = vBegin;
-    auto _end = vBack;
-    unsigned _size = 0;
-    unsigned _linkercount = 0;
-    unsigned _emptylinkerCount = 0;
-    while (_loopCheck.insert(_it).second) {
-        _loop.push_back(_it);
-        _it = _it->itnext();
-    }
-    if (_loop.size() - 1 != vSize || _loop.back() != vEnd) {
-        std::cout << "Early loop detected\n";
-        for (auto _el : _loop) {
-            std::cout << _el << "\n";
+    if (DEBUG_ >= 1) {
+        if (DEBUG_ >= 2) {
+            std::cout << "========================\n";
+            std::cout << "Module: " << iModule << "\n";
+            std::cout << "Start integrity check:\n";
         }
-        return void();
-    }
-    _it = vBegin;
-    while (_it != _end && _it != vEnd) {
-        _size++;
-        _linkercount++;
-        if (_it != _it->prev()->next() || _it != _it->next()->prev()) {
-            std::cout << "chain not closed @ " << _it << "\n";
-            _it = _end;
+        if (vSize == 0) {
+            std::cout << "chain lenght is zero\n";
+            return void();
         }
-        if (_it != _it->prevLinker()->nextMembrane()) {
-            std::cout << "Linker " << _it->prevLinker() << " broken @ " << _it << "\n";
-            _it = _end;
+        if (vBack->itnext() != vEnd) {
+            std::cout << "distached End\n";
+            return void();
         }
-        if (_it != _it->nextLinker()->prevMembrane()) {
-            std::cout << "Linker " << _it->nextLinker() << " broken @ " << _it << "\n";
-            _it = _end;
+        std::vector<membrane_part_base *> _loop;
+        std::set<membrane_part_base *> _loopCheck;
+        auto _it = vBegin;
+        auto _end = vBack;
+        unsigned _size = 0;
+        unsigned _linkercount = 0;
+        unsigned _emptylinkerCount = 0;
+        while (_loopCheck.insert(_it).second) {
+            _loop.push_back(_it);
+            _it = _it->itnext();
         }
-        if (!_it->nextLinker()->connectedFillament()) {
-            std::cout << "Linker " << _it->nextLinker() << " is empty\n";
-            _emptylinkerCount++;
+        if (_loop.size() - 1 != vSize || _loop.back() != vEnd) {
+            std::cout << "Early loop detected\n";
+            for (auto _el : _loop) {
+                std::cout << _el << "\n";
+            }
+            return void();
         }
+        _it = vBegin;
+        while (_it != _end && _it != vEnd) {
+            _size++;
+            _linkercount++;
+            if (_it != _it->prev()->next() || _it != _it->next()->prev()) {
+                std::cout << "chain not closed @ " << _it << "\n";
+                _it = _end;
+            }
+            if (_it != _it->prevLinker()->nextMembrane()) {
+                std::cout << "Linker " << _it->prevLinker() << " broken @ " << _it << "\n";
+                _it = _end;
+            }
+            if (_it != _it->nextLinker()->prevMembrane()) {
+                std::cout << "Linker " << _it->nextLinker() << " broken @ " << _it << "\n";
+                _it = _end;
+            }
+            if (DEBUG_ >= 2) {
+                if (!_it->nextLinker()->connectedFillament()) {
+                    std::cout << "Linker " << _it->nextLinker() << " is empty\n";
+                    _emptylinkerCount++;
+                }
+            }
 
-        _it = _it->itnext();
-        if (_it == vBack) {
-            _end = vBegin;
+            _it = _it->itnext();
+            if (_it == vBack) {
+                _end = vBegin;
+            }
         }
-    }
-    if (_it == vEnd) {
-        _it = vBack;
-        std::cout << "End was reached\n";
-    }
-    if (_size != vSize) {
-        std::cout << "size mismatch\n";
-    }
-    std::cout << "vSize: " << vSize << ", measured Size: " << _size << "\n";
-    if (_emptylinkerCount > 0) {
-        std::cout << _emptylinkerCount << " empty linkers found\n";
-    }
-    std::cout << "========================\n";
+        if (DEBUG_ >= 2) {
+            if (_it == vEnd) {
+                _it = vBack;
+                std::cout << "End was reached\n";
+            }
+        }
+        if (_size != vSize) {
+            std::cout << "size mismatch\n";
+        }
+        if (DEBUG_ >= 2) {
+            std::cout << "vSize: " << vSize << ", measured Size: " << _size << "\n";
+            if (_emptylinkerCount > 0) {
+                std::cout << _emptylinkerCount << " empty linkers found\n";
+            }
+            std::cout << "========================\n";
+        }
+    };
 }
 
 /***************************

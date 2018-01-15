@@ -30,6 +30,8 @@ public:
 
     virtual const std::vector<std::pair<double, actin *>> &get_filamentSetupOrder() {return filamentSetupOrder;};
 
+    virtual double get_totalLength();
+
     virtual void make_timeStep(double &dT, cell *iCell);
 
 protected:
@@ -42,6 +44,8 @@ protected:
     virtual double find_lifeTime(cell &iCell);
 
     virtual double find_tmv(cell &iCell);
+
+    virtual void update_totalLength(cell &iCell);
 
     //virtual double find_stallingForce(cell &iCell);
 
@@ -61,6 +65,7 @@ protected:
     //double &bound2StokesCoeff;
     //bool &constStokesCoeff;
     double& stokesCoeff;
+    double totalLength;
     std::vector<std::pair<double, actin *>> filamentSetupOrder;
 };
 

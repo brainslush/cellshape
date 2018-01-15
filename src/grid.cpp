@@ -29,6 +29,29 @@ void border::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     iVisualObjs.push_back(associatedVisualObj);
 }
 
+/*
+* indicator to show intersections from the line sweep
+*/
+
+intersectIndicator::intersectIndicator(const Eigen::Vector3d &iPos) {
+    positions.clear();
+    positions.emplace_back(iPos);
+    associatedVisualObj = new visual_ellipse(this);
+    associatedVisualObj->set_color(1, 0, 1);
+    associatedVisualObj->set_fillColor(1, 0, 1);
+    parameters.push_back(2);
+    parameters.push_back(2);
+}
+
+intersectIndicator::~intersectIndicator() {
+    delete associatedVisualObj;
+    associatedVisualObj = nullptr;
+}
+
+void intersectIndicator::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
+    iVisualObjs.push_back(associatedVisualObj);
+}
+
 
 /*
 * The grid cells store which cell components are inside their boundaries. The stored cell components are updated after
@@ -391,7 +414,8 @@ container::container(mygui::gui *&iGuiBase, double iSideLength) :
         guiGroup(guiBase->register_group("Grid")),
         showGrid(guiGroup->register_setting<bool>("Show grid", true, false)),
         showGridOccupation(guiGroup->register_setting<bool>("show Occ", true, false)),
-        resolution(guiGroup->register_setting<unsigned>("Resolution", false, 2, 250, 100)) {
+        resolution(guiGroup->register_setting<unsigned>("Resolution", false, 2, 250, 100)),
+        doLineSweep(true) {
     create_cells();
 }
 
@@ -400,25 +424,26 @@ container::~container() {
         delete _it;
         _it = nullptr;
     }
+    for (auto _it : intersectIndicators) {
+        delete _it;
+        _it = nullptr;
+    }
 }
 
 void container::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
     if (showGrid || showGridOccupation) {
-        for (auto &it : cells) {
-            it->obtain_visualObjs(iVisualObjs);
+        for (auto &_it : cells) {
+            _it->obtain_visualObjs(iVisualObjs);
+        }
+        for (auto &_it : intersectIndicators) {
+            _it->obtain_visualObjs(iVisualObjs);
         }
     }
 }
 
 void container::register_component(base *iComponent) {
-    // removed check b/c this function is mostly called in headers and causes problems with virtuality
-    //if (iComponent->get_visualObj()) {
     components.insert(iComponent);
-    /*} else {
-        std::cout << "Could not register object with ID: " << typeid(*iComponent).name()
-                  << "\n Visual object is missing";
-    }*/
-    return void();
+    typeCheckQueue.push_back(iComponent);
 }
 
 void container::unregister_component(base *iComponent) {
@@ -688,10 +713,16 @@ void container::update_component(base *iComponent) {
 void container::update_components() {
     for (auto &it : components) {
         it->clear_intersectors();
-        update_component(it);
+        if (!doLineSweep) {
+            update_component(it);
+        }
     }
-    for (auto &it : cells) {
-        it->update_intersecting();
+    if (doLineSweep) {
+        lineSweep();
+    } else {
+        for (auto &it : cells) {
+            it->update_intersecting();
+        }
     }
 }
 
@@ -701,6 +732,7 @@ void container::reset() {
         _it = nullptr;
     }
     cells.clear();
+    intersectIndicators.clear();
     guiGroup->forceVariableUpdate();
     create_cells();
 }
@@ -716,4 +748,33 @@ void container::create_cells() {
             cells.push_back(new cell(showGrid, showGridOccupation, iX1, iY1, iX2, iY2));
         }
     }
+}
+
+void container::lineSweep() {
+    // do the line sweep
+    auto _intersections = lazySweep::sweep(components);
+    // delete all visual intersection indicators
+    for (auto _it : intersectIndicators) {
+        delete _it;
+        _it = nullptr;
+    }
+    intersectIndicators.clear();
+    // create new visuals
+    if (showGridOccupation) {
+        for (auto &_it : _intersections) {
+            intersectIndicators.push_back(new intersectIndicator(_it.pos));
+        }
+    }
+}
+
+void container::typeCheck() {
+    if (doLineSweep) {
+        for (auto _it : typeCheckQueue) {
+            if (_it->get_visualObj()->get_type() != 1) {
+                doLineSweep = false;
+                std::cout << "Grid: Can't do line sweep, using fallback!";
+            }
+        }
+    }
+    typeCheckQueue.clear();
 }

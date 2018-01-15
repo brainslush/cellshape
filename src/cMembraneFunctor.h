@@ -56,6 +56,7 @@ protected:
     virtual void update_length(cell_base *iCell);
 
     double length;
+    bool updateLength;
     unsigned &resolution;
 };
 
