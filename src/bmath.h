@@ -32,7 +32,7 @@ namespace bmath {
      * return the angle in rads between two vectors
      */
 
-    template <typename T>
+    template<typename T>
     T angleVector2d(
             const T &x1,
             const T &y1,
@@ -49,9 +49,28 @@ namespace bmath {
             const T &x1,
             const T &x2
     ) {
-        return angleVector2d((double)x1,(double)x2,1.0d,0.0d);
+        return angleVector2d((double) x1, (double) x2, 1.0d, 0.0d);
     }
 
+    /*
+     * checks if the primary element of a pair is larger than the second
+     * element of another pair
+     */
+
+    template<typename S, typename T>
+    bool sortpairbypri(const std::pair<S, T> &a, const std::pair<S, T> &b) {
+        return (a.first < b.first);
+    };
+
+    /*
+     * checks if the second element of a pair is larger than the second
+     * element of another pair
+     */
+
+    template<typename S, typename T>
+    bool sortpairbysec(const std::pair<S, T> &a, const std::pair<S, T> &b) {
+        return (a.second < b.second);
+    };
 };
 
 

@@ -1,11 +1,10 @@
 #include "base.h"
 
 
-
 base::base() :
         associatedVisualObj(nullptr),
         timeStamp(ofGetFrameNum()),
-        typeHash(0){}
+        typeHash(0) {}
 
 base::base(
         std::vector<Eigen::Vector3d> iPositions
@@ -57,7 +56,7 @@ void base::add_intersector(base *iIntersector, Eigen::Vector3d iIntersectorVec) 
 void base::clear_intersectors() {
     intersectors.clear();
     intersectionVectors.clear();
-    intersectorsChecked.clear();
+    clear_intersectorsChecked();
 }
 
 void base::obtain_visualObjs(std::vector<visual_base *> &iVisualObjs) {
@@ -69,6 +68,14 @@ std::size_t &base::get_typeHash() {
         typeHash = typeid(*this).hash_code();
     }
     return typeHash;
+}
+
+void base::add_intersectorChecked(base *iChecked) {
+    intersectorsChecked.insert(iChecked);
+}
+
+void base::clear_intersectorsChecked() {
+    intersectorsChecked.clear();
 }
 
 /***************************
@@ -88,7 +95,7 @@ visual_base::visual_base(unsigned iType, base *iComponent) {
     associatedComponent = iComponent;
 }
 
-visual_base::~visual_base() =default;
+visual_base::~visual_base() = default;
 
 ofFloatColor &visual_base::get_color() {
     return color;
@@ -148,7 +155,7 @@ void visual_base::draw(double iScale) {
 visual_line::visual_line(base *iComponent) : visual_base(1, iComponent) {
 }
 
-visual_line::~visual_line() =default;
+visual_line::~visual_line() = default;
 
 void visual_line::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -166,7 +173,7 @@ void visual_line::draw(double iScale) {
 visual_ellipse::visual_ellipse(base *iComponent) : visual_base(2, iComponent) {
 }
 
-visual_ellipse::~visual_ellipse() =default;
+visual_ellipse::~visual_ellipse() = default;
 
 void visual_ellipse::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -202,7 +209,7 @@ void visual_rectangle::draw(double iScale) {
 visual_triangle::visual_triangle(base *iComponent) : visual_base(4, iComponent) {
 }
 
-visual_triangle::~visual_triangle() =default;
+visual_triangle::~visual_triangle() = default;
 
 void visual_triangle::draw(double iScale) {
     ofSetColor(get_fillColor());
@@ -214,4 +221,84 @@ void visual_triangle::draw(double iScale) {
             (float) (iScale * get_positions()[2](0)),
             (float) (iScale * get_positions()[2](1))
     );
+}
+
+/*
+ * visual_acrCircle
+ */
+
+visual_arcCircle::visual_arcCircle(base *iComponent) : visual_base(5, iComponent) {
+
+}
+
+visual_arcCircle::~visual_arcCircle() = default;
+
+void visual_arcCircle::draw(double iScale) {
+    double &_x = get_positions()[0](0);
+    double &_y = get_positions()[0](1);
+    double &_R = get_parameters()[0];
+    double &_angleB = get_parameters()[1];
+    double &_angleE = get_parameters()[2];
+
+    auto _step = 2 * M_PI / 360;
+    double _xp = _x + _R * cos(_angleB);
+    double _yp = _y + _R * sin(_angleB);
+    ofPoint _pos((float) (iScale * _xp), (float) (iScale * _yp));
+    ofPolyline _curve({_pos});
+    double _angle1 = _angleB;
+    double _angle2 = _angleE;
+    while (_angle1 > _angle2) {
+        _angle2 += 2 * M_PI;
+    }
+    while (_angle1 + _step <= _angle2) {
+        _angle1 += _step;
+        _xp = _x + _R * cos(_angle1);
+        _yp = _y + _R * sin(_angle1);
+        _curve.lineTo((float) (iScale * _xp), (float) (iScale * _yp));
+    }
+    _xp = _x + _R * cos(_angleE);
+    _yp = _y + _R * sin(_angleE);
+    _curve.lineTo((float) (iScale * _xp), (float) (iScale * _yp));
+    ofSetColor(get_fillColor());
+    _curve.draw();
+}
+
+visual_hyperbola::visual_hyperbola(base *iComponent) : visual_base(6, iComponent) {
+
+}
+
+visual_hyperbola::~visual_hyperbola() {
+
+}
+
+void visual_hyperbola::draw(double iScale) {
+    auto &_pos = get_positions()[0];
+    auto &_d = get_parameters()[0];
+    auto &_a = get_parameters()[1];
+    auto &_b = get_parameters()[2];
+    auto &_t1 = get_parameters()[3];
+    auto &_t2 = get_parameters()[4];
+    auto &_dir = get_parameters()[5];
+    auto _xp = _a * cosh(_t1) + _d;
+    auto _yp = _b * sinh(_t1);
+
+    auto _step = abs(_t1 - _t2) / 20.0d;
+
+    ofPoint _startpos((float) (iScale * _xp), (float) (iScale * _yp));
+    ofPath _curve = ofPath();
+    _curve.lineTo(_startpos);
+
+    while (_t1 + _step <= _t2) {
+        _t1 += _step;
+        _xp = _a * cosh(_t1) + _d;
+        _yp = _b * sinh(_t1);
+        _curve.lineTo((float) (iScale * _xp), (float) (iScale * _yp));
+    }
+    _curve.rotate((float)(360 * _dir / M_PI_2), ofPoint(0,0,1));
+    _curve.translate(ofPoint(_pos(0) * iScale, _pos(1) * iScale));
+    //ofSetColor(get_fillColor());
+    _curve.setStrokeColor(get_fillColor());
+    _curve.setStrokeWidth(1);
+    _curve.setFilled(false);
+    _curve.draw();
 }

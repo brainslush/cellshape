@@ -49,9 +49,9 @@ random_container::random_container() {
 }
 
 random_container::~random_container() {
-    for (auto it : distributions) {
-        delete it;
-        it = nullptr;
+    for (auto _it : distributions) {
+        delete _it;
+        _it = nullptr;
     }
 }
 

@@ -140,7 +140,11 @@ fmCollision::calc(
 fConstantForce::fConstantForce(mygui::gui *&iGui) :
         guiGroup(iGui->register_group("Constant Force")),
         activated(guiGroup->register_setting<bool>("Active", true, true)),
-        factor(guiGroup->register_setting<double>("Factor", true, 0, 10, 0.1)) {
+        factor(guiGroup->register_setting<double>("Factor", true, 0.0d, 3.0d, 0.1d)),
+        isAngleDep(guiGroup->register_setting<bool>("Angle Dependency", true, false)),
+        isRubberBand(guiGroup->register_setting<bool>("Rubber Banding", true, true)),
+        isActinLDep(guiGroup->register_setting<bool>("Actin Length Dep", true, true))
+{
 }
 
 fConstantForce::~fConstantForce() = default;
@@ -153,8 +157,62 @@ fConstantForce::calc(
         const Eigen::Vector3d &L,
         stokes::Solver &solver
 ) {
-    auto _filament = dynamic_cast<filament_base *>(solver.get_object());
-    auto &_X = _filament->get_positions();
-    Eigen::Vector3d _F = (_X[0] - _X[1]).normalized() * factor;
-    return {_F, Eigen::Vector3d(0,0,0)};
+    if (activated) {
+        auto _filament = dynamic_cast<filament_base *>(solver.get_object());
+        auto &_cell = _filament->get_cell();
+        auto _ffunctor = dynamic_cast<functor_cell_filamentCreation *>(_cell.get_filamentFunctor());
+        auto _mfunctor = dynamic_cast<functor_cell_membraneCreation *>(_cell.get_membraneFunctor());
+        auto _polymerLength = _ffunctor->get_totalLength();
+        auto _membraneLength = _mfunctor->get_length(&_cell);
+        auto &_globals = _filament->get_globals();
+        auto &_X = _filament->get_positions();
+        auto &_referenceLength = _globals.settings->referenceLength;
+        auto _realFactor = factor / 100 * _referenceLength;
+        Eigen::Vector3d _dirVF = (_X[1] - _X[0]).normalized();
+        Eigen::Vector3d _dirHF = _dirVF.cross(Eigen::Vector3d(0, 0, 1));
+        auto _cfactorA = -1.0d;
+        auto _cfactorB = -1.0d;
+        auto _sfactorA = 0.0d;
+        auto _sfactorB = 0.0d;
+        if (isActinLDep) {
+            double _polyc = _polymerLength / _referenceLength;
+            _realFactor *= _polyc;
+        }
+        if (isRubberBand) {
+            double _memc = _membraneLength / _referenceLength;
+            _realFactor *= _memc;
+        }
+        if (isAngleDep) {
+            auto &_prevLinkerPos = *_filament->get_connectedMembraneLinker()->prevLinker()->referencePos();
+            auto &_nextLinkerPos = *_filament->get_connectedMembraneLinker()->nextLinker()->referencePos();
+            auto &_linkerPos = *_filament->get_connectedMembraneLinker()->referencePos();
+
+            Eigen::Vector3d _dirVP = (_prevLinkerPos - _linkerPos).normalized();
+            Eigen::Vector3d _dirVN = (_nextLinkerPos - _linkerPos).normalized();
+
+            auto _angleA = bmath::angleVector2d(_dirVF(0), _dirVF(1), _dirVP(0), _dirVP(1));
+            auto _angleB = bmath::angleVector2d(_dirVF(0), _dirVN(1), _dirVP(0), _dirVN(1));
+
+            if (_angleA >= 0.5 * M_PI && _angleA <= 1.5 * M_PI) {
+                _cfactorA = cos(_angleA);
+            } else {
+                _cfactorA = 0;
+            }
+            if (_angleB >= 0.5 * M_PI && _angleB <= 1.5 * M_PI) {
+                _cfactorB = cos(_angleA);
+            } else {
+                _cfactorB = 0;
+            }
+
+            _sfactorA = sin(_angleA);
+            _sfactorB = sin(_angleB);
+        }
+
+        //Eigen::Vector3d _F(_realFactor * 0.5 * (_dirVF * (_cfactorA + _cfactorB) + _dirHF * (_sfactorA + _sfactorB)));
+        Eigen::Vector3d _F(_realFactor * 0.5 * _dirVF * (_cfactorA + _cfactorB));
+
+
+        return {_F, Eigen::Vector3d(0, 0, 0)};
+    }
+    return {Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,0,0)};
 }

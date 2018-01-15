@@ -18,9 +18,9 @@ group::group(std::string iName) {
 }
 
 group::~group() {
-    for (auto it : settings) {
-        delete it;
-        it = nullptr;
+    for (auto _it : settings) {
+        delete _it;
+        _it = nullptr;
     }
     delete folder;
     folder = nullptr;
@@ -49,9 +49,9 @@ gui::gui(std::string& iName) {
 }
 
 gui::~gui() {
-    for (auto it : groups) {
-        delete it;
-        it = nullptr;
+    for (auto _it : groups) {
+        delete _it;
+        _it = nullptr;
     }
     delete datGui;
     datGui = nullptr;
@@ -79,9 +79,9 @@ void gui::unregister_group(group *iGroup) {
 container::container() = default;
 
 container::~container() {
-    for (auto it : guis) {
-        delete it;
-        it = nullptr;
+    for (auto _it : guis) {
+        delete _it;
+        _it = nullptr;
     }
 }
 

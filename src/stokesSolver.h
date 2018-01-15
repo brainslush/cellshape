@@ -86,8 +86,7 @@ namespace stokes {
                 std::set<functor *> *iFunctors
         ) :
                 object(iObj),
-                functors(iFunctors)
-        {
+                functors(iFunctors) {
             X = Vec3(0, 0, 0);
             R = 0.0;
             c = 1.0;
@@ -148,14 +147,22 @@ namespace stokes {
 
         virtual Vec3 &get_F() {
             return F;
-        }
+        };
 
         virtual Vec3 &get_T() {
             return T;
-        }
+        };
 
         Base *get_object() {
             return object;
+        };
+
+        virtual std::set<functor *> &get_functors() {
+            return *functors;
+        };
+
+        virtual std::set<functor *> *get_functorsP() {
+            return functors;
         };
 
         /*

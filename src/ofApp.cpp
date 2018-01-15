@@ -3,18 +3,19 @@
 ofApp::ofApp() {
     globals.guiC = new mygui::container();
     globals.guiMain = globals.guiC->register_gui("General");
-    mygui::group *guiGroup = globals.guiMain->register_group("Control");
-    //maxFPS =guiGroup->register_setting<unsigned>("Max FPS", true, 0, 60, 10));
-    guiGroup->register_action<void()>("Start", [this]() { halt = false; });
-    guiGroup->register_action<void()>("Stop", [this]() { halt = true; });
-    guiGroup->register_action<void()>("Reset", [this]() {
-                                          halt = true;
-                                          ccell->reset();
-                                          surface->reset();
-                                          globals.grid->reset();
-                                          globals.grid->update_components();
-                                      }
+    globals.guiMainGroup = globals.guiMain->register_group("Control");
+    globals.guiMainGroup->register_action<void()>("Start", [this]() { halt = false; });
+    globals.guiMainGroup->register_action<void()>("Stop", [this]() { halt = true; });
+    globals.guiMainGroup->register_action<void()>("Reset", [this]() {
+                                                      halt = true;
+                                                      globals.guiMainGroup->forceVariableUpdate();
+                                                      ccell->reset();
+                                                      surface->reset();
+                                                      globals.grid->reset();
+                                                      globals.grid->update_components();
+                                                  }
     );
+    globals.settings = new sSettings(globals.guiMainGroup->register_setting<double>("Ref Length", false, 1, 200, 100));
     halt = true;
     // add classes to the registrar
     registrar::n::registerBase(typeid(base));
@@ -24,8 +25,8 @@ ofApp::ofApp() {
     registrar::n::registerType(typeid(cell_base), typeid(cell));
     // cellcomponents base registration
     registrar::n::registerType(typeid(components_base), typeid(cellcomponents_base));
-    // crosslinker registration
-    registrar::n::registerType(typeid(cellcomponents_base), typeid(crosslinker_base));
+    // linker registration
+    registrar::n::registerType(typeid(cellcomponents_base), typeid(linker_base));
     // fillament registration
     registrar::n::registerType(typeid(cellcomponents_base), typeid(filament_base));
     registrar::n::registerType(typeid(filament_base), typeid(actin));
@@ -63,13 +64,15 @@ ofApp::~ofApp() {
 
 void ofApp::setup() {
     // openframeworks settings
-    ofSetFrameRate(10);
+    ofSetFrameRate(40);
     ofBackground(50, 50, 50);
+    ofSetCoordHandedness(OF_RIGHT_HANDED);
+
     // set settings
-    globals.settings.deltaT = 1;
-    globals.settings.sideLength = 500;
+    globals.settings->deltaT = 1;
+    globals.settings->sideLength = 500;
     // create grid
-    globals.grid = new grid::container(globals.guiMain, globals.settings.sideLength);
+    globals.grid = new grid::container(globals.guiMain, globals.settings->sideLength);
     // initialize random
     globals.rndC = new random_container();
     globals.rndC->set_seed();
@@ -77,10 +80,13 @@ void ofApp::setup() {
     globals.time = 0;
     globals.frameNo = 0;
     // create surface
-    surface = new simple_surface(globals, globals.settings.sideLength);
+    surface = new simple_surface(globals, globals.settings->sideLength);
     // create cell components
-    membraneF = new functor_cell_membraneCreation(globals); // membrane creation functor for cell
+    membraneF = new functor_cell_membraneCreation(globals);
+    //membraneF = new functor_cell_arcMembraneCreation(globals);
+    //membraneF = new functor_cell_hyperbolicMembraneCreation(globals);
     filamentF = new functor_cell_filamentCreation(globals); // filament creation functor for cell
+    linkerF = new functor_cell_linkerCreation(globals);
     // register membrane force/torque functors
     //membraneF->register_functor(new functor::membraneSpring(membraneF->get_guiFunctor()));
     // register filament  force/torque functors
@@ -89,26 +95,28 @@ void ofApp::setup() {
     //filamentF->register_functor(new functor::fViscosity(filamentF->get_guiFunctor()));
     filamentF->register_functor(new functor::fConstantForce(filamentF->get_guiFunctor()));
     // create actual cell
-    ccell = new cell(globals, membraneF, filamentF);
+    ccell = new cell(globals, membraneF, filamentF, linkerF);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-    //std::cout << "surface_border :: " << typeid(surface_border).name();
+    std::stringstream strm;
+    strm << "fps: " << round(ofGetFrameRate());
+    ofSetWindowTitle(strm.str());
     // calculate scale factor when window is resized
-    scale = std::min(ofGetHeight() / (double) globals.settings.sideLength,
-                     ofGetWidth() / (double) globals.settings.sideLength);
+    scale = std::min(ofGetHeight() / (double) globals.settings->sideLength,
+                     ofGetWidth() / (double) globals.settings->sideLength);
     // variableUpdate gui variables
     globals.guiC->update();
     // only execute if simulation is not paused
     if (!halt) {
         // variableUpdate global variables
         globals.frameNo++;
-        globals.time = globals.frameNo * globals.settings.deltaT;
+        globals.time = globals.frameNo * globals.settings->deltaT;
         // variableUpdate grid
         globals.grid->update_components();
         // make timestep
-        ccell->make_timeStep(globals.settings.deltaT);
+        ccell->make_timeStep(globals.settings->deltaT);
     }
 }
 

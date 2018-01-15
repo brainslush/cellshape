@@ -65,11 +65,36 @@ namespace mygui {
                 bool &iUpdatePerFrame,
                 T iMinValue,
                 T iMaxValue,
-                T iValue) : updatePerFrame(iUpdatePerFrame),
-                            value(iValue) {
+                T iValue
+        ) :
+                updatePerFrame(iUpdatePerFrame),
+                value(iValue) {
             valuePointer = &value;
             if (std::is_floating_point<T>::value || std::is_integral<T>::value) {
                 control = iFolder->addSlider(iLabel, (float) iMinValue, (float) iMaxValue, (double) value);
+            } else {
+                std::stringstream s;
+                s << "ERROR wrong type (" << iLabel << ")";
+                control = iFolder->addLabel(s.str());
+            }
+        }
+
+        setting(
+                ofxDatGuiFolder *iFolder,
+                std::string &iLabel,
+                bool &iUpdatePerFrame,
+                T iMinValue,
+                T iMaxValue,
+                T iValue,
+                int iPrecision
+        ) :
+                updatePerFrame(iUpdatePerFrame),
+                value(iValue) {
+            valuePointer = &value;
+            if (std::is_floating_point<T>::value || std::is_integral<T>::value) {
+                control = iFolder->addSlider(iLabel, (float) iMinValue, (float) iMaxValue, (double) value);
+                //auto _el = dynamic_cast<ofxDatGuiSlider *>(&control);
+                //_el->setPrecision(iPrecision);
             } else {
                 std::stringstream s;
                 s << "ERROR wrong type (" << iLabel << ")";
@@ -116,6 +141,7 @@ namespace mygui {
         action_base() = default;
 
         virtual ~action_base() = default;
+
     protected:
 
     };
@@ -211,7 +237,7 @@ namespace mygui {
 
     class gui {
     public:
-        explicit gui(std::string& iName);
+        explicit gui(std::string &iName);
 
         virtual ~gui();
 

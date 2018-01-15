@@ -18,18 +18,14 @@
 struct sGlobalVars {
     mygui::container *guiC;
     mygui::gui *guiMain;
+    mygui::group *guiMainGroup;
     random_container *rndC;
     grid::container *grid;
     double time;
     uint64_t frameNo;
-    sSettings settings;
+    sSettings *settings;
 
     sGlobalVars() {};
-
-    /*sGlobalVars(
-            mygui::gui *iGuiBase
-    ) : guiBase(iGuiBase) {};
-    */
 };
 
 #endif /* SRC_GLOBALVARS_H_ */

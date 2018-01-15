@@ -25,47 +25,98 @@ public:
             std::set<stokes::functor *> &iFunctors
     );
 
+    membrane_part(
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
+            const Eigen::Vector3d & iPosS,
+            const Eigen::Vector3d & iPosE,
+            std::set<stokes::functor *> &iFunctors
+    );
+
     virtual ~membrane_part();
+
+    //virtual void set_sharedPositions(const std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &iSharedPos);
+
+    //virtual std::pair<Eigen::Vector3d *, Eigen::Vector3d *> &get_sharedPositions();
 
     virtual Eigen::Vector3d &get_normal();
 
+    virtual double get_length();
+
     virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void make_timeStep(double &dT);
+    virtual void make_timeStep(const double &dT);
 
 protected:
     Eigen::Vector3d normal;
+    //std::pair<Eigen::Vector3d *, Eigen::Vector3d *> sharedPositions;
+
+    virtual void update_normal();
 };
 
-// membrane container which organizes membrane parts and its creation
-class membrane_container : public cellcomponents_base {
+class arc_membrane_part : public membrane_part_base {
 public:
-    membrane_container(
+    arc_membrane_part(
             sGlobalVars &iGlobals,
-            cell_base &iCell
+            cell_base &iCell,
+            double iX1, double iY1,
+            double R,
+            double angleB,
+            double angleE,
+            std::set<stokes::functor *> &iFunctors
     );
 
-    virtual ~membrane_container();
+    virtual ~arc_membrane_part();
 
-    virtual double &get_area();
+    virtual Eigen::Vector3d get_normal(const double &iDeg);
 
-    virtual double &get_length();
+    virtual double get_length();
 
-    virtual std::vector<membrane_part_base *> &get_parts();
+    virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
 
-    virtual void obtain_visualObjs(std::vector<visual_base *> &oVisualComponents);
-
-    virtual void make_timeStep(double &dT);
+    virtual void make_timeStep(const double &dT);
 
 protected:
-    double area;
+};
+
+class hyperbolic_membrane_part : public membrane_part_base {
+public:
+    hyperbolic_membrane_part(
+            sGlobalVars &iGlobals,
+            cell_base &iCell,
+            const Eigen::Vector3d &iPos,
+            double iD,
+            double iA, double iB,
+            double iT1, double iT2,
+            double iDir,
+            std::set<stokes::functor *> &iFunctors
+    );
+
+    virtual ~hyperbolic_membrane_part();
+
+    virtual double get_length();
+
+    virtual Eigen::Vector3d get_normal(double iS);
+
+    virtual Eigen::Vector3d get_normal(unsigned iId);
+
+    virtual std::pair<unsigned, double> get_segmentId(double iS);
+
+    virtual const Eigen::Vector3d &get_segment(double iS);
+
+    virtual const Eigen::Vector3d &get_segment(unsigned iId);
+
+    virtual void obtain_visualObjs(std::vector<visual_base *> &iVisualObjs);
+
+    virtual void make_timeStep(const double &dT);
+protected:
+    void update_curveSegments();
+
+    std::vector<Eigen::Vector3d> curveSegments;
+    std::vector<double> curveSegmentLenghts;
+    bool updatedCurveSegements;
+    bool updatedLength;
     double length;
-    const bool canColide = true;
-    std::vector<membrane_part_base *> parts;
-
-    virtual void update_area();
-
-    virtual void update_length();
 };
 
 #endif /* SRC_CMEMBRANE_H_ */
